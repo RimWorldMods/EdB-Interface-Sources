@@ -1,25 +1,18 @@
 using RimWorld;
-using System.Collections.Generic;
-using System.Collections;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Xml.Linq;
-using System.Xml;
 using System;
-using UnityEngine;
-using Verse.AI;
-using Verse.Sound;
-using Verse;
 
 namespace EdB.Interface
 {
 	public class AlertsReadoutComponent : IRenderedComponent, IUpdatedComponent, INamedComponent
 	{
+		//
+		// Fields
+		//
 		private AlertsReadout alertsReadout;
 
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "AlertsReadout";
@@ -32,11 +25,17 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public AlertsReadoutComponent (AlertsReadout alertsReadout)
 		{
 			this.alertsReadout = alertsReadout;
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI ()
 		{
 			this.alertsReadout.AlertsReadoutOnGUI ();
@@ -47,9 +46,17 @@ namespace EdB.Interface
 			this.alertsReadout.AlertsReadoutUpdate ();
 		}
 	}
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class AllColonistsSquad : Squad
 	{
+		//
+		// Properties
+		//
 		public override string Name {
 			get {
 				return this.name;
@@ -58,61 +65,90 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public AllColonistsSquad ()
 		{
 			this.name = Translator.Translate ("EdB.Squads.AllColonistsSquadName");
 		}
 
+		//
+		// Methods
+		//
 		public override bool Remove (Pawn pawn)
 		{
 			return base.Remove (pawn);
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Linq;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ArchitectCategoryTab
 	{
+		//
+		// Static Fields
+		//
 		public const float InfoRectHeight = 230;
 
+		//
+		// Fields
+		//
 		public DesignationCategoryDef def;
 
+		//
+		// Static Properties
+		//
 		public static Rect InfoRect {
 			get {
-				return new Rect (0, (float)(Screen.height - 35) - ((MainTabWindow_Architect)MainTabDefOf.Architect.Window).WinHeight - 230, 200, 230);
+				return new Rect (0, (float)(Screen.get_height () - 35) - ((MainTabWindow_Architect)MainTabDefOf.Architect.get_Window ()).get_WinHeight () - 230, 200, 230);
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ArchitectCategoryTab (DesignationCategoryDef def)
 		{
 			this.def = def;
 		}
 
+		//
+		// Methods
+		//
 		public void DesignationTabOnGUI ()
 		{
-			if (DesignatorManager.SelectedDesignator != null) {
-				DesignatorManager.SelectedDesignator.DoExtraGuiControls (0, (float)(Screen.height - 35) - ((MainTabWindow_Architect)MainTabDefOf.Architect.Window).WinHeight - 230);
+			if (DesignatorManager.get_SelectedDesignator () != null) {
+				DesignatorManager.get_SelectedDesignator ().DoExtraGuiControls (0, (float)(Screen.get_height () - 35) - ((MainTabWindow_Architect)MainTabDefOf.Architect.get_Window ()).get_WinHeight () - 230);
 			}
 			float startX = 210;
 			Gizmo selectedDesignator;
 			GizmoGridDrawer.DrawGizmoGrid (this.def.resolvedDesignators.Cast<Gizmo> (), startX, out selectedDesignator);
-			if (selectedDesignator == null && DesignatorManager.SelectedDesignator != null) {
-				selectedDesignator = DesignatorManager.SelectedDesignator;
+			if (selectedDesignator == null && DesignatorManager.get_SelectedDesignator () != null) {
+				selectedDesignator = DesignatorManager.get_SelectedDesignator ();
 			}
 			this.DoInfoBox (ArchitectCategoryTab.InfoRect, (Designator)selectedDesignator);
 		}
 
 		protected void DoInfoBox (Rect infoRect, Designator designator)
 		{
-			Find.WindowStack.ImmediateWindow (32520, infoRect, 0, delegate {
+			Find.get_WindowStack ().ImmediateWindow (32520, infoRect, 0, delegate {
 				if (designator != null) {
 					Rect rect = GenUI.ContractedBy (GenUI.AtZero (infoRect), 7);
 					GUI.BeginGroup (rect);
-					Rect rect2 = new Rect (0, 0, rect.width, 999);
-					Text.Font = GameFont.Small;
-					Widgets.Label (rect2, designator.LabelCap);
+					Rect rect2 = new Rect (0, 0, rect.get_width (), 999);
+					Text.set_Font (1);
+					Widgets.Label (rect2, designator.get_LabelCap ());
 					float num = 24;
-					designator.DrawPanelReadout (ref num, rect.width);
-					Rect rect3 = new Rect (0, num, rect.width, rect.height - num);
-					string desc = designator.Desc;
+					designator.DrawPanelReadout (ref num, rect.get_width ());
+					Rect rect3 = new Rect (0, num, rect.get_width (), rect.get_height () - num);
+					string desc = designator.get_Desc ();
 					GenText.SetTextSizeToFit (desc, rect3);
 					Widgets.Label (rect3, desc);
 					GUI.EndGroup ();
@@ -125,70 +161,82 @@ namespace EdB.Interface
 			DesignatorManager.Deselect ();
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Verse;
+using Verse.Sound;
 
+namespace EdB.Interface
+{
 	public static class AreaAllowedGUI
 	{
+		//
+		// Static Methods
+		//
 		public static void DoAllowedAreaSelectors (Rect rect, Pawn p, AllowedAreaMode mode)
 		{
-			List<Area> allAreas = Find.AreaManager.AllAreas;
+			List<Area> allAreas = Find.get_AreaManager ().get_AllAreas ();
 			int num = 1;
 			for (int i = 0; i < allAreas.Count; i++) {
 				if (allAreas [i].AssignableAsAllowed (mode)) {
 					num++;
 				}
 			}
-			float num2 = rect.width / (float)num;
-			Text.WordWrap = false;
-			Text.Font = GameFont.Tiny;
-			Rect rect2 = new Rect (rect.x, rect.y, num2, rect.height);
+			float num2 = rect.get_width () / (float)num;
+			Text.set_WordWrap (false);
+			Text.set_Font (0);
+			Rect rect2 = new Rect (rect.get_x (), rect.get_y (), num2, rect.get_height ());
 			AreaAllowedGUI.DoAreaSelector (rect2, p, null);
 			int num3 = 1;
 			for (int j = 0; j < allAreas.Count; j++) {
 				if (allAreas [j].AssignableAsAllowed (mode)) {
 					float num4 = (float)num3 * num2;
-					Rect rect3 = new Rect (rect.x + num4, rect.y, num2, rect.height);
+					Rect rect3 = new Rect (rect.get_x () + num4, rect.get_y (), num2, rect.get_height ());
 					AreaAllowedGUI.DoAreaSelector (rect3, p, allAreas [j]);
 					num3++;
 				}
 			}
-			Text.WordWrap = true;
+			Text.set_WordWrap (true);
 		}
 
 		public static void DoAllowedAreaSelectors (Rect rect, ref Area areaRestriction, AllowedAreaMode mode, IEnumerable<Pawn> pawns)
 		{
-			List<Area> allAreas = Find.AreaManager.AllAreas;
+			List<Area> allAreas = Find.get_AreaManager ().get_AllAreas ();
 			int num = 1;
 			for (int i = 0; i < allAreas.Count; i++) {
 				if (allAreas [i].AssignableAsAllowed (mode)) {
 					num++;
 				}
 			}
-			float num2 = rect.width / (float)num;
-			Text.WordWrap = false;
-			Text.Font = GameFont.Tiny;
-			Rect rect2 = new Rect (rect.x, rect.y, num2, rect.height);
+			float num2 = rect.get_width () / (float)num;
+			Text.set_WordWrap (false);
+			Text.set_Font (0);
+			Rect rect2 = new Rect (rect.get_x (), rect.get_y (), num2, rect.get_height ());
 			AreaAllowedGUI.DoAreaSelector (rect2, ref areaRestriction, null, pawns);
 			int num3 = 1;
 			for (int j = 0; j < allAreas.Count; j++) {
 				if (allAreas [j].AssignableAsAllowed (mode)) {
 					float num4 = (float)num3 * num2;
-					Rect rect3 = new Rect (rect.x + num4, rect.y, num2, rect.height);
+					Rect rect3 = new Rect (rect.get_x () + num4, rect.get_y (), num2, rect.get_height ());
 					AreaAllowedGUI.DoAreaSelector (rect3, ref areaRestriction, allAreas [j], pawns);
 					num3++;
 				}
 			}
-			Text.WordWrap = true;
+			Text.set_WordWrap (true);
 		}
 
 		private static void DoAreaSelector (Rect rect, ref Area areaRestriction, Area area, IEnumerable<Pawn> pawns)
 		{
 			rect = GenUI.ContractedBy (rect, 1);
-			GUI.DrawTexture (rect, (area != null) ? area.ColorTexture : BaseContent.GreyTex);
-			Text.Anchor = TextAnchor.MiddleLeft;
+			GUI.DrawTexture (rect, (area != null) ? area.get_ColorTexture () : BaseContent.GreyTex);
+			Text.set_Anchor (3);
 			string text = AreaUtility.AreaAllowedLabel_Area (area);
 			Rect rect2 = rect;
-			rect2.xMin = rect2.xMin + 3;
-			rect2.yMin = rect2.yMin + 2;
+			rect2.set_xMin (rect2.get_xMin () + 3);
+			rect2.set_yMin (rect2.get_yMin () + 2);
 			Widgets.Label (rect2, text);
 			if (areaRestriction == area) {
 				Widgets.DrawBox (rect, 2);
@@ -201,10 +249,10 @@ namespace EdB.Interface
 					areaRestriction = area;
 					bool flag = false;
 					foreach (Pawn current in pawns) {
-						if (current.playerSettings.AreaRestriction != area) {
+						if (current.playerSettings.get_AreaRestriction () != area) {
 							flag = true;
 						}
-						current.playerSettings.AreaRestriction = area;
+						current.playerSettings.set_AreaRestriction (area);
 					}
 					if (flag) {
 						SoundStarter.PlayOneShotOnCamera (SoundDefOf.DesignateDragStandardChanged);
@@ -212,43 +260,57 @@ namespace EdB.Interface
 				}
 			}
 			TooltipHandler.TipRegion (rect, text);
-			Text.Anchor = TextAnchor.UpperLeft;
+			Text.set_Anchor (0);
 		}
 
 		private static void DoAreaSelector (Rect rect, Pawn p, Area area)
 		{
 			rect = GenUI.ContractedBy (rect, 1);
-			GUI.DrawTexture (rect, (area != null) ? area.ColorTexture : BaseContent.GreyTex);
-			Text.Anchor = TextAnchor.MiddleLeft;
+			GUI.DrawTexture (rect, (area != null) ? area.get_ColorTexture () : BaseContent.GreyTex);
+			Text.set_Anchor (3);
 			string text = AreaUtility.AreaAllowedLabel_Area (area);
 			Rect rect2 = rect;
-			rect2.xMin = rect2.xMin + 3;
-			rect2.yMin = rect2.yMin + 2;
+			rect2.set_xMin (rect2.get_xMin () + 3);
+			rect2.set_yMin (rect2.get_yMin () + 2);
 			Widgets.Label (rect2, text);
-			if (p.playerSettings.AreaRestriction == area) {
+			if (p.playerSettings.get_AreaRestriction () == area) {
 				Widgets.DrawBox (rect, 2);
 			}
 			if (Mouse.IsOver (rect)) {
 				if (area != null) {
 					area.MarkForDraw ();
 				}
-				if (Input.GetMouseButton (0) && p.playerSettings.AreaRestriction != area) {
-					p.playerSettings.AreaRestriction = area;
+				if (Input.GetMouseButton (0) && p.playerSettings.get_AreaRestriction () != area) {
+					p.playerSettings.set_AreaRestriction (area);
 					SoundStarter.PlayOneShotOnCamera (SoundDefOf.DesignateDragStandardChanged);
 				}
 			}
 			TooltipHandler.TipRegion (rect, text);
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	internal static class BeautyDrawer
 	{
-		private static Color ColorUgly = Color.red;
+		//
+		// Static Fields
+		//
+		private static Color ColorUgly = Color.get_red ();
 
-		private static Color ColorBeautiful = Color.green;
+		private static Color ColorBeautiful = Color.get_green ();
 
 		private static List<Thing> tempCountedThings = new List<Thing> ();
 
+		//
+		// Static Methods
+		//
 		private static Color BeautyColor (float beauty)
 		{
 			float num = Mathf.InverseLerp (-40, 40, beauty);
@@ -258,7 +320,7 @@ namespace EdB.Interface
 
 		public static void BeautyOnGUI ()
 		{
-			if (!Find.PlaySettings.showBeauty) {
+			if (!Find.get_PlaySettings ().showBeauty) {
 				return;
 			}
 			if (!GenGrid.InBounds (Gen.MouseCell ()) || GridsUtility.Fogged (Gen.MouseCell ())) {
@@ -274,17 +336,24 @@ namespace EdB.Interface
 					GenWorldUI.DrawThingLabel (vector, GenString.ToStringCached (Mathf.RoundToInt (num)), BeautyDrawer.BeautyColor (num));
 				}
 			}
-			Text.Font = GameFont.Medium;
-			Rect rect = new Rect (Event.current.mousePosition.x + 19, Event.current.mousePosition.y + 19, 100, 100);
+			Text.set_Font (2);
+			Rect rect = new Rect (Event.get_current ().get_mousePosition ().x + 19, Event.get_current ().get_mousePosition ().y + 19, 100, 100);
 			float beauty = BeautyUtility.AverageBeautyPerceptible (Gen.MouseCell ());
-			GUI.color = BeautyDrawer.BeautyColor (beauty);
+			GUI.set_color (BeautyDrawer.BeautyColor (beauty));
 			Widgets.Label (rect, beauty.ToString ("F1"));
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class BeautyDrawerComponent : IRenderedComponent, INamedComponent
 	{
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "BeautyDrawer";
@@ -297,14 +366,30 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI ()
 		{
 			BeautyDrawer.BeautyOnGUI ();
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using UnityEngine;
+using Verse;
+using Verse.Sound;
 
+namespace EdB.Interface
+{
 	public static class BillDrawer
 	{
+		//
+		// Static Fields
+		//
 		private static MethodInfo statusStringGetter;
 
 		public static readonly Texture2D ButtonBGAtlas;
@@ -333,6 +418,9 @@ namespace EdB.Interface
 
 		public static readonly Texture2D ButtonTexMinus;
 
+		//
+		// Constructors
+		//
 		static BillDrawer ()
 		{
 			BillDrawer.ButtonTexDeleteX = ContentFinder<Texture2D>.Get ("UI/Buttons/Delete", true);
@@ -341,37 +429,40 @@ namespace EdB.Interface
 			BillDrawer.ButtonBGAtlas = ContentFinder<Texture2D>.Get ("UI/Widgets/ButtonBG", true);
 			BillDrawer.ButtonBGAtlasMouseover = ContentFinder<Texture2D>.Get ("UI/Widgets/ButtonBGMouseover", true);
 			BillDrawer.ButtonBGAtlasClick = ContentFinder<Texture2D>.Get ("UI/Widgets/ButtonBGClick", true);
-			BillDrawer.ButtonColor = new Color (1, 0.8627f, 0.2235f);
-			BillDrawer.ButtonColorDisabled = new Color (BillDrawer.ButtonColor.r, BillDrawer.ButtonColor.g, BillDrawer.ButtonColor.b, 0.0627f);
+			BillDrawer.ButtonColor = new Color (1, 0.8627, 0.2235);
+			BillDrawer.ButtonColorDisabled = new Color (BillDrawer.ButtonColor.r, BillDrawer.ButtonColor.g, BillDrawer.ButtonColor.b, 0.0627);
 			BillDrawer.ProductionBillPadding = 3;
 			PropertyInfo property = typeof(Bill).GetProperty ("StatusString", BindingFlags.Instance | BindingFlags.NonPublic);
 			BillDrawer.statusStringGetter = property.GetGetMethod (true);
 			BillDrawer.drawConfigInterfaceMethod = typeof(Bill).GetMethod ("DrawConfigInterface", BindingFlags.Instance | BindingFlags.NonPublic);
 		}
 
+		//
+		// Static Methods
+		//
 		public static Bill DrawListing (BillStack billStack, Rect rect, Func<List<FloatMenuOption>> recipeOptionsMaker, ScrollView scrollView)
 		{
 			Bill result = null;
 			GUI.BeginGroup (rect);
-			Text.Font = GameFont.Small;
-			if (billStack.Count < 10) {
+			Text.set_Font (1);
+			if (billStack.get_Count () < 10) {
 				Rect rect2 = new Rect (0, 0, 150, 29);
 				if (Widgets.TextButton (rect2, Translator.Translate ("AddBill"), true, false)) {
-					Find.WindowStack.Add (new FloatMenu (recipeOptionsMaker.Invoke (), false));
+					Find.get_WindowStack ().Add (new FloatMenu (recipeOptionsMaker.Invoke (), false));
 				}
 			}
-			Text.Anchor = TextAnchor.UpperLeft;
-			GUI.color = Color.white;
-			Rect viewRect = new Rect (0, 35, rect.width, rect.height - 35);
+			Text.set_Anchor (0);
+			GUI.set_color (Color.get_white ());
+			Rect viewRect = new Rect (0, 35, rect.get_width (), rect.get_height () - 35);
 			scrollView.Begin (viewRect);
 			float num = 0;
-			for (int i = 0; i < billStack.Count; i++) {
-				Bill bill = billStack[i];
+			for (int i = 0; i < billStack.get_Count (); i++) {
+				Bill bill = billStack.get_Item (i);
 				Rect rect3 = BillDrawer.DrawProductionBill (billStack, bill, 0, num, scrollView.ViewWidth, i);
-				if (!bill.DeletedOrDereferenced && rect3.Contains (Event.current.mousePosition)) {
+				if (!bill.get_DeletedOrDereferenced () && rect3.Contains (Event.get_current ().get_mousePosition ())) {
 					result = bill;
 				}
-				num += rect3.height + 6;
+				num += rect3.get_height () + 6;
 			}
 			scrollView.End (num + 60);
 			GUI.EndGroup ();
@@ -382,19 +473,19 @@ namespace EdB.Interface
 		{
 			string text = (string)BillDrawer.statusStringGetter.Invoke (bill, null);
 			Rect rect = new Rect (x, y, width, 48);
-			float num = rect.width - 106;
-			float num2 = Text.CalcHeight (bill.LabelCap, num);
+			float num = rect.get_width () - 106;
+			float num2 = Text.CalcHeight (bill.get_LabelCap (), num);
 			float num3 = num2 + 10;
-			rect.height = (num3 >= rect.height) ? num3 : rect.height;
+			rect.set_height ((num3 >= rect.get_height ()) ? num3 : rect.get_height ());
 			if (!GenText.NullOrEmpty (text)) {
-				rect.height = rect.height + 17;
+				rect.set_height (rect.get_height () + 17);
 			}
-			Color white = Color.white;
+			Color white = Color.get_white ();
 			if (!bill.ShouldDoNow ()) {
-				white = new Color (1, 0.7f, 0.7f, 0.7f);
+				white = new Color (1, 0.7, 0.7, 0.7);
 			}
-			GUI.color = white;
-			Text.Font = GameFont.Small;
+			GUI.set_color (white);
+			Text.set_Font (1);
 			if (index % 2 == 0) {
 				Widgets.DrawAltRect (rect);
 			}
@@ -404,60 +495,60 @@ namespace EdB.Interface
 					Widgets.DrawAltRect (rect);
 				}
 			}
-			GUI.color = new Color (0.2969f, 0.3359f, 0.3789f);
+			GUI.set_color (new Color (0.2969, 0.3359, 0.3789));
 			Widgets.DrawBox (rect, 1);
-			GUI.color = white;
+			GUI.set_color (white);
 			try {
 				GUI.BeginGroup (rect);
 				Rect rect2 = new Rect (10, 4, 24, 20);
-				GUI.color = BillDrawer.ButtonColor;
+				GUI.set_color (BillDrawer.ButtonColor);
 				if (billStack.IndexOf (bill) > 0) {
 					if (Widgets.ImageButton (rect2, BillDrawer.ButtonTexReorderUp, white)) {
 						billStack.Reorder (bill, -1);
 						SoundStarter.PlayOneShotOnCamera (SoundDefOf.TickHigh);
 					}
 				}
-				else if (billStack.Count > 1) {
-					GUI.color = BillDrawer.ButtonColorDisabled;
+				else if (billStack.get_Count () > 1) {
+					GUI.set_color (BillDrawer.ButtonColorDisabled);
 					GUI.DrawTexture (rect2, BillDrawer.ButtonTexReorderUp);
 				}
 				Rect rect3 = new Rect (10, 26, 24, 20);
-				if (billStack.IndexOf (bill) < billStack.Count - 1) {
-					GUI.color = BillDrawer.ButtonColor;
+				if (billStack.IndexOf (bill) < billStack.get_Count () - 1) {
+					GUI.set_color (BillDrawer.ButtonColor);
 					if (Widgets.ImageButton (rect3, BillDrawer.ButtonTexReorderDown, white)) {
 						billStack.Reorder (bill, 1);
 						SoundStarter.PlayOneShotOnCamera (SoundDefOf.TickLow);
 					}
 				}
-				else if (billStack.Count > 1) {
-					GUI.color = BillDrawer.ButtonColorDisabled;
+				else if (billStack.get_Count () > 1) {
+					GUI.set_color (BillDrawer.ButtonColorDisabled);
 					GUI.DrawTexture (rect3, BillDrawer.ButtonTexReorderDown);
 				}
-				GUI.color = white;
-				Rect rect4 = new Rect (42, 1, num, rect.height);
-				Text.Anchor = TextAnchor.MiddleLeft;
+				GUI.set_color (white);
+				Rect rect4 = new Rect (42, 1, num, rect.get_height ());
+				Text.set_Anchor (3);
 				if (bill.suspended) {
-					GUI.color = new Color (white.r, white.g, white.b, 0.45f * white.a);
+					GUI.set_color (new Color (white.r, white.g, white.b, 0.45 * white.a));
 				}
-				Widgets.Label (rect4, bill.LabelCap);
-				Text.Anchor = TextAnchor.UpperLeft;
+				Widgets.Label (rect4, bill.get_LabelCap ());
+				Text.set_Anchor (0);
 				BillDrawer.drawConfigInterfaceMethod.Invoke (bill, new object[] {
 					GenUI.AtZero (rect),
 					white
 				});
-				Rect rect5 = new Rect (rect.width - 28, 4, 24, 24);
+				Rect rect5 = new Rect (rect.get_width () - 28, 4, 24, 24);
 				if (Widgets.ImageButton (rect5, TexButton.DeleteX, white)) {
 					billStack.Delete (bill);
 				}
 				Rect rect6 = new Rect (rect5);
-				rect6.x = rect6.x - (rect6.width + 4);
-				GUI.color = BillDrawer.ButtonColor;
+				rect6.set_x (rect6.get_x () - (rect6.get_width () + 4));
+				GUI.set_color (BillDrawer.ButtonColor);
 				if (Widgets.ImageButton (rect6, BillDrawer.ButtonTexSuspend, white)) {
 					bill.suspended = !bill.suspended;
 				}
 				if (!GenText.NullOrEmpty (text)) {
-					Text.Font = GameFont.Tiny;
-					Rect rect7 = new Rect (24, rect.height - 17, rect.width - 24, 17);
+					Text.set_Font (0);
+					Rect rect7 = new Rect (24, rect.get_height () - 17, rect.get_width () - 24, 17);
 					Widgets.Label (rect7, text);
 				}
 			}
@@ -465,38 +556,38 @@ namespace EdB.Interface
 				GUI.EndGroup ();
 			}
 			if (bill.suspended) {
-				Text.Font = GameFont.Medium;
-				Text.Anchor = TextAnchor.MiddleCenter;
-				Rect rect8 = new Rect (rect.x + rect.width / 2 - 70, rect.y + rect.height / 2 - 20, 140, 40);
+				Text.set_Font (2);
+				Text.set_Anchor (4);
+				Rect rect8 = new Rect (rect.get_x () + rect.get_width () / 2 - 70, rect.get_y () + rect.get_height () / 2 - 20, 140, 40);
 				GUI.DrawTexture (rect8, TexUI.GrayTextBG);
-				GUI.color = new Color (0.9f, 0.9f, 0.9f, 1);
+				GUI.set_color (new Color (0.9, 0.9, 0.9, 1));
 				Widgets.Label (rect8, Translator.Translate ("SuspendedCaps"));
-				Text.Anchor = TextAnchor.UpperLeft;
-				Text.Font = GameFont.Small;
+				Text.set_Anchor (0);
+				Text.set_Font (1);
 			}
-			Text.Font = GameFont.Small;
-			GUI.color = Color.white;
+			Text.set_Font (1);
+			GUI.set_color (Color.get_white ());
 			return rect;
 		}
 
 		public static Rect DrawProductionBill (BillStack billStack, Bill bill, float x, float y, float width, int index)
 		{
 			Rect rect = new Rect (x, y, width - 16, 60);
-			float num = rect.width - BillDrawer.ProductionBillPadding * 2 - 100;
-			float num2 = Text.CalcHeight (bill.LabelCap, num);
+			float num = rect.get_width () - BillDrawer.ProductionBillPadding * 2 - 100;
+			float num2 = Text.CalcHeight (bill.get_LabelCap (), num);
 			string text = (string)BillDrawer.statusStringGetter.Invoke (bill, null);
-			Text.Font = GameFont.Tiny;
-			float num3 = rect.width - BillDrawer.ProductionBillPadding * 2 - 48;
+			Text.set_Font (0);
+			float num3 = rect.get_width () - BillDrawer.ProductionBillPadding * 2 - 48;
 			float num4 = (!string.IsNullOrEmpty (text)) ? (Text.CalcHeight (text, num3) - 4) : 0;
-			Text.Font = GameFont.Small;
+			Text.set_Font (1);
 			float height = 44 + num2 + num4;
-			rect.height = height;
+			rect.set_height (height);
 			Bill_Production productionBill = bill as Bill_Production;
-			Color white = Color.white;
+			Color white = Color.get_white ();
 			if (!bill.ShouldDoNow ()) {
-				white = new Color (1, 0.7f, 0.7f, 0.7f);
+				white = new Color (1, 0.7, 0.7, 0.7);
 			}
-			GUI.color = white;
+			GUI.set_color (white);
 			if (index % 2 == 0) {
 				Widgets.DrawAltRect (rect);
 			}
@@ -506,40 +597,40 @@ namespace EdB.Interface
 					Widgets.DrawAltRect (rect);
 				}
 			}
-			GUI.color = new Color (0.2969f, 0.3359f, 0.3789f);
+			GUI.set_color (new Color (0.2969, 0.3359, 0.3789));
 			Widgets.DrawBox (rect, 1);
-			GUI.color = white;
+			GUI.set_color (white);
 			Rect rect2 = GenUI.ContractedBy (rect, BillDrawer.ProductionBillPadding);
 			GUI.BeginGroup (rect2);
 			Rect rect3 = new Rect (2, 3, 24, 24);
 			if (billStack.IndexOf (bill) > 0) {
-				GUI.color = BillDrawer.ButtonColor;
+				GUI.set_color (BillDrawer.ButtonColor);
 				if (Widgets.ImageButton (rect3, BillDrawer.ButtonTexReorderUp, white)) {
 					billStack.Reorder (bill, -1);
 					SoundStarter.PlayOneShotOnCamera (SoundDef.Named ("TickHigh"));
 				}
 			}
-			else if (billStack.Count > 1) {
-				GUI.color = BillDrawer.ButtonColorDisabled;
+			else if (billStack.get_Count () > 1) {
+				GUI.set_color (BillDrawer.ButtonColorDisabled);
 				GUI.DrawTexture (rect3, BillDrawer.ButtonTexReorderUp);
 			}
 			Rect rect4 = new Rect (2, 28, 24, 24);
-			if (billStack.IndexOf (bill) < billStack.Count - 1) {
-				GUI.color = BillDrawer.ButtonColor;
+			if (billStack.IndexOf (bill) < billStack.get_Count () - 1) {
+				GUI.set_color (BillDrawer.ButtonColor);
 				if (Widgets.ImageButton (rect4, BillDrawer.ButtonTexReorderDown, white)) {
 					billStack.Reorder (bill, 1);
 					SoundStarter.PlayOneShotOnCamera (SoundDef.Named ("TickLow"));
 				}
 			}
-			else if (billStack.Count > 1) {
-				GUI.color = BillDrawer.ButtonColorDisabled;
+			else if (billStack.get_Count () > 1) {
+				GUI.set_color (BillDrawer.ButtonColorDisabled);
 				GUI.DrawTexture (rect4, BillDrawer.ButtonTexReorderDown);
 			}
-			GUI.color = white;
+			GUI.set_color (white);
 			Rect rect5 = new Rect (36, 4, num, num2);
-			Widgets.Label (rect5, bill.recipe.LabelCap);
+			Widgets.Label (rect5, bill.recipe.get_LabelCap ());
 			float num5 = 26;
-			float num6 = rect5.height + 6;
+			float num6 = rect5.get_height () + 6;
 			if (productionBill != null) {
 				Rect rect6 = new Rect (32, num6, 180, num5);
 				string text2 = null;
@@ -548,46 +639,46 @@ namespace EdB.Interface
 					text2 = text2.Replace ("X", string.Empty + productionBill.repeatCount);
 					productionBill.targetCount = productionBill.repeatCount;
 				}
-				if (productionBill.repeatMode == BillRepeatMode.TargetCount) {
+				if (productionBill.repeatMode == 1) {
 					text2 = Translator.Translate ("DoUntilYouHaveX");
 					text2 = text2.Replace ("X", string.Empty + productionBill.targetCount);
 					productionBill.repeatCount = productionBill.targetCount;
 				}
-				if (productionBill.repeatMode == BillRepeatMode.Forever) {
+				if (productionBill.repeatMode == 2) {
 					text2 = Translator.Translate ("DoForever");
 				}
 				if (BillDrawer.TextButton (rect6, text2, white, 0)) {
 					List<FloatMenuOption> list = new List<FloatMenuOption> ();
 					list.Add (new FloatMenuOption (Translator.Translate ("DoXTimes"), delegate {
-						productionBill.repeatMode = BillRepeatMode.RepeatCount;
-					}, MenuOptionPriority.Medium, null, null));
+						productionBill.repeatMode = 0;
+					}, 1, null, null));
 					FloatMenuOption item = new FloatMenuOption (Translator.Translate ("DoUntilYouHaveX"), delegate {
-						if (!productionBill.recipe.WorkerCounter.CanCountProducts (productionBill)) {
-							Messages.Message (Translator.Translate ("RecipeCannotHaveTargetCount"), MessageSound.RejectInput);
+						if (!productionBill.recipe.get_WorkerCounter ().CanCountProducts (productionBill)) {
+							Messages.Message (Translator.Translate ("RecipeCannotHaveTargetCount"), 2);
 						}
 						else {
-							productionBill.repeatMode = BillRepeatMode.TargetCount;
+							productionBill.repeatMode = 1;
 						}
-					}, MenuOptionPriority.Medium, null, null);
+					}, 1, null, null);
 					list.Add (item);
 					list.Add (new FloatMenuOption (Translator.Translate ("DoForever"), delegate {
-						productionBill.repeatMode = BillRepeatMode.Forever;
-					}, MenuOptionPriority.Medium, null, null));
-					Find.WindowStack.Add (new FloatMenu (list, false));
+						productionBill.repeatMode = 2;
+					}, 1, null, null));
+					Find.get_WindowStack ().Add (new FloatMenu (list, false));
 				}
 				if (!GenText.NullOrEmpty (text)) {
-					Rect rect7 = new Rect (rect6.x + 3, rect6.y + rect6.height + 4, num3, num4);
-					Text.Font = GameFont.Tiny;
+					Rect rect7 = new Rect (rect6.get_x () + 3, rect6.get_y () + rect6.get_height () + 4, num3, num4);
+					Text.set_Font (0);
 					Widgets.Label (rect7, text);
-					Text.Font = GameFont.Small;
+					Text.set_Font (1);
 				}
 				Rect rect8 = new Rect (213, num6, 27, num5);
 				if (BillDrawer.TextButton (rect8, "-", white, -1)) {
-					if (productionBill.repeatMode == BillRepeatMode.Forever) {
-						productionBill.repeatMode = BillRepeatMode.RepeatCount;
+					if (productionBill.repeatMode == 2) {
+						productionBill.repeatMode = 0;
 						productionBill.repeatCount = 1;
 					}
-					if (productionBill.repeatMode == BillRepeatMode.TargetCount) {
+					if (productionBill.repeatMode == 1) {
 						productionBill.targetCount = Mathf.Max (1, productionBill.targetCount - 1);
 					}
 					if (productionBill.repeatMode == null) {
@@ -597,11 +688,11 @@ namespace EdB.Interface
 				}
 				Rect rect9 = new Rect (243, num6, 27, num5);
 				if (BillDrawer.TextButton (rect9, "+", white, -1)) {
-					if (productionBill.repeatMode == BillRepeatMode.Forever) {
-						productionBill.repeatMode = BillRepeatMode.RepeatCount;
+					if (productionBill.repeatMode == 2) {
+						productionBill.repeatMode = 0;
 						productionBill.repeatCount = 1;
 					}
-					if (productionBill.repeatMode == BillRepeatMode.TargetCount) {
+					if (productionBill.repeatMode == 1) {
 						productionBill.targetCount++;
 					}
 					if (productionBill.repeatMode == null) {
@@ -611,29 +702,29 @@ namespace EdB.Interface
 				}
 				Rect rect10 = new Rect (276, num6, 35, num5);
 				if (BillDrawer.TextButton (rect10, "...", white, 0)) {
-					Find.WindowStack.Add (new Dialog_BillConfig (productionBill, ((Thing)productionBill.billStack.billGiver).Position));
+					Find.get_WindowStack ().Add (new Dialog_BillConfig (productionBill, ((Thing)productionBill.billStack.billGiver).get_Position ()));
 				}
 			}
-			GUI.color = white;
-			Rect rect11 = new Rect (rect2.width - 28, 1, 24, 24);
+			GUI.set_color (white);
+			Rect rect11 = new Rect (rect2.get_width () - 28, 1, 24, 24);
 			if (Widgets.ImageButton (rect11, BillDrawer.ButtonTexDeleteX, white)) {
 				billStack.Delete (bill);
 			}
 			Rect rect12 = new Rect (rect11);
-			rect12.x = rect12.x - (rect12.width + 4);
-			GUI.color = BillDrawer.ButtonColor;
+			rect12.set_x (rect12.get_x () - (rect12.get_width () + 4));
+			GUI.set_color (BillDrawer.ButtonColor);
 			if (Widgets.ImageButton (rect12, BillDrawer.ButtonTexSuspend, white)) {
 				bill.suspended = !bill.suspended;
 			}
 			GUI.EndGroup ();
 			if (bill.suspended) {
-				Text.Font = GameFont.Medium;
-				Text.Anchor = TextAnchor.MiddleCenter;
-				Rect rect13 = new Rect (rect.x + rect.width / 2 - 70, rect.y + rect.height / 2 - 20, 140, 40);
+				Text.set_Font (2);
+				Text.set_Anchor (4);
+				Rect rect13 = new Rect (rect.get_x () + rect.get_width () / 2 - 70, rect.get_y () + rect.get_height () / 2 - 20, 140, 40);
 				GUI.DrawTexture (rect13, TexUI.GrayTextBG);
 				Widgets.Label (rect13, Translator.Translate ("SuspendedCaps"));
-				Text.Anchor = TextAnchor.UpperLeft;
-				Text.Font = GameFont.Small;
+				Text.set_Anchor (0);
+				Text.set_Font (1);
 			}
 			return rect;
 		}
@@ -648,44 +739,64 @@ namespace EdB.Interface
 		public static bool TextButton (Rect rect, string label, Color optionColor, float labelAdjustmentX = 0)
 		{
 			Texture2D texture2D = BillDrawer.ButtonBGAtlas;
-			if (rect.Contains (Event.current.mousePosition)) {
+			if (rect.Contains (Event.get_current ().get_mousePosition ())) {
 				texture2D = BillDrawer.ButtonBGAtlasMouseover;
 				if (Input.GetMouseButton (0)) {
 					texture2D = BillDrawer.ButtonBGAtlasClick;
 				}
 			}
 			Widgets.DrawAtlas (rect, texture2D);
-			Text.Anchor = TextAnchor.MiddleCenter;
+			Text.set_Anchor (4);
 			Rect rect2 = new Rect (rect);
-			rect2.x = rect2.x + labelAdjustmentX;
-			rect2.y = rect2.y + 1;
+			rect2.set_x (rect2.get_x () + labelAdjustmentX);
+			rect2.set_y (rect2.get_y () + 1);
 			Widgets.Label (rect2, label);
-			Text.Anchor = TextAnchor.UpperLeft;
-			GUI.color = Color.white;
+			Text.set_Anchor (0);
+			GUI.set_color (Color.get_white ());
 			return Widgets.InvisibleButton (rect);
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class BillExtensions
 	{
 	}
+}
+using System;
+using System.Threading;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public abstract class BooleanPreference : IPreference
 	{
 		public delegate void ValueChangedHandler (bool value);
 
+		//
+		// Static Fields
+		//
 		public static float LabelMargin = BooleanPreference.CheckboxWidth + BooleanPreference.CheckboxMargin;
 
 		public static float CheckboxMargin = 18;
 
 		public static float CheckboxWidth = 24;
 
+		//
+		// Fields
+		//
 		public int tooltipId;
 
 		private bool? boolValue;
 
 		private string stringValue;
 
+		//
+		// Properties
+		//
 		public abstract bool DefaultValue {
 			get;
 		}
@@ -791,10 +902,16 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public BooleanPreference ()
 		{
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI (float positionX, ref float positionY, float width)
 		{
 			bool disabled = this.Disabled;
@@ -807,10 +924,10 @@ namespace EdB.Interface
 			}
 			Rect rect2 = new Rect (positionX + num, positionY, width - BooleanPreference.LabelMargin - num, num2);
 			if (disabled) {
-				GUI.color = Dialog_InterfaceOptions.DisabledControlColor;
+				GUI.set_color (Dialog_InterfaceOptions.DisabledControlColor);
 			}
 			GUI.Label (rect2, label);
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 			if (this.Tooltip != null) {
 				TipSignal tipSignal = new TipSignal (() => Translator.Translate (this.Tooltip), this.TooltipId);
 				TooltipHandler.TipRegion (rect2, tipSignal);
@@ -821,38 +938,89 @@ namespace EdB.Interface
 			positionY += num2;
 		}
 
-		public event BooleanPreference.ValueChangedHandler ValueChanged;
+		//
+		// Events
+		//
+		public event BooleanPreference.ValueChangedHandler ValueChanged {
+			add {
+				BooleanPreference.ValueChangedHandler valueChangedHandler = this.ValueChanged;
+				BooleanPreference.ValueChangedHandler valueChangedHandler2;
+				do {
+					valueChangedHandler2 = valueChangedHandler;
+					valueChangedHandler = Interlocked.CompareExchange<BooleanPreference.ValueChangedHandler> (ref this.ValueChanged, (BooleanPreference.ValueChangedHandler)Delegate.Combine (valueChangedHandler2, value), valueChangedHandler);
+				}
+				while (valueChangedHandler != valueChangedHandler2);
+			}
+			remove {
+				BooleanPreference.ValueChangedHandler valueChangedHandler = this.ValueChanged;
+				BooleanPreference.ValueChangedHandler valueChangedHandler2;
+				do {
+					valueChangedHandler2 = valueChangedHandler;
+					valueChangedHandler = Interlocked.CompareExchange<BooleanPreference.ValueChangedHandler> (ref this.ValueChanged, (BooleanPreference.ValueChangedHandler)Delegate.Remove (valueChangedHandler2, value), valueChangedHandler);
+				}
+				while (valueChangedHandler != valueChangedHandler2);
+			}
+		}
 	}
+}
+using System;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class Bootstrap : ITab
 	{
+		//
+		// Fields
+		//
 		protected GameObject gameObject;
 
+		//
+		// Constructors
+		//
 		public Bootstrap ()
 		{
 			Log.Message ("Initialized EdB Interface.");
 			this.gameObject = new GameObject (Controller.GameObjectName);
 			this.gameObject.AddComponent<Controller> ();
-			UnityEngine.Object.DontDestroyOnLoad (this.gameObject);
+			Object.DontDestroyOnLoad (this.gameObject);
 		}
 
+		//
+		// Methods
+		//
 		protected override void FillTab ()
 		{
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Linq;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class BrowseButtonDrawer
 	{
+		//
+		// Static Fields
+		//
 		public static SelectorUtility selector = new SelectorUtility ();
 
 		public static Texture2D ButtonTexturePrevious;
 
 		public static Texture2D ButtonTextureNext;
 
-		public static Color ButtonColor = new Color (0.75f, 0.75f, 0.75f);
+		public static Color ButtonColor = new Color (0.75, 0.75, 0.75);
 
 		public static Vector2 ButtonSize = new Vector2 (15, 17);
 
+		//
+		// Static Methods
+		//
 		public static void DrawBrowseButtons (Vector2 tabSize, Pawn currentPawn)
 		{
 			float num = 14;
@@ -866,8 +1034,8 @@ namespace EdB.Interface
 			if (currentPawn != null) {
 				Action action = null;
 				Action action2 = null;
-				if (currentPawn.IsColonist) {
-					if (Find.ListerPawns.FreeColonists.Count<Pawn> () > 1) {
+				if (currentPawn.get_IsColonist ()) {
+					if (Find.get_ListerPawns ().get_FreeColonists ().Count<Pawn> () > 1) {
 						action = delegate {
 							BrowseButtonDrawer.selector.SelectNextColonist ();
 						};
@@ -876,8 +1044,8 @@ namespace EdB.Interface
 						};
 					}
 				}
-				else if (currentPawn.IsPrisonerOfColony) {
-					if (Find.ListerPawns.PrisonersOfColonyCount > 1) {
+				else if (currentPawn.get_IsPrisonerOfColony ()) {
+					if (Find.get_ListerPawns ().get_PrisonersOfColonyCount () > 1) {
 						action = delegate {
 							BrowseButtonDrawer.selector.SelectNextPrisoner ();
 						};
@@ -887,10 +1055,10 @@ namespace EdB.Interface
 					}
 				}
 				else {
-					Faction faction = currentPawn.Faction;
+					Faction faction = currentPawn.get_Faction ();
 					if (faction != null) {
-						if (faction != Faction.OfColony) {
-							FactionRelation factionRelation = faction.RelationWith (Faction.OfColony);
+						if (faction != Faction.get_OfColony ()) {
+							FactionRelation factionRelation = faction.RelationWith (Faction.get_OfColony ());
 							if (factionRelation != null) {
 								bool hostile = factionRelation.hostile;
 								if (hostile) {
@@ -925,25 +1093,25 @@ namespace EdB.Interface
 				}
 				Rect rect = new Rect (0, 0, BrowseButtonDrawer.ButtonSize.x, BrowseButtonDrawer.ButtonSize.y);
 				if (action != null && action2 != null) {
-					rect.x = padding - rect.width;
-					rect.y = top;
-					if (rect.Contains (Event.current.mousePosition)) {
-						GUI.color = Color.white;
+					rect.set_x (padding - rect.get_width ());
+					rect.set_y (top);
+					if (rect.Contains (Event.get_current ().get_mousePosition ())) {
+						GUI.set_color (Color.get_white ());
 					}
 					else {
-						GUI.color = BrowseButtonDrawer.ButtonColor;
+						GUI.set_color (BrowseButtonDrawer.ButtonColor);
 					}
 					GUI.DrawTexture (rect, BrowseButtonDrawer.ButtonTexturePrevious);
 					if (Widgets.InvisibleButton (rect)) {
 						action2.Invoke ();
 					}
-					rect.x = width - padding;
-					rect.y = top;
-					if (rect.Contains (Event.current.mousePosition)) {
-						GUI.color = Color.white;
+					rect.set_x (width - padding);
+					rect.set_y (top);
+					if (rect.Contains (Event.get_current ().get_mousePosition ())) {
+						GUI.set_color (Color.get_white ());
 					}
 					else {
-						GUI.color = BrowseButtonDrawer.ButtonColor;
+						GUI.set_color (BrowseButtonDrawer.ButtonColor);
 					}
 					GUI.DrawTexture (rect, BrowseButtonDrawer.ButtonTextureNext);
 					if (Widgets.InvisibleButton (rect)) {
@@ -957,53 +1125,66 @@ namespace EdB.Interface
 		{
 			BrowseButtonDrawer.ButtonTextureNext = ContentFinder<Texture2D>.Get ("EdB/Interface/TabReplacement/BrowseNext", true);
 			BrowseButtonDrawer.ButtonTexturePrevious = ContentFinder<Texture2D>.Get ("EdB/Interface/TabReplacement/BrowsePrevious", true);
-			BrowseButtonDrawer.ButtonSize = new Vector2 ((float)BrowseButtonDrawer.ButtonTextureNext.width, (float)BrowseButtonDrawer.ButtonTextureNext.height);
+			BrowseButtonDrawer.ButtonSize = new Vector2 ((float)BrowseButtonDrawer.ButtonTextureNext.get_width (), (float)BrowseButtonDrawer.ButtonTextureNext.get_height ());
 		}
 	}
+}
+using System;
+using UnityEngine;
+using Verse;
+using Verse.Sound;
 
+namespace EdB.Interface
+{
 	public class Button
 	{
+		//
+		// Static Fields
+		//
 		protected static Texture2D ButtonBGAtlas;
 
 		protected static readonly Texture2D ButtonBGAtlasMouseover = ContentFinder<Texture2D>.Get ("UI/Widgets/ButtonBGMouseover", true);
 
 		protected static readonly Texture2D ButtonBGAtlasClick = ContentFinder<Texture2D>.Get ("UI/Widgets/ButtonBGClick", true);
 
-		protected static Color InactiveButtonColor = new Color (1, 1, 1, 0.5f);
+		protected static Color InactiveButtonColor = new Color (1, 1, 1, 0.5);
 
-		protected static readonly Color MouseoverOptionColor = Color.yellow;
+		protected static readonly Color MouseoverOptionColor = Color.get_yellow ();
 
+		//
+		// Static Methods
+		//
 		public static bool IconButton (Rect rect, Texture texture, Color baseColor, Color highlightColor, bool enabled)
 		{
 			if (texture == null) {
 				return false;
 			}
 			if (!enabled) {
-				GUI.color = Button.InactiveButtonColor;
+				GUI.set_color (Button.InactiveButtonColor);
 			}
 			else {
-				GUI.color = Color.white;
+				GUI.set_color (Color.get_white ());
 			}
 			Texture2D texture2D = Button.ButtonBGAtlas;
-			if (enabled && rect.Contains (Event.current.mousePosition)) {
+			if (enabled && rect.Contains (Event.get_current ().get_mousePosition ())) {
 				texture2D = Button.ButtonBGAtlasMouseover;
 				if (Input.GetMouseButton (0)) {
 					texture2D = Button.ButtonBGAtlasClick;
 				}
 			}
 			Widgets.DrawAtlas (rect, texture2D);
-			Rect rect2 = new Rect (rect.x + rect.width / 2 - (float)(texture.width / 2), rect.y + rect.height / 2 - (float)(texture.height / 2), (float)texture.width, (float)texture.height);
+			Rect rect2 = new Rect (rect.get_x () + rect.get_width () / 2 - (float)(texture.get_width () / 2), rect.get_y () + rect.get_height () / 2 - (float)(texture.get_height () / 2), (float)texture.get_width (), (float)texture.get_height ());
 			if (!enabled) {
-				GUI.color = Button.InactiveButtonColor;
+				GUI.set_color (Button.InactiveButtonColor);
 			}
 			else {
-				GUI.color = baseColor;
+				GUI.set_color (baseColor);
 			}
-			if (enabled && rect.Contains (Event.current.mousePosition)) {
-				GUI.color = highlightColor;
+			if (enabled && rect.Contains (Event.get_current ().get_mousePosition ())) {
+				GUI.set_color (highlightColor);
 			}
 			GUI.DrawTexture (rect2, texture);
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 			return enabled && Widgets.InvisibleButton (rect);
 		}
 
@@ -1014,22 +1195,22 @@ namespace EdB.Interface
 
 		public static bool ImageButton (Rect butRect, Texture2D tex, Color baseColor, Color mouseOverColor)
 		{
-			if (butRect.Contains (Event.current.mousePosition)) {
-				GUI.color = mouseOverColor;
+			if (butRect.Contains (Event.get_current ().get_mousePosition ())) {
+				GUI.set_color (mouseOverColor);
 			}
 			GUI.DrawTexture (butRect, tex);
-			GUI.color = baseColor;
+			GUI.set_color (baseColor);
 			return Widgets.InvisibleButton (butRect);
 		}
 
 		public static bool ImageButton (Rect butRect, Texture2D tex, Color highlightColor)
 		{
-			Color color = GUI.color;
-			if (butRect.Contains (Event.current.mousePosition)) {
-				GUI.color = highlightColor;
+			Color color = GUI.get_color ();
+			if (butRect.Contains (Event.get_current ().get_mousePosition ())) {
+				GUI.set_color (highlightColor);
 			}
 			GUI.DrawTexture (butRect, tex);
-			GUI.color = color;
+			GUI.set_color (color);
 			return Widgets.InvisibleButton (butRect);
 		}
 
@@ -1040,12 +1221,12 @@ namespace EdB.Interface
 
 		public static bool TextButton (Rect rect, string label, bool drawBackground, bool doMouseoverSound, bool enabled)
 		{
-			TextAnchor anchor = Text.Anchor;
-			Color color = GUI.color;
-			GUI.color = (!enabled) ? Button.InactiveButtonColor : Color.white;
+			TextAnchor anchor = Text.get_Anchor ();
+			Color color = GUI.get_color ();
+			GUI.set_color ((!enabled) ? Button.InactiveButtonColor : Color.get_white ());
 			if (drawBackground) {
 				Texture2D texture2D = Button.ButtonBGAtlas;
-				if (enabled && rect.Contains (Event.current.mousePosition)) {
+				if (enabled && rect.Contains (Event.get_current ().get_mousePosition ())) {
 					texture2D = Button.ButtonBGAtlasMouseover;
 					if (Input.GetMouseButton (0)) {
 						texture2D = Button.ButtonBGAtlasClick;
@@ -1056,35 +1237,46 @@ namespace EdB.Interface
 			if (doMouseoverSound) {
 				MouseoverSounds.DoRegion (rect);
 			}
-			if (!drawBackground && enabled && rect.Contains (Event.current.mousePosition)) {
-				GUI.color = Button.MouseoverOptionColor;
+			if (!drawBackground && enabled && rect.Contains (Event.get_current ().get_mousePosition ())) {
+				GUI.set_color (Button.MouseoverOptionColor);
 			}
 			if (drawBackground) {
-				Text.Anchor = TextAnchor.MiddleCenter;
+				Text.set_Anchor (4);
 			}
 			else {
-				Text.Anchor = TextAnchor.MiddleLeft;
+				Text.set_Anchor (3);
 			}
 			Widgets.Label (rect, label);
-			Text.Anchor = anchor;
-			GUI.color = color;
+			Text.set_Anchor (anchor);
+			GUI.set_color (color);
 			return enabled && Widgets.InvisibleButton (rect);
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ColonistBar
 	{
 		public delegate void SelectedGroupChangedHandler (ColonistBarGroup group);
 
-		protected static Color BrowseButtonColor = new Color (1, 1, 1, 0.15f);
+		//
+		// Static Fields
+		//
+		protected static Color BrowseButtonColor = new Color (1, 1, 1, 0.15);
 
-		protected static Color BrowseButtonHighlightColor = new Color (1, 1, 1, 0.5f);
+		protected static Color BrowseButtonHighlightColor = new Color (1, 1, 1, 0.5);
 
-		protected static Color GroupNameColor = new Color (0.85f, 0.85f, 0.85f);
+		protected static Color GroupNameColor = new Color (0.85, 0.85, 0.85);
 
 		protected static float GroupNameDisplayDuration = 1;
 
-		protected static float GroupNameEaseOutDuration = 0.4f;
+		protected static float GroupNameEaseOutDuration = 0.4;
 
 		protected static float GroupNameEaseOutStart = ColonistBar.GroupNameDisplayDuration - ColonistBar.GroupNameEaseOutDuration;
 
@@ -1094,6 +1286,9 @@ namespace EdB.Interface
 
 		protected static Texture2D BrowseGroupsUp;
 
+		//
+		// Fields
+		//
 		protected PreferenceSmallIcons preferenceSmallIcons = new PreferenceSmallIcons ();
 
 		protected bool alwaysShowGroupName;
@@ -1132,6 +1327,9 @@ namespace EdB.Interface
 
 		protected List<KeyBindingDef> squadSelectionBindings = new List<KeyBindingDef> ();
 
+		//
+		// Properties
+		//
 		public bool AlwaysShowGroupName {
 			get {
 				return this.alwaysShowGroupName;
@@ -1204,6 +1402,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ColonistBar ()
 		{
 			this.preferences.Add (this.preferenceEnabled);
@@ -1211,12 +1412,18 @@ namespace EdB.Interface
 			this.Reset ();
 		}
 
+		//
+		// Static Methods
+		//
 		public static void ResetTextures ()
 		{
 			ColonistBar.BrowseGroupsUp = ContentFinder<Texture2D>.Get ("EdB/Interface/ColonistBar/BrowseGroupUp", true);
 			ColonistBar.BrowseGroupsDown = ContentFinder<Texture2D>.Get ("EdB/Interface/ColonistBar/BrowseGroupDown", true);
 		}
 
+		//
+		// Methods
+		//
 		public void AddGroup (ColonistBarGroup group)
 		{
 			this.groups.Add (group);
@@ -1244,32 +1451,32 @@ namespace EdB.Interface
 					this.drawer.UseLargeIcons ();
 				}
 				if (this.GroupsBrowsable) {
-					GUI.color = ColonistBar.BrowseButtonColor;
+					GUI.set_color (ColonistBar.BrowseButtonColor);
 					Rect butRect = value ? new Rect (592, 15, 32, 18) : new Rect (592, 25, 32, 18);
-					if (butRect.Contains (Event.current.mousePosition)) {
-						this.squadNameDisplayTimestamp = Time.time;
+					if (butRect.Contains (Event.get_current ().get_mousePosition ())) {
+						this.squadNameDisplayTimestamp = Time.get_time ();
 					}
 					if (Button.ImageButton (butRect, ColonistBar.BrowseGroupsUp, ColonistBar.BrowseButtonHighlightColor)) {
 						this.SelectNextGroup (-1);
 					}
-					GUI.color = ColonistBar.BrowseButtonColor;
+					GUI.set_color (ColonistBar.BrowseButtonColor);
 					butRect = (value ? new Rect (592, 39, 32, 18) : new Rect (592, 49, 32, 18));
-					if (butRect.Contains (Event.current.mousePosition)) {
-						this.squadNameDisplayTimestamp = Time.time;
+					if (butRect.Contains (Event.get_current ().get_mousePosition ())) {
+						this.squadNameDisplayTimestamp = Time.get_time ();
 					}
 					if (Button.ImageButton (butRect, ColonistBar.BrowseGroupsDown, ColonistBar.BrowseButtonHighlightColor)) {
 						this.SelectNextGroup (1);
 					}
-					GUI.color = Color.white;
+					GUI.set_color (Color.get_white ());
 				}
 				bool flag = false;
 				Color groupNameColor = ColonistBar.GroupNameColor;
-				Color black = Color.black;
+				Color black = Color.get_black ();
 				if (this.alwaysShowGroupName) {
 					flag = true;
 				}
 				else if (this.displayGroupName && this.squadNameDisplayTimestamp > 0) {
-					float time = Time.time;
+					float time = Time.get_time ();
 					float num = time - this.squadNameDisplayTimestamp;
 					if (num < ColonistBar.GroupNameDisplayDuration) {
 						flag = true;
@@ -1291,25 +1498,25 @@ namespace EdB.Interface
 				if (flag) {
 					Rect rect = value ? new Rect (348, 20, 225, 36) : new Rect (348, 29, 225, 36);
 					if (!this.GroupsBrowsable) {
-						rect.x = rect.x + 48;
+						rect.set_x (rect.get_x () + 48);
 					}
-					Text.Anchor = TextAnchor.MiddleRight;
-					Text.Font = GameFont.Small;
-					GUI.color = black;
-					Widgets.Label (new Rect (rect.x + 1, rect.y + 1, rect.width, rect.height), this.currentGroup.Name);
-					if (rect.Contains (Event.current.mousePosition)) {
-						GUI.color = Color.white;
+					Text.set_Anchor (5);
+					Text.set_Font (1);
+					GUI.set_color (black);
+					Widgets.Label (new Rect (rect.get_x () + 1, rect.get_y () + 1, rect.get_width (), rect.get_height ()), this.currentGroup.Name);
+					if (rect.Contains (Event.get_current ().get_mousePosition ())) {
+						GUI.set_color (Color.get_white ());
 					}
 					else {
-						GUI.color = groupNameColor;
+						GUI.set_color (groupNameColor);
 					}
 					Widgets.Label (rect, this.currentGroup.Name);
 					if (Widgets.InvisibleButton (rect)) {
 						this.drawer.SelectAllActive ();
 					}
-					Text.Anchor = TextAnchor.UpperLeft;
-					Text.Font = GameFont.Small;
-					GUI.color = Color.white;
+					Text.set_Anchor (0);
+					Text.set_Font (1);
+					GUI.set_color (Color.get_white ());
 				}
 			}
 		}
@@ -1353,7 +1560,7 @@ namespace EdB.Interface
 		protected void ResetGroupNameDisplay ()
 		{
 			if (this.currentGroup != null && this.displayGroupName) {
-				this.squadNameDisplayTimestamp = Time.time;
+				this.squadNameDisplayTimestamp = Time.get_time ();
 			}
 			else {
 				this.squadNameDisplayTimestamp = 0;
@@ -1400,11 +1607,45 @@ namespace EdB.Interface
 			this.drawer.SizeCamera (width, height);
 		}
 
-		public event ColonistBar.SelectedGroupChangedHandler SelectedGroupChanged;
+		//
+		// Events
+		//
+		public event ColonistBar.SelectedGroupChangedHandler SelectedGroupChanged {
+			add {
+				ColonistBar.SelectedGroupChangedHandler selectedGroupChangedHandler = this.SelectedGroupChanged;
+				ColonistBar.SelectedGroupChangedHandler selectedGroupChangedHandler2;
+				do {
+					selectedGroupChangedHandler2 = selectedGroupChangedHandler;
+					selectedGroupChangedHandler = Interlocked.CompareExchange<ColonistBar.SelectedGroupChangedHandler> (ref this.SelectedGroupChanged, (ColonistBar.SelectedGroupChangedHandler)Delegate.Combine (selectedGroupChangedHandler2, value), selectedGroupChangedHandler);
+				}
+				while (selectedGroupChangedHandler != selectedGroupChangedHandler2);
+			}
+			remove {
+				ColonistBar.SelectedGroupChangedHandler selectedGroupChangedHandler = this.SelectedGroupChanged;
+				ColonistBar.SelectedGroupChangedHandler selectedGroupChangedHandler2;
+				do {
+					selectedGroupChangedHandler2 = selectedGroupChangedHandler;
+					selectedGroupChangedHandler = Interlocked.CompareExchange<ColonistBar.SelectedGroupChangedHandler> (ref this.SelectedGroupChanged, (ColonistBar.SelectedGroupChangedHandler)Delegate.Remove (selectedGroupChangedHandler2, value), selectedGroupChangedHandler);
+				}
+				while (selectedGroupChangedHandler != selectedGroupChangedHandler2);
+			}
+		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Verse;
+using Verse.Sound;
 
+namespace EdB.Interface
+{
 	public class ColonistBarDrawer : MonoBehaviour
 	{
+		//
+		// Static Fields
+		//
 		public static Material SlotBackgroundMat = null;
 
 		public static Vector2 HealthOffsetLarge = new Vector2 (52, 6);
@@ -1441,15 +1682,15 @@ namespace EdB.Interface
 
 		public static Vector2 HealthSizeSmall = new Vector2 (3, 28);
 
-		public static Color ColorBroken = new Color (0.65f, 0.9f, 0.93f);
+		public static Color ColorBroken = new Color (0.65, 0.9, 0.93);
 
-		public static Color ColorPsycho = new Color (0.9f, 0.2f, 0.5f);
+		public static Color ColorPsycho = new Color (0.9, 0.2, 0.5);
 
-		public static Color ColorDead = new Color (0.5f, 0.5f, 0.5f, 1);
+		public static Color ColorDead = new Color (0.5, 0.5, 0.5, 1);
 
-		public static Color ColorFrozen = new Color (0.7f, 0.7f, 0.9f, 1);
+		public static Color ColorFrozen = new Color (0.7, 0.7, 0.9, 1);
 
-		public static Color ColorNameUnderlay = new Color (0, 0, 0, 0.6f);
+		public static Color ColorNameUnderlay = new Color (0, 0, 0, 0.6);
 
 		public static Vector2 MentalHealthSizeSmall = new Vector2 (52, 52);
 
@@ -1531,6 +1772,9 @@ namespace EdB.Interface
 
 		public static Vector2 MentalHealthOffset;
 
+		//
+		// Fields
+		//
 		protected float doubleClickTime = -1;
 
 		protected Camera camera;
@@ -1557,6 +1801,9 @@ namespace EdB.Interface
 
 		protected MaterialPropertyBlock deadPropertyBlock = new MaterialPropertyBlock ();
 
+		//
+		// Properties
+		//
 		public List<TrackedColonist> Slots {
 			get {
 				return this.slots;
@@ -1581,28 +1828,37 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ColonistBarDrawer ()
 		{
 			ColonistBarDrawer.ResetTextures ();
 		}
 
+		//
+		// Static Methods
+		//
 		public static void ResetTextures ()
 		{
 			ColonistBarDrawer.SlotBackgroundMatLarge = MaterialPool.MatFrom ("EdB/Interface/ColonistBar/PortraitBackgroundLarge");
-			ColonistBarDrawer.SlotBackgroundMatLarge.mainTexture.filterMode = 0;
+			ColonistBarDrawer.SlotBackgroundMatLarge.get_mainTexture ().set_filterMode (0);
 			ColonistBarDrawer.SlotBordersMatLarge = MaterialPool.MatFrom ("EdB/Interface/ColonistBar/PortraitBordersLarge");
-			ColonistBarDrawer.SlotBordersMatLarge.mainTexture.filterMode = 0;
+			ColonistBarDrawer.SlotBordersMatLarge.get_mainTexture ().set_filterMode (0);
 			ColonistBarDrawer.SlotSelectedMatLarge = MaterialPool.MatFrom ("EdB/Interface/ColonistBar/PortraitSelectedLarge");
-			ColonistBarDrawer.SlotSelectedMatLarge.mainTexture.filterMode = 0;
+			ColonistBarDrawer.SlotSelectedMatLarge.get_mainTexture ().set_filterMode (0);
 			ColonistBarDrawer.SlotBackgroundMatSmall = MaterialPool.MatFrom ("EdB/Interface/ColonistBar/PortraitBackgroundSmall");
-			ColonistBarDrawer.SlotBackgroundMatSmall.mainTexture.filterMode = 0;
+			ColonistBarDrawer.SlotBackgroundMatSmall.get_mainTexture ().set_filterMode (0);
 			ColonistBarDrawer.SlotBordersMatSmall = MaterialPool.MatFrom ("EdB/Interface/ColonistBar/PortraitBordersSmall");
-			ColonistBarDrawer.SlotBordersMatSmall.mainTexture.filterMode = 0;
+			ColonistBarDrawer.SlotBordersMatSmall.get_mainTexture ().set_filterMode (0);
 			ColonistBarDrawer.SlotSelectedMatSmall = MaterialPool.MatFrom ("EdB/Interface/ColonistBar/PortraitSelectedSmall");
-			ColonistBarDrawer.SlotSelectedMatSmall.mainTexture.filterMode = 0;
+			ColonistBarDrawer.SlotSelectedMatSmall.get_mainTexture ().set_filterMode (0);
 			ColonistBarDrawer.ToggleButton = ContentFinder<Texture2D>.Get ("EdB/Interface/ColonistBar/ToggleBar", true);
 		}
 
+		//
+		// Methods
+		//
 		public void Draw ()
 		{
 			if (this.visible) {
@@ -1614,7 +1870,7 @@ namespace EdB.Interface
 		{
 			Pawn pawn = slot.Pawn;
 			if (Widgets.InvisibleButton (new Rect (position.x, position.y, ColonistBarDrawer.SlotSize.x, ColonistBarDrawer.SlotSize.y))) {
-				int button = Event.current.button;
+				int button = Event.get_current ().get_button ();
 				if (button == 2 && slot.Carrier == null) {
 					if (slot.Broken) {
 						this.SelectAllNotSane ();
@@ -1627,29 +1883,29 @@ namespace EdB.Interface
 					}
 				}
 				if (button == 0) {
-					if (Time.time - this.doubleClickTime < 0.3f) {
-						if (!pawn.Dead) {
+					if (Time.get_time () - this.doubleClickTime < 0.3) {
+						if (!pawn.get_Dead ()) {
 							Pawn carrier = slot.Carrier;
 							if (carrier == null) {
-								Find.CameraMap.JumpTo (pawn.Position);
+								Find.get_CameraMap ().JumpTo (pawn.get_Position ());
 							}
 							else {
-								Find.CameraMap.JumpTo (carrier.Position);
+								Find.get_CameraMap ().JumpTo (carrier.get_Position ());
 							}
 						}
 						else if (slot.Corpse != null) {
-							Find.CameraMap.JumpTo (slot.Corpse.Position);
+							Find.get_CameraMap ().JumpTo (slot.Corpse.get_Position ());
 						}
 						this.doubleClickTime = -1;
 					}
 					else {
-						if (!pawn.Dead) {
-							if ((Event.current.shift || Event.current.control) && Find.Selector.IsSelected (pawn)) {
-								Find.Selector.Deselect (pawn);
+						if (!pawn.get_Dead ()) {
+							if ((Event.get_current ().get_shift () || Event.get_current ().get_control ()) && Find.get_Selector ().IsSelected (pawn)) {
+								Find.get_Selector ().Deselect (pawn);
 							}
 							else if (slot.Carrier == null) {
-								if (!Event.current.alt) {
-									this.pawnSelector.SelectThing (pawn, Event.current.shift);
+								if (!Event.get_current ().get_alt ()) {
+									this.pawnSelector.SelectThing (pawn, Event.get_current ().get_shift ());
 								}
 								else if (slot.Broken) {
 									this.SelectAllNotSane ();
@@ -1664,18 +1920,18 @@ namespace EdB.Interface
 								this.doubleClickTime = -1;
 								return;
 							}
-							if (Event.current.shift && Find.Selector.IsSelected (slot.Corpse)) {
-								Find.Selector.Deselect (slot.Corpse);
+							if (Event.get_current ().get_shift () && Find.get_Selector ().IsSelected (slot.Corpse)) {
+								Find.get_Selector ().Deselect (slot.Corpse);
 							}
-							else if (Event.current.alt) {
+							else if (Event.get_current ().get_alt ()) {
 								this.SelectAllDead ();
 							}
 							else {
-								this.pawnSelector.SelectThing (slot.Corpse, Event.current.shift);
+								this.pawnSelector.SelectThing (slot.Corpse, Event.get_current ().get_shift ());
 							}
 						}
-						if (!Event.current.shift) {
-							this.doubleClickTime = Time.time;
+						if (!Event.get_current ().get_shift ()) {
+							this.doubleClickTime = Time.get_time ();
 						}
 					}
 				}
@@ -1688,56 +1944,56 @@ namespace EdB.Interface
 						string text = (!slot.Missing) ? Translator.Translate ("EdB.ColonistBar.RemoveDeadColonist") : Translator.Translate ("EdB.ColonistBar.RemoveMissingColonist");
 						list.Add (new FloatMenuOption (text, delegate {
 							ColonistTracker.Instance.StopTrackingPawn (slot.Pawn);
-						}, MenuOptionPriority.Medium, null, null));
+						}, 1, null, null));
 					}
 					list.Add (new FloatMenuOption (Translator.Translate ("EdB.ColonistBar.HideColonistBar"), delegate {
 						this.visible = false;
-					}, MenuOptionPriority.Medium, null, null));
+					}, 1, null, null));
 					FloatMenu floatMenu = new FloatMenu (list, string.Empty, false, false);
-					Find.WindowStack.Add (floatMenu);
+					Find.get_WindowStack ().Add (floatMenu);
 				}
 			}
-			if (Event.current.type != EventType.Repaint) {
+			if (Event.get_current ().get_type () != 7) {
 				return;
 			}
 			if (!slot.Dead) {
 				if (slot.Incapacitated) {
-					GUI.color = new Color (0.7843f, 0, 0);
+					GUI.set_color (new Color (0.7843, 0, 0));
 				}
-				else if ((double)slot.HealthPercent < 0.95f) {
-					GUI.color = new Color (0.7843f, 0.7843f, 0);
+				else if ((double)slot.HealthPercent < 0.95) {
+					GUI.set_color (new Color (0.7843, 0.7843, 0));
 				}
 				else {
-					GUI.color = new Color (0, 0.7843f, 0);
+					GUI.set_color (new Color (0, 0.7843, 0));
 				}
 				if (slot.Missing) {
-					GUI.color = new Color (0.4824f, 0.4824f, 0.4824f);
+					GUI.set_color (new Color (0.4824, 0.4824, 0.4824));
 				}
 				float num = ColonistBarDrawer.HealthSize.y * slot.HealthPercent;
 				GUI.DrawTexture (new Rect (position.x + ColonistBarDrawer.HealthOffset.x, position.y + ColonistBarDrawer.HealthOffset.y + ColonistBarDrawer.HealthSize.y - num, ColonistBarDrawer.HealthSize.x, num), BaseContent.WhiteTex);
 			}
-			Vector2 vector = Text.CalcSize (pawn.LabelBaseShort);
+			Vector2 vector = Text.CalcSize (pawn.get_LabelBaseShort ());
 			if (vector.x > ColonistBarDrawer.MaxLabelSize.x) {
 				vector.x = ColonistBarDrawer.MaxLabelSize.x;
 			}
 			vector.x += 4;
-			GUI.color = ColonistBarDrawer.ColorNameUnderlay;
+			GUI.set_color (ColonistBarDrawer.ColorNameUnderlay);
 			GUI.DrawTexture (new Rect (position.x + ColonistBarDrawer.SlotSize.x / 2 - vector.x / 2, position.y + ColonistBarDrawer.PortraitSize.y, vector.x, 12), BaseContent.BlackTex);
-			Text.Font = GameFont.Tiny;
-			GUI.skin.label.alignment = TextAnchor.UpperCenter;
-			Text.Anchor = TextAnchor.UpperCenter;
-			Color color = Color.white;
+			Text.set_Font (0);
+			GUI.get_skin ().get_label ().set_alignment (1);
+			Text.set_Anchor (1);
+			Color color = Color.get_white ();
 			BrokenStateDef brokenState = slot.BrokenState;
 			if (brokenState != null) {
 				color = brokenState.nameColor;
 			}
-			GUI.color = color;
-			Widgets.Label (new Rect (position.x + ColonistBarDrawer.SlotSize.x / 2 - vector.x / 2, position.y + ColonistBarDrawer.PortraitSize.y - 2, vector.x, 20), pawn.LabelBaseShort);
+			GUI.set_color (color);
+			Widgets.Label (new Rect (position.x + ColonistBarDrawer.SlotSize.x / 2 - vector.x / 2, position.y + ColonistBarDrawer.PortraitSize.y - 2, vector.x, 20), pawn.get_LabelBaseShort ());
 			if (slot.Drafted) {
 				vector.x -= 4;
 				GUI.DrawTexture (new Rect (position.x + ColonistBarDrawer.SlotSize.x / 2 - vector.x / 2, position.y + ColonistBarDrawer.PortraitSize.y + 11, vector.x, 1), BaseContent.WhiteTex);
 			}
-			Text.Anchor = TextAnchor.UpperLeft;
+			Text.set_Anchor (0);
 			string text2 = null;
 			if (slot.Missing) {
 				text2 = Translator.Translate ("EdB.ColonistBar.Status.MISSING");
@@ -1765,21 +2021,21 @@ namespace EdB.Interface
 			if (text2 != null) {
 				Vector2 vector2 = Text.CalcSize (text2);
 				vector2.x += 4;
-				GUI.color = new Color (0, 0, 0, 0.4f);
+				GUI.set_color (new Color (0, 0, 0, 0.4));
 				GUI.DrawTexture (new Rect (position.x + ColonistBarDrawer.SlotSize.x / 2 - vector2.x / 2, position.y + ColonistBarDrawer.PortraitSize.y + 12, vector2.x, 13), BaseContent.BlackTex);
-				Text.Font = GameFont.Tiny;
-				GUI.skin.label.alignment = TextAnchor.UpperCenter;
-				Text.Anchor = TextAnchor.UpperCenter;
-				GUI.color = color;
+				Text.set_Font (0);
+				GUI.get_skin ().get_label ().set_alignment (1);
+				Text.set_Anchor (1);
+				GUI.set_color (color);
 				Widgets.Label (new Rect (position.x + ColonistBarDrawer.SlotSize.x / 2 - vector2.x / 2, position.y + ColonistBarDrawer.PortraitSize.y + 10, vector2.x, 20), text2);
-				Text.Anchor = TextAnchor.UpperLeft;
+				Text.set_Anchor (0);
 			}
-			GUI.color = new Color (1, 1, 1);
+			GUI.set_color (new Color (1, 1, 1));
 			if (!slot.Cryptosleep) {
-				if (slot.MentalBreakWarningLevel == 2 && (double)Time.time % 1.2f < 0.4f) {
+				if (slot.MentalBreakWarningLevel == 2 && (double)Time.get_time () % 1.2 < 0.4) {
 					GUI.DrawTexture (new Rect (position.x + ColonistBarDrawer.PortraitOffset.x, position.y + ColonistBarDrawer.PortraitOffset.y, ColonistBarDrawer.MentalHealthSize.x, ColonistBarDrawer.MentalHealthSize.y), ColonistBarDrawer.MentalBreakImminentTex);
 				}
-				else if (slot.MentalBreakWarningLevel == 1 && (double)Time.time % 1.2f < 0.4f) {
+				else if (slot.MentalBreakWarningLevel == 1 && (double)Time.get_time () % 1.2 < 0.4) {
 					GUI.DrawTexture (new Rect (position.x + ColonistBarDrawer.MentalHealthOffset.x, position.y + ColonistBarDrawer.MentalHealthOffset.y, ColonistBarDrawer.MentalHealthSize.x, ColonistBarDrawer.MentalHealthSize.y), ColonistBarDrawer.UnhappyTex);
 				}
 			}
@@ -1791,7 +2047,7 @@ namespace EdB.Interface
 				return;
 			}
 			Vector2 startingPosition = ColonistBarDrawer.StartingPosition;
-			float num = (float)Screen.width;
+			float num = (float)Screen.get_width ();
 			foreach (TrackedColonist current in this.slots) {
 				this.DrawTextureForSlot (current, startingPosition);
 				startingPosition.x += ColonistBarDrawer.SlotSize.x + ColonistBarDrawer.SlotPadding.x;
@@ -1807,7 +2063,7 @@ namespace EdB.Interface
 			if (this.visible) {
 				return;
 			}
-			Rect rect = new Rect ((float)(Screen.width - ColonistBarDrawer.ToggleButton.width - 16), ColonistBarDrawer.StartingPosition.y + 4, (float)ColonistBarDrawer.ToggleButton.width, (float)ColonistBarDrawer.ToggleButton.height);
+			Rect rect = new Rect ((float)(Screen.get_width () - ColonistBarDrawer.ToggleButton.get_width () - 16), ColonistBarDrawer.StartingPosition.y + 4, (float)ColonistBarDrawer.ToggleButton.get_width (), (float)ColonistBarDrawer.ToggleButton.get_height ());
 			GUI.DrawTexture (rect, ColonistBarDrawer.ToggleButton);
 			if (Widgets.InvisibleButton (rect)) {
 				SoundStarter.PlayOneShotOnCamera (SoundDefOf.TickTiny);
@@ -1841,7 +2097,7 @@ namespace EdB.Interface
 				return;
 			}
 			Vector2 startingPosition = ColonistBarDrawer.StartingPosition;
-			float num = (float)Screen.width;
+			float num = (float)Screen.get_width ();
 			foreach (TrackedColonist current in this.slots) {
 				this.RenderSlot (current, startingPosition);
 				startingPosition.x += ColonistBarDrawer.SlotSize.x + ColonistBarDrawer.SlotPadding.x;
@@ -1854,19 +2110,19 @@ namespace EdB.Interface
 
 		protected void RenderSlot (TrackedColonist slot, Vector2 position)
 		{
-			if (Event.current.type != EventType.Repaint) {
+			if (Event.get_current ().get_type () != 7) {
 				return;
 			}
-			Rot4 south = Rot4.South;
+			Rot4 south = Rot4.get_South ();
 			Pawn pawn = slot.Pawn;
 			PawnGraphicSet graphics = pawn.drawer.renderer.graphics;
-			if (!graphics.AllResolved) {
+			if (!graphics.get_AllResolved ()) {
 				graphics.ResolveAllGraphics ();
 			}
 			bool flag = slot.Dead || slot.Missing;
 			bool cryptosleep = slot.Cryptosleep;
-			Quaternion identity = Quaternion.identity;
-			Vector3 one = Vector3.one;
+			Quaternion identity = Quaternion.get_identity ();
+			Vector3 one = Vector3.get_one ();
 			Graphics.DrawMesh (this.backgroundMesh, Matrix4x4.TRS (new Vector3 (position.x + ColonistBarDrawer.BackgroundOffset.x, position.y + ColonistBarDrawer.BackgroundOffset.y, 0), identity, one), ColonistBarDrawer.SlotBackgroundMat, 1, this.camera, 0, null);
 			MaterialPropertyBlock materialPropertyBlock = null;
 			if (flag) {
@@ -1891,7 +2147,7 @@ namespace EdB.Interface
 			Material material2;
 			for (int i = 0; i < graphics.apparelGraphics.Count; i++) {
 				ApparelGraphicRecord apparelGraphicRecord = graphics.apparelGraphics [i];
-				if (apparelGraphicRecord.sourceApparel.def.apparel.LastLayer == ApparelLayer.Shell) {
+				if (apparelGraphicRecord.sourceApparel.def.apparel.get_LastLayer () == 2) {
 					material2 = apparelGraphicRecord.graphic.MatAt (south, null);
 					material2 = graphics.flasher.GetDamagedMat (material2);
 					material = material2;
@@ -1907,7 +2163,7 @@ namespace EdB.Interface
 			}
 			Graphics.DrawMesh (this.backgroundMesh, Matrix4x4.TRS (new Vector3 (position.x + ColonistBarDrawer.BackgroundOffset.x, position.y + ColonistBarDrawer.BackgroundOffset.y, num), identity, one), ColonistBarDrawer.SlotBordersMat, 1, this.camera);
 			num += 1;
-			if ((slot.Corpse == null) ? Find.Selector.IsSelected (pawn) : Find.Selector.IsSelected (slot.Corpse)) {
+			if (Find.get_Selector ().IsSelected ((slot.Corpse != null) ? slot.Corpse : pawn)) {
 				Graphics.DrawMesh (this.backgroundMesh, Matrix4x4.TRS (new Vector3 (position.x + ColonistBarDrawer.BackgroundOffset.x, position.y + ColonistBarDrawer.BackgroundOffset.y, num), identity, one), ColonistBarDrawer.SlotSelectedMat, 1, this.camera);
 				num += 1;
 			}
@@ -1924,7 +2180,7 @@ namespace EdB.Interface
 			bool flag2 = false;
 			List<ApparelGraphicRecord> apparelGraphics = graphics.apparelGraphics;
 			for (int j = 0; j < apparelGraphics.Count; j++) {
-				if (apparelGraphics [j].sourceApparel.def.apparel.LastLayer == ApparelLayer.Overhead) {
+				if (apparelGraphics [j].sourceApparel.def.apparel.get_LastLayer () == 4) {
 					flag2 = true;
 					material2 = apparelGraphics [j].graphic.MatAt (south, null);
 					material2 = graphics.flasher.GetDamagedMat (material2);
@@ -1962,70 +2218,70 @@ namespace EdB.Interface
 		protected void ResizeMeshes ()
 		{
 			this.backgroundMesh = new Mesh ();
-			this.backgroundMesh.vertices = new Vector3[] {
+			this.backgroundMesh.set_vertices (new Vector3[] {
 				new Vector3 (0, 0, 0),
 				new Vector3 (ColonistBarDrawer.BackgroundSize.x, 0, 0),
 				new Vector3 (0, ColonistBarDrawer.BackgroundSize.y, 0),
 				new Vector3 (ColonistBarDrawer.BackgroundSize.x, ColonistBarDrawer.BackgroundSize.y, 0)
-			};
-			this.backgroundMesh.uv = new Vector2[] {
+			});
+			this.backgroundMesh.set_uv (new Vector2[] {
 				new Vector2 (0, 1),
 				new Vector2 (1, 1),
 				new Vector2 (0, 0),
 				new Vector2 (1, 0)
-			};
-			this.backgroundMesh.triangles = new int[] {
+			});
+			this.backgroundMesh.set_triangles (new int[] {
 				0,
 				1,
 				2,
 				1,
 				3,
 				2
-			};
+			});
 			this.bodyMesh = new Mesh ();
-			this.bodyMesh.vertices = new Vector3[] {
+			this.bodyMesh.set_vertices (new Vector3[] {
 				new Vector3 (0, 0, 0),
 				new Vector3 (ColonistBarDrawer.PortraitSize.x, 0, 0),
 				new Vector3 (0, ColonistBarDrawer.PortraitSize.y, 0),
 				new Vector3 (ColonistBarDrawer.PortraitSize.x, ColonistBarDrawer.PortraitSize.y, 0)
-			};
+			});
 			Vector2 vector = new Vector2 ((ColonistBarDrawer.PortraitOffset.x - ColonistBarDrawer.BodyOffset.x) / ColonistBarDrawer.BodySize.x, (ColonistBarDrawer.PortraitOffset.y - ColonistBarDrawer.BodyOffset.y) / ColonistBarDrawer.BodySize.y);
 			Vector2 vector2 = new Vector2 ((ColonistBarDrawer.PortraitOffset.x - ColonistBarDrawer.BodyOffset.x + ColonistBarDrawer.PortraitSize.x) / ColonistBarDrawer.BodySize.x, (ColonistBarDrawer.PortraitOffset.y - ColonistBarDrawer.BodyOffset.y + ColonistBarDrawer.PortraitSize.y) / ColonistBarDrawer.BodySize.y);
-			this.bodyMesh.uv = new Vector2[] {
+			this.bodyMesh.set_uv (new Vector2[] {
 				new Vector2 (vector.x, vector2.y),
 				new Vector2 (vector2.x, vector2.y),
 				new Vector2 (vector.x, vector.y),
 				new Vector2 (vector2.x, vector.y)
-			};
-			this.bodyMesh.triangles = new int[] {
+			});
+			this.bodyMesh.set_triangles (new int[] {
 				0,
 				1,
 				2,
 				1,
 				3,
 				2
-			};
+			});
 			this.headMesh = new Mesh ();
-			this.headMesh.vertices = new Vector3[] {
+			this.headMesh.set_vertices (new Vector3[] {
 				new Vector3 (0, 0, 0),
 				new Vector3 (ColonistBarDrawer.HeadSize.x, 0, 0),
 				new Vector3 (0, ColonistBarDrawer.HeadSize.y, 0),
 				new Vector3 (ColonistBarDrawer.HeadSize.x, ColonistBarDrawer.HeadSize.y, 0)
-			};
-			this.headMesh.uv = new Vector2[] {
+			});
+			this.headMesh.set_uv (new Vector2[] {
 				new Vector2 (0, 1),
 				new Vector2 (1, 1),
 				new Vector2 (0, 0),
 				new Vector2 (1, 0)
-			};
-			this.headMesh.triangles = new int[] {
+			});
+			this.headMesh.set_triangles (new int[] {
 				0,
 				1,
 				2,
 				1,
 				3,
 				2
-			};
+			});
 		}
 
 		public void SelectAllActive ()
@@ -2060,25 +2316,25 @@ namespace EdB.Interface
 
 		public void SizeCamera (int width, int height)
 		{
-			float num = (float)width * 0.5f;
-			float num2 = (float)height * 0.5f;
-			this.camera.orthographicSize = num2;
-			this.camera.transform.position = new Vector3 (num, num2, 100);
-			this.camera.transform.LookAt (new Vector3 (num, num2, 0), new Vector3 (0, -1, 0));
-			this.camera.aspect = num / num2;
+			float num = (float)width * 0.5;
+			float num2 = (float)height * 0.5;
+			this.camera.set_orthographicSize (num2);
+			this.camera.get_transform ().set_position (new Vector3 (num, num2, 100));
+			this.camera.get_transform ().LookAt (new Vector3 (num, num2, 0), new Vector3 (0, -1, 0));
+			this.camera.set_aspect (num / num2);
 		}
 
 		public void Start ()
 		{
-			this.camera = base.gameObject.AddComponent<Camera> ();
-			this.camera.orthographic = true;
-			this.camera.backgroundColor = new Color (0, 0, 0, 0);
-			this.SizeCamera (Screen.width, Screen.height);
-			this.camera.clearFlags = CameraClearFlags.Depth;
-			this.camera.nearClipPlane = 1;
-			this.camera.farClipPlane = 200;
-			this.camera.depth = -1;
-			this.camera.enabled = false;
+			this.camera = base.get_gameObject ().AddComponent<Camera> ();
+			this.camera.set_orthographic (true);
+			this.camera.set_backgroundColor (new Color (0, 0, 0, 0));
+			this.SizeCamera (Screen.get_width (), Screen.get_height ());
+			this.camera.set_clearFlags (3);
+			this.camera.set_nearClipPlane (1);
+			this.camera.set_farClipPlane (200);
+			this.camera.set_depth (-1);
+			this.camera.set_enabled (false);
 			this.UseLargeIcons ();
 			this.deadPropertyBlock = new MaterialPropertyBlock ();
 			this.deadPropertyBlock.Clear ();
@@ -2136,9 +2392,18 @@ namespace EdB.Interface
 			this.ResetMaxLabelSize ();
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ColonistBarGroup
 	{
+		//
+		// Fields
+		//
 		private List<TrackedColonist> colonists;
 
 		private string name;
@@ -2147,6 +2412,9 @@ namespace EdB.Interface
 
 		private string id = string.Empty;
 
+		//
+		// Properties
+		//
 		public List<TrackedColonist> Colonists {
 			get {
 				return this.colonists;
@@ -2191,6 +2459,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ColonistBarGroup (string name, List<TrackedColonist> colonists)
 		{
 			this.colonists = colonists;
@@ -2212,6 +2483,9 @@ namespace EdB.Interface
 			this.colonists = new List<TrackedColonist> ();
 		}
 
+		//
+		// Methods
+		//
 		public void Add (TrackedColonist colonist)
 		{
 			if (!this.colonists.Contains (colonist)) {
@@ -2239,9 +2513,18 @@ namespace EdB.Interface
 			return false;
 		}
 	}
+}
+using RimWorld;
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ColonistBarSlot
 	{
+		//
+		// Fields
+		//
 		public Pawn pawn;
 
 		protected bool remove;
@@ -2268,6 +2551,9 @@ namespace EdB.Interface
 
 		public int psychologyLevel;
 
+		//
+		// Properties
+		//
 		public Corpse Corpse {
 			get {
 				return this.corpse;
@@ -2310,11 +2596,17 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ColonistBarSlot (Pawn pawn)
 		{
 			this.pawn = pawn;
 		}
 
+		//
+		// Methods
+		//
 		public Pawn FindCarrier ()
 		{
 			if (this.pawn.holder != null && this.pawn.holder.owner != null) {
@@ -2333,39 +2625,39 @@ namespace EdB.Interface
 			}
 			this.incapacitated = false;
 			if (this.pawn.health != null) {
-				this.health = this.pawn.health.summaryHealth.SummaryHealthPercent;
-				this.incapacitated = this.pawn.health.Downed;
+				this.health = this.pawn.health.summaryHealth.get_SummaryHealthPercent ();
+				this.incapacitated = this.pawn.health.get_Downed ();
 			}
 			else {
 				this.health = 0;
 			}
 			this.kidnapped = false;
 			if (this.pawn.holder != null) {
-				if (this.pawn.Destroyed) {
+				if (this.pawn.get_Destroyed ()) {
 					this.missing = true;
 				}
 				else if (this.pawn.holder.owner != null) {
 					Pawn_CarryTracker pawn_CarryTracker = this.pawn.holder.owner as Pawn_CarryTracker;
-					if (pawn_CarryTracker != null && pawn_CarryTracker.pawn != null && pawn_CarryTracker.pawn.Faction != null && pawn_CarryTracker.pawn.Faction != Faction.OfColony && pawn_CarryTracker.pawn.Faction.RelationWith (Faction.OfColony).hostile) {
+					if (pawn_CarryTracker != null && pawn_CarryTracker.pawn != null && pawn_CarryTracker.pawn.get_Faction () != null && pawn_CarryTracker.pawn.get_Faction () != Faction.get_OfColony () && pawn_CarryTracker.pawn.get_Faction ().RelationWith (Faction.get_OfColony ()).hostile) {
 						this.kidnapped = true;
 					}
 				}
 			}
-			this.dead = this.pawn.Dead;
+			this.dead = this.pawn.get_Dead ();
 			if (this.dead && this.WasReplaced (this.pawn)) {
 				this.dead = false;
 			}
 			this.sanity = null;
 			if (this.pawn.mindState != null && this.pawn.mindState.broken != null) {
-				this.sanity = this.pawn.mindState.broken.CurStateDef;
+				this.sanity = this.pawn.mindState.broken.get_CurStateDef ();
 			}
-			this.drafted = (!this.dead && this.pawn.Drafted);
+			this.drafted = (!this.dead && this.pawn.get_Drafted ());
 			this.psychologyLevel = 0;
-			if (this.pawn.mindState != null && this.pawn.mindState.breaker != null && !this.pawn.Downed && !this.pawn.Dead) {
-				if (this.pawn.mindState.breaker.HardBreakImminent) {
+			if (this.pawn.mindState != null && this.pawn.mindState.breaker != null && !this.pawn.get_Downed () && !this.pawn.get_Dead ()) {
+				if (this.pawn.mindState.breaker.get_HardBreakImminent ()) {
 					this.psychologyLevel = 2;
 				}
-				else if (this.pawn.mindState.breaker.MentalBreakApproaching) {
+				else if (this.pawn.mindState.breaker.get_MentalBreakApproaching ()) {
 					this.psychologyLevel = 1;
 				}
 			}
@@ -2373,7 +2665,7 @@ namespace EdB.Interface
 
 		protected bool WasReplaced (Pawn pawn)
 		{
-			foreach (Pawn current in Find.ListerPawns.FreeColonists) {
+			foreach (Pawn current in Find.get_ListerPawns ().get_FreeColonists ()) {
 				if (current.GetUniqueLoadID () == pawn.GetUniqueLoadID ()) {
 					return true;
 				}
@@ -2381,11 +2673,21 @@ namespace EdB.Interface
 			return false;
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ColonistBarSquadSupervisor
 	{
 		public delegate void SelectedSquadChangedHandler (Squad Squad);
 
+		//
+		// Fields
+		//
 		protected List<ColonistBarGroup> scratchGroups = new List<ColonistBarGroup> ();
 
 		private bool enabled = true;
@@ -2406,6 +2708,9 @@ namespace EdB.Interface
 
 		private Dictionary<Squad, ColonistBarGroup> groupDictionary = new Dictionary<Squad, ColonistBarGroup> ();
 
+		//
+		// Properties
+		//
 		public bool Enabled {
 			get {
 				return this.enabled;
@@ -2428,11 +2733,17 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ColonistBarSquadSupervisor (ColonistBar colonistBar)
 		{
 			this.colonistBar = colonistBar;
 		}
 
+		//
+		// Methods
+		//
 		public bool SaveCurrentSquadAsFavorite (int index)
 		{
 			return this.selectedSquad != null && SquadManager.Instance.SetFavorite (index, this.selectedSquad);
@@ -2551,19 +2862,56 @@ namespace EdB.Interface
 			}
 		}
 
-		public event ColonistBarSquadSupervisor.SelectedSquadChangedHandler SelectedSquadChanged;
+		//
+		// Events
+		//
+		public event ColonistBarSquadSupervisor.SelectedSquadChangedHandler SelectedSquadChanged {
+			add {
+				ColonistBarSquadSupervisor.SelectedSquadChangedHandler selectedSquadChangedHandler = this.SelectedSquadChanged;
+				ColonistBarSquadSupervisor.SelectedSquadChangedHandler selectedSquadChangedHandler2;
+				do {
+					selectedSquadChangedHandler2 = selectedSquadChangedHandler;
+					selectedSquadChangedHandler = Interlocked.CompareExchange<ColonistBarSquadSupervisor.SelectedSquadChangedHandler> (ref this.SelectedSquadChanged, (ColonistBarSquadSupervisor.SelectedSquadChangedHandler)Delegate.Combine (selectedSquadChangedHandler2, value), selectedSquadChangedHandler);
+				}
+				while (selectedSquadChangedHandler != selectedSquadChangedHandler2);
+			}
+			remove {
+				ColonistBarSquadSupervisor.SelectedSquadChangedHandler selectedSquadChangedHandler = this.SelectedSquadChanged;
+				ColonistBarSquadSupervisor.SelectedSquadChangedHandler selectedSquadChangedHandler2;
+				do {
+					selectedSquadChangedHandler2 = selectedSquadChangedHandler;
+					selectedSquadChangedHandler = Interlocked.CompareExchange<ColonistBarSquadSupervisor.SelectedSquadChangedHandler> (ref this.SelectedSquadChanged, (ColonistBarSquadSupervisor.SelectedSquadChangedHandler)Delegate.Remove (selectedSquadChangedHandler2, value), selectedSquadChangedHandler);
+				}
+				while (selectedSquadChangedHandler != selectedSquadChangedHandler2);
+			}
+		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public delegate void ColonistListSyncNeededHandler ();
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ColonistNotification
 	{
+		//
+		// Fields
+		//
 		public TrackedColonist colonist;
 
 		public ColonistNotificationType type;
 
 		public Pawn relatedPawn;
 
+		//
+		// Constructors
+		//
 		public ColonistNotification (ColonistNotificationType type, TrackedColonist colonist)
 		{
 			this.type = type;
@@ -2578,20 +2926,31 @@ namespace EdB.Interface
 			this.relatedPawn = relatedPawn;
 		}
 
+		//
+		// Methods
+		//
 		public override string ToString ()
 		{
-			NameTriple nameTriple = this.colonist.Pawn.Name as NameTriple;
+			NameTriple nameTriple = this.colonist.Pawn.get_Name () as NameTriple;
 			return string.Concat (new object[] {
 				"ColonistNotification, ",
 				this.type,
 				": ",
-				nameTriple.Nick
+				nameTriple.get_Nick ()
 			});
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public delegate void ColonistNotificationHandler (ColonistNotification notification);
+}
+using System;
 
+namespace EdB.Interface
+{
 	public enum ColonistNotificationType
 	{
 		New,
@@ -2606,18 +2965,31 @@ namespace EdB.Interface
 		Cryptosleep,
 		WokeFromCryptosleep
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ColonistRowDrawer : ListWidgetItemDrawer<TrackedColonist>
 	{
+		//
+		// Fields
+		//
 		private Vector2 padding = new Vector2 (9, 8);
 
 		private Texture blackTexture;
 
-		private Color deadColor = new Color (0.5f, 0.5f, 0.5f);
+		private Color deadColor = new Color (0.5, 0.5, 0.5);
 
 		private Color selectedTextColor = new Color (1, 1, 1);
 
-		private Color textColor = new Color (0.85f, 0.85f, 0.85f);
+		private Color textColor = new Color (0.85, 0.85, 0.85);
 
 		private Vector2 iconSize = new Vector2 (41, 40);
 
@@ -2627,12 +2999,18 @@ namespace EdB.Interface
 
 		private List<Texture> rowTextures = new List<Texture> ();
 
+		//
+		// Constructors
+		//
 		public ColonistRowDrawer ()
 		{
 			this.paddingTotal = new Vector2 (this.padding.x * 2, this.padding.y * 2);
-			this.blackTexture = SolidColorMaterials.NewSolidColorTexture (new Color (0.1523f, 0.168f, 0.1836f));
+			this.blackTexture = SolidColorMaterials.NewSolidColorTexture (new Color (0.1523, 0.168, 0.1836));
 		}
 
+		//
+		// Methods
+		//
 		public void AddRowColor (Color color)
 		{
 			this.rowTextures.Add (SolidColorMaterials.NewSolidColorTexture (color));
@@ -2640,34 +3018,34 @@ namespace EdB.Interface
 
 		public Vector2 Draw (int index, TrackedColonist colonist, Vector2 cursor, float width, bool selected, bool disabled)
 		{
-			string nameStringShort = colonist.Pawn.NameStringShort;
-			Text.Anchor = TextAnchor.MiddleLeft;
+			string nameStringShort = colonist.Pawn.get_NameStringShort ();
+			Text.set_Anchor (3);
 			float num = 56;
 			Rect rect = new Rect (cursor.x, cursor.y, width, num);
 			Rect rect2 = new Rect (cursor.x + this.padding.x, cursor.y + this.padding.y, this.iconSize.x, this.iconSize.y);
 			GUI.DrawTexture (rect2, this.blackTexture);
-			GUI.color = new Color (0.3f, 0.3f, 0.3f);
+			GUI.set_color (new Color (0.3, 0.3, 0.3));
 			Widgets.DrawBox (rect2, 1);
-			Rect rect3 = new Rect (rect2.x + this.iconSize.x - 1, rect2.y, 7, this.iconSize.y);
+			Rect rect3 = new Rect (rect2.get_x () + this.iconSize.x - 1, rect2.get_y (), 7, this.iconSize.y);
 			bool flag = colonist.Dead || colonist.Missing;
 			bool cryptosleep = colonist.Cryptosleep;
 			if (!flag) {
 				if (colonist.Incapacitated) {
-					GUI.color = new Color (0.7843f, 0, 0);
+					GUI.set_color (new Color (0.7843, 0, 0));
 				}
-				else if ((double)colonist.HealthPercent < 0.95f) {
-					GUI.color = new Color (0.7843f, 0.7843f, 0);
+				else if ((double)colonist.HealthPercent < 0.95) {
+					GUI.set_color (new Color (0.7843, 0.7843, 0));
 				}
 				else {
-					GUI.color = new Color (0, 0.7843f, 0);
+					GUI.set_color (new Color (0, 0.7843, 0));
 				}
 				if (colonist.Missing) {
-					GUI.color = new Color (0.4824f, 0.4824f, 0.4824f);
+					GUI.set_color (new Color (0.4824, 0.4824, 0.4824));
 				}
-				float num2 = rect3.height * colonist.HealthPercent;
-				GUI.DrawTexture (new Rect (rect3.x, rect3.y + rect3.height - num2, rect3.width, num2), BaseContent.WhiteTex);
+				float num2 = rect3.get_height () * colonist.HealthPercent;
+				GUI.DrawTexture (new Rect (rect3.get_x (), rect3.get_y () + rect3.get_height () - num2, rect3.get_width (), num2), BaseContent.WhiteTex);
 			}
-			GUI.color = new Color (0.3f, 0.3f, 0.3f);
+			GUI.set_color (new Color (0.3, 0.3, 0.3));
 			Widgets.DrawBox (rect3, 1);
 			Rect rect4 = new Rect (cursor.x + this.padding.x + 1, cursor.y, this.iconSize.x, this.iconSize.y + this.padding.y - 1);
 			try {
@@ -2677,48 +3055,48 @@ namespace EdB.Interface
 				Vector2 vector3 = new Vector2 (-12, -9);
 				bool flag2 = true;
 				if (flag) {
-					GUI.color = this.deadColor;
+					GUI.set_color (this.deadColor);
 					flag2 = false;
 				}
 				else if (cryptosleep) {
-					GUI.color = ColonistBarDrawer.ColorFrozen;
+					GUI.set_color (ColonistBarDrawer.ColorFrozen);
 					flag2 = false;
 				}
 				if (flag2) {
-					GUI.color = colonist.Pawn.story.skinColor;
+					GUI.set_color (colonist.Pawn.story.skinColor);
 				}
 				Rect rect5 = new Rect (vector2.x, vector2.y, vector.x, vector.y);
-				GUI.DrawTexture (rect5, colonist.Pawn.drawer.renderer.graphics.nakedGraphic.MatFront.mainTexture);
+				GUI.DrawTexture (rect5, colonist.Pawn.drawer.renderer.graphics.nakedGraphic.get_MatFront ().get_mainTexture ());
 				bool flag3 = false;
 				foreach (ApparelGraphicRecord current in colonist.Pawn.drawer.renderer.graphics.apparelGraphics) {
-					if (current.sourceApparel.def.apparel.LastLayer != ApparelLayer.Overhead) {
+					if (current.sourceApparel.def.apparel.get_LastLayer () != 4) {
 						if (flag2) {
-							GUI.color = current.sourceApparel.DrawColor;
+							GUI.set_color (current.sourceApparel.get_DrawColor ());
 						}
-						GUI.DrawTexture (rect5, current.graphic.MatFront.mainTexture);
+						GUI.DrawTexture (rect5, current.graphic.get_MatFront ().get_mainTexture ());
 					}
 					else {
 						flag3 = true;
 					}
 				}
 				if (flag2) {
-					GUI.color = colonist.Pawn.story.skinColor;
+					GUI.set_color (colonist.Pawn.story.skinColor);
 				}
 				Rect rect6 = new Rect (vector3.x, vector3.y, vector.x, vector.y);
-				GUI.DrawTexture (rect6, colonist.Pawn.drawer.renderer.graphics.headGraphic.MatFront.mainTexture);
+				GUI.DrawTexture (rect6, colonist.Pawn.drawer.renderer.graphics.headGraphic.get_MatFront ().get_mainTexture ());
 				if (!flag3) {
 					if (flag2) {
-						GUI.color = colonist.Pawn.story.hairColor;
+						GUI.set_color (colonist.Pawn.story.hairColor);
 					}
-					GUI.DrawTexture (rect6, colonist.Pawn.drawer.renderer.graphics.hairGraphic.MatFront.mainTexture);
+					GUI.DrawTexture (rect6, colonist.Pawn.drawer.renderer.graphics.hairGraphic.get_MatFront ().get_mainTexture ());
 				}
 				else {
 					foreach (ApparelGraphicRecord current2 in colonist.Pawn.drawer.renderer.graphics.apparelGraphics) {
-						if (current2.sourceApparel.def.apparel.LastLayer == ApparelLayer.Overhead) {
+						if (current2.sourceApparel.def.apparel.get_LastLayer () == 4) {
 							if (flag2) {
-								GUI.color = current2.sourceApparel.DrawColor;
+								GUI.set_color (current2.sourceApparel.get_DrawColor ());
 							}
-							GUI.DrawTexture (rect6, current2.graphic.MatFront.mainTexture);
+							GUI.DrawTexture (rect6, current2.graphic.get_MatFront ().get_mainTexture ());
 						}
 					}
 				}
@@ -2726,13 +3104,13 @@ namespace EdB.Interface
 			finally {
 				GUI.EndGroup ();
 			}
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 			try {
 				if (selected) {
-					GUI.color = this.selectedTextColor;
+					GUI.set_color (this.selectedTextColor);
 				}
 				else {
-					GUI.color = this.textColor;
+					GUI.set_color (this.textColor);
 				}
 				string text = null;
 				if (flag) {
@@ -2752,24 +3130,24 @@ namespace EdB.Interface
 				}
 				else {
 					Rect rect8 = new Rect (cursor.x + this.padding.x + this.iconSize.x + this.iconPadding.x, cursor.y + this.padding.y + 5, width - this.paddingTotal.x - this.iconSize.x - this.iconPadding.x, (num - this.paddingTotal.y) / 2);
-					Text.Anchor = TextAnchor.LowerLeft;
+					Text.set_Anchor (6);
 					Widgets.Label (rect8, nameStringShort);
-					rect8.y = rect8.y + rect8.height - 3;
-					Text.Anchor = TextAnchor.UpperLeft;
-					Text.Font = GameFont.Tiny;
+					rect8.set_y (rect8.get_y () + rect8.get_height () - 3);
+					Text.set_Anchor (0);
+					Text.set_Font (0);
 					Widgets.Label (rect8, text);
 				}
 			}
 			finally {
-				Text.Anchor = TextAnchor.UpperLeft;
-				Text.Font = GameFont.Small;
-				GUI.color = Color.white;
+				Text.set_Anchor (0);
+				Text.set_Font (1);
+				GUI.set_color (Color.get_white ());
 			}
 			if (!colonist.Dead && !colonist.Missing) {
 				string tooltipText = this.GetTooltipText (colonist);
 				TooltipHandler.TipRegion (rect, new TipSignal (tooltipText, tooltipText.GetHashCode ()));
 			}
-			return new Vector2 (cursor.x, cursor.y + rect.height);
+			return new Vector2 (cursor.x, cursor.y + rect.get_height ());
 		}
 
 		public float GetHeight (int index, TrackedColonist colonist, Vector2 cursor, float width, bool selected, bool disabled)
@@ -2784,7 +3162,7 @@ namespace EdB.Interface
 			foreach (SkillRecord current in pawn.skills.skills) {
 				stringBuilder.AppendLine (current.def.skillLabel + ": " + current.level);
 			}
-			List<WorkTags> list = pawn.story.DisabledWorkTags.ToList<WorkTags> ();
+			List<WorkTags> list = pawn.story.get_DisabledWorkTags ().ToList<WorkTags> ();
 			if (list.Count > 0) {
 				stringBuilder.AppendLine ();
 				stringBuilder.Append (Translator.Translate ("IncapableOf"));
@@ -2801,28 +3179,43 @@ namespace EdB.Interface
 				for (int i = 0; i < pawn.story.traits.allTraits.Count; i++) {
 					Trait trait = pawn.story.traits.allTraits [i];
 					stringBuilder.Append ("   ");
-					stringBuilder.AppendLine (trait.LabelCap);
+					stringBuilder.AppendLine (trait.get_LabelCap ());
 				}
 			}
 			if (pawn.equipment != null) {
-				ThingWithComps primary = pawn.equipment.Primary;
+				ThingWithComps primary = pawn.equipment.get_Primary ();
 				if (primary != null) {
 					stringBuilder.AppendLine ();
-					stringBuilder.AppendLine (primary.LabelBaseCap);
+					stringBuilder.AppendLine (primary.get_LabelBaseCap ());
 				}
 			}
 			return stringBuilder.ToString ();
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ColonistTracker
 	{
+		//
+		// Static Fields
+		//
 		protected static ColonistTracker instance;
 
 		public static readonly bool LoggingEnabled;
 
 		public static int MaxMissingDuration = 12000;
 
+		//
+		// Fields
+		//
 		protected ThingRequest corpseThingRequest;
 
 		protected List<Pawn> removalList = new List<Pawn> ();
@@ -2833,6 +3226,9 @@ namespace EdB.Interface
 
 		protected HashSet<Pawn> pawnsInFaction = new HashSet<Pawn> ();
 
+		//
+		// Static Properties
+		//
 		public static ColonistTracker Instance {
 			get {
 				if (ColonistTracker.instance == null) {
@@ -2842,6 +3238,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Properties
+		//
 		public List<Pawn> SortedPawns {
 			get {
 				List<Pawn> list = new List<Pawn> (this.trackedColonists.Keys);
@@ -2861,12 +3260,18 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		protected ColonistTracker ()
 		{
 			this.corpseThingRequest = default(ThingRequest);
-			this.corpseThingRequest.group = ThingRequestGroup.Corpse;
+			this.corpseThingRequest.group = 8;
 		}
 
+		//
+		// Methods
+		//
 		protected Faction FindCarryingFaction (Pawn pawn, out Pawn carrier)
 		{
 			ThingContainer holder = pawn.holder;
@@ -2878,12 +3283,12 @@ namespace EdB.Interface
 						Pawn pawn2 = pawn_CarryTracker.pawn;
 						if (pawn2 != null) {
 							carrier = pawn2;
-							if (Find.ListerPawns.PawnsHostileToColony.Contains (pawn2)) {
-								this.Message (pawn, "Carried by pawn (" + pawn2.NameStringShort + ") in hostile faction");
-								return pawn2.Faction;
+							if (Find.get_ListerPawns ().get_PawnsHostileToColony ().Contains (pawn2)) {
+								this.Message (pawn, "Carried by pawn (" + pawn2.get_NameStringShort () + ") in hostile faction");
+								return pawn2.get_Faction ();
 							}
-							this.Message (pawn, "Carried by pawn (" + pawn2.NameStringShort + ") in non-hostile faction");
-							return Faction.OfColony;
+							this.Message (pawn, "Carried by pawn (" + pawn2.get_NameStringShort () + ") in non-hostile faction");
+							return Faction.get_OfColony ();
 						}
 					}
 				}
@@ -2894,7 +3299,7 @@ namespace EdB.Interface
 
 		protected Pawn FindColonist (Pawn pawn)
 		{
-			foreach (Pawn current in Find.ListerPawns.PawnsInFaction (Faction.OfColony)) {
+			foreach (Pawn current in Find.get_ListerPawns ().PawnsInFaction (Faction.get_OfColony ())) {
 				if (current.GetUniqueLoadID () == pawn.GetUniqueLoadID ()) {
 					return current;
 				}
@@ -2917,20 +3322,20 @@ namespace EdB.Interface
 			this.trackedColonists.Clear ();
 			this.pawnsInFaction.Clear ();
 			List<Pawn> list = new List<Pawn> ();
-			foreach (Pawn current in Find.ListerPawns.PawnsInFaction (Faction.OfColony)) {
+			foreach (Pawn current in Find.get_ListerPawns ().PawnsInFaction (Faction.get_OfColony ())) {
 				list.Add (current);
 			}
-			foreach (Pawn current2 in Find.ListerPawns.PawnsHostileToColony) {
+			foreach (Pawn current2 in Find.get_ListerPawns ().get_PawnsHostileToColony ()) {
 				if (current2.carrier != null) {
-					Pawn pawn = current2.carrier.CarriedThing as Pawn;
-					if (pawn != null && pawn.Faction != null && pawn.Faction == Faction.OfColony) {
+					Pawn pawn = current2.carrier.get_CarriedThing () as Pawn;
+					if (pawn != null && pawn.get_Faction () != null && pawn.get_Faction () == Faction.get_OfColony ()) {
 						list.Add (pawn);
 					}
 				}
 			}
-			foreach (Thing current3 in Find.ListerThings.AllThings) {
+			foreach (Thing current3 in Find.get_ListerThings ().get_AllThings ()) {
 				Corpse corpse = current3 as Corpse;
-				if (corpse != null && corpse.innerPawn != null && corpse.innerPawn.Faction == Faction.OfColony && !this.IsBuried (corpse)) {
+				if (corpse != null && corpse.innerPawn != null && corpse.innerPawn.get_Faction () == Faction.get_OfColony () && !this.IsBuried (corpse)) {
 					list.Add (corpse.innerPawn);
 				}
 			}
@@ -2997,7 +3402,7 @@ namespace EdB.Interface
 		protected void MarkColonistAsFreed (TrackedColonist colonist)
 		{
 			colonist.CapturingFaction = null;
-			if (!colonist.Pawn.Destroyed) {
+			if (!colonist.Pawn.get_Destroyed ()) {
 				if (this.ColonistChanged != null) {
 					this.ColonistChanged (new ColonistNotification (ColonistNotificationType.Freed, colonist));
 				}
@@ -3021,7 +3426,7 @@ namespace EdB.Interface
 					this.Message (colonist.Pawn, "Captured colonist has been removed from the map (by " + colonist.CapturingFaction + ")");
 				}
 				colonist.Missing = true;
-				colonist.MissingTimestamp = Find.TickManager.TicksGame;
+				colonist.MissingTimestamp = Find.get_TickManager ().get_TicksGame ();
 				if (this.ColonistChanged != null) {
 					this.ColonistChanged (new ColonistNotification (ColonistNotificationType.Missing, colonist));
 				}
@@ -3040,8 +3445,8 @@ namespace EdB.Interface
 
 		private void Message (Pawn pawn, string message)
 		{
-			NameTriple nameTriple = pawn.Name as NameTriple;
-			string str = (nameTriple == null) ? pawn.Label : nameTriple.Nick;
+			NameTriple nameTriple = pawn.get_Name () as NameTriple;
+			string str = (nameTriple == null) ? pawn.get_Label () : nameTriple.get_Nick ();
 			this.Message (str + ": " + message);
 		}
 
@@ -3073,9 +3478,9 @@ namespace EdB.Interface
 
 		public void ResolveMissingPawn (Pawn pawn, TrackedColonist colonist)
 		{
-			if (pawn.Dead || pawn.Destroyed) {
+			if (pawn.get_Dead () || pawn.get_Destroyed ()) {
 				this.Message (pawn, "Tracked colonist is dead or destroyed.  Searching for corpse.");
-				Corpse corpse = (Corpse)Find.ListerThings.ThingsMatching (this.corpseThingRequest).FirstOrDefault (delegate (Thing thing) {
+				Corpse corpse = (Corpse)Find.get_ListerThings ().ThingsMatching (this.corpseThingRequest).FirstOrDefault (delegate (Thing thing) {
 					Corpse corpse2 = thing as Corpse;
 					return corpse2 != null && corpse2.innerPawn == pawn;
 				});
@@ -3106,7 +3511,7 @@ namespace EdB.Interface
 				}
 				return;
 			}
-			if (faction != Faction.OfColony) {
+			if (faction != Faction.get_OfColony ()) {
 				colonist.CapturingFaction = faction;
 				this.Message (pawn, "Colonist is captured");
 				return;
@@ -3116,7 +3521,7 @@ namespace EdB.Interface
 
 		protected TrackedColonist StartTrackingPawn (Pawn pawn)
 		{
-			if (pawn == null || !pawn.IsColonist) {
+			if (pawn == null || !pawn.get_IsColonist ()) {
 				return null;
 			}
 			TrackedColonist trackedColonist = null;
@@ -3159,9 +3564,9 @@ namespace EdB.Interface
 		{
 			this.pawnsInFaction.Clear ();
 			this.colonistsInFaction.Clear ();
-			foreach (Pawn current in Find.ListerPawns.PawnsInFaction (Faction.OfColony)) {
+			foreach (Pawn current in Find.get_ListerPawns ().PawnsInFaction (Faction.get_OfColony ())) {
 				this.pawnsInFaction.Add (current);
-				if (current.IsColonist) {
+				if (current.get_IsColonist ()) {
 					this.colonistsInFaction.Add (current);
 				}
 				if (!this.trackedColonists.ContainsKey (current)) {
@@ -3185,7 +3590,7 @@ namespace EdB.Interface
 
 		public void Update ()
 		{
-			if (Find.ListerPawns.PawnsInFaction (Faction.OfColony).Count != this.pawnsInFaction.Count) {
+			if (Find.get_ListerPawns ().PawnsInFaction (Faction.get_OfColony ()).Count != this.pawnsInFaction.Count) {
 				this.Message ("Free colonist list changed.  Re-syncing");
 				this.SyncColonistLists ();
 			}
@@ -3205,14 +3610,14 @@ namespace EdB.Interface
 			bool flag = false;
 			Pawn pawn2 = null;
 			if (pawn.holder != null) {
-				if (pawn.Destroyed) {
+				if (pawn.get_Destroyed ()) {
 					this.MarkColonistAsMissing (colonist);
 				}
 				else if (pawn.holder.owner != null) {
 					Pawn_CarryTracker pawn_CarryTracker = pawn.holder.owner as Pawn_CarryTracker;
-					if (pawn_CarryTracker != null && pawn_CarryTracker.pawn != null && pawn_CarryTracker.pawn.Faction != null && pawn_CarryTracker.pawn.Faction != Faction.OfColony && pawn_CarryTracker.pawn.Faction.RelationWith (Faction.OfColony).hostile) {
+					if (pawn_CarryTracker != null && pawn_CarryTracker.pawn != null && pawn_CarryTracker.pawn.get_Faction () != null && pawn_CarryTracker.pawn.get_Faction () != Faction.get_OfColony () && pawn_CarryTracker.pawn.get_Faction ().RelationWith (Faction.get_OfColony ()).hostile) {
 						pawn2 = pawn_CarryTracker.pawn;
-						faction = pawn2.Faction;
+						faction = pawn2.get_Faction ();
 					}
 					Building_CryptosleepCasket building_CryptosleepCasket = pawn.holder.owner as Building_CryptosleepCasket;
 					if (building_CryptosleepCasket != null) {
@@ -3258,10 +3663,10 @@ namespace EdB.Interface
 			else if (!flag && colonist.Cryptosleep) {
 				this.MarkColonistAsWokenFromCryptosleep (colonist);
 			}
-			int ticksGame = Find.TickManager.TicksGame;
+			int ticksGame = Find.get_TickManager ().get_TicksGame ();
 			if (colonist.Dead && !colonist.Missing) {
 				if (colonist.Corpse != null) {
-					if (colonist.Corpse.Destroyed) {
+					if (colonist.Corpse.get_Destroyed ()) {
 						this.MarkColonistAsMissing (colonist);
 					}
 					else if (this.IsBuried (colonist.Corpse)) {
@@ -3277,13 +3682,62 @@ namespace EdB.Interface
 			}
 		}
 
-		public event ColonistNotificationHandler ColonistChanged;
+		//
+		// Events
+		//
+		public event ColonistNotificationHandler ColonistChanged {
+			add {
+				ColonistNotificationHandler colonistNotificationHandler = this.ColonistChanged;
+				ColonistNotificationHandler colonistNotificationHandler2;
+				do {
+					colonistNotificationHandler2 = colonistNotificationHandler;
+					colonistNotificationHandler = Interlocked.CompareExchange<ColonistNotificationHandler> (ref this.ColonistChanged, (ColonistNotificationHandler)Delegate.Combine (colonistNotificationHandler2, value), colonistNotificationHandler);
+				}
+				while (colonistNotificationHandler != colonistNotificationHandler2);
+			}
+			remove {
+				ColonistNotificationHandler colonistNotificationHandler = this.ColonistChanged;
+				ColonistNotificationHandler colonistNotificationHandler2;
+				do {
+					colonistNotificationHandler2 = colonistNotificationHandler;
+					colonistNotificationHandler = Interlocked.CompareExchange<ColonistNotificationHandler> (ref this.ColonistChanged, (ColonistNotificationHandler)Delegate.Remove (colonistNotificationHandler2, value), colonistNotificationHandler);
+				}
+				while (colonistNotificationHandler != colonistNotificationHandler2);
+			}
+		}
 
-		public event ColonistListSyncNeededHandler ColonistListSyncNeeded;
+		public event ColonistListSyncNeededHandler ColonistListSyncNeeded {
+			add {
+				ColonistListSyncNeededHandler colonistListSyncNeededHandler = this.ColonistListSyncNeeded;
+				ColonistListSyncNeededHandler colonistListSyncNeededHandler2;
+				do {
+					colonistListSyncNeededHandler2 = colonistListSyncNeededHandler;
+					colonistListSyncNeededHandler = Interlocked.CompareExchange<ColonistListSyncNeededHandler> (ref this.ColonistListSyncNeeded, (ColonistListSyncNeededHandler)Delegate.Combine (colonistListSyncNeededHandler2, value), colonistListSyncNeededHandler);
+				}
+				while (colonistListSyncNeededHandler != colonistListSyncNeededHandler2);
+			}
+			remove {
+				ColonistListSyncNeededHandler colonistListSyncNeededHandler = this.ColonistListSyncNeeded;
+				ColonistListSyncNeededHandler colonistListSyncNeededHandler2;
+				do {
+					colonistListSyncNeededHandler2 = colonistListSyncNeededHandler;
+					colonistListSyncNeededHandler = Interlocked.CompareExchange<ColonistListSyncNeededHandler> (ref this.ColonistListSyncNeeded, (ColonistListSyncNeededHandler)Delegate.Remove (colonistListSyncNeededHandler2, value), colonistListSyncNeededHandler);
+				}
+				while (colonistListSyncNeededHandler != colonistListSyncNeededHandler2);
+			}
+		}
 	}
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ColonyInfoComponent : IRenderedComponent, INamedComponent
 	{
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "ColonyInfo";
@@ -3296,29 +3750,49 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI ()
 		{
-			Find.ColonyInfo.ColonyInfoOnGUI ();
+			Find.get_ColonyInfo ().ColonyInfoOnGUI ();
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
 
+namespace EdB.Interface
+{
 	public class ComponentAlternateMaterialSelection : IInitializedComponent, IComponentWithPreferences
 	{
+		//
+		// Fields
+		//
 		protected List<IPreference> preferences = new List<IPreference> ();
 
 		protected PreferenceRightClickOnly preference = new PreferenceRightClickOnly ();
 
+		//
+		// Properties
+		//
 		public IEnumerable<IPreference> Preferences {
 			get {
 				return this.preferences;
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ComponentAlternateMaterialSelection ()
 		{
 			this.preferences.Add (this.preference);
 		}
 
+		//
+		// Methods
+		//
 		public void Initialize (UserInterface userInterface)
 		{
 		}
@@ -3328,9 +3802,17 @@ namespace EdB.Interface
 			GizmoGridDrawer.RightClickMaterialPreference = this.preference;
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
 
+namespace EdB.Interface
+{
 	public class ComponentAlternateTimeDisplay : IInitializedComponent, IComponentWithPreferences
 	{
+		//
+		// Fields
+		//
 		protected List<IPreference> preferences = new List<IPreference> ();
 
 		protected PreferenceMinuteInterval preferenceMinuteInterval = new PreferenceMinuteInterval ();
@@ -3339,12 +3821,18 @@ namespace EdB.Interface
 
 		protected PreferenceEnableAlternateTimeDisplay preferenceEnableAlternateTimeDisplay = new PreferenceEnableAlternateTimeDisplay ();
 
+		//
+		// Properties
+		//
 		public IEnumerable<IPreference> Preferences {
 			get {
 				return this.preferences;
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ComponentAlternateTimeDisplay ()
 		{
 			this.preferences.Add (this.preferenceEnableAlternateTimeDisplay);
@@ -3354,6 +3842,9 @@ namespace EdB.Interface
 			this.preferenceMinuteInterval.PreferenceEnableAlternateTimeDisplay = this.preferenceEnableAlternateTimeDisplay;
 		}
 
+		//
+		// Methods
+		//
 		public void Initialize (UserInterface userInterface)
 		{
 		}
@@ -3366,15 +3857,26 @@ namespace EdB.Interface
 			DateReadout.Reinit ();
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
 
+namespace EdB.Interface
+{
 	public class ComponentColonistBar : IRenderedComponent, IInitializedComponent, INamedComponent, ICustomTextureComponent, IComponentWithPreferences
 	{
+		//
+		// Fields
+		//
 		private ColonistBar colonistBar;
 
 		private ColonistBarGroup defaultGroup = new ColonistBarGroup ();
 
 		private List<ColonistBarGroup> defaultGroups = new List<ColonistBarGroup> ();
 
+		//
+		// Properties
+		//
 		public ColonistBar ColonistBar {
 			get {
 				return this.colonistBar;
@@ -3411,6 +3913,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ComponentColonistBar ()
 		{
 			this.defaultGroups.Add (this.defaultGroup);
@@ -3419,6 +3924,9 @@ namespace EdB.Interface
 			this.colonistBar.CurrentGroup = this.defaultGroup;
 		}
 
+		//
+		// Methods
+		//
 		public void ColonistNotificationHandler (ColonistNotification notification)
 		{
 			if (notification.type == ColonistNotificationType.New) {
@@ -3450,20 +3958,33 @@ namespace EdB.Interface
 			ColonistBarDrawer.ResetTextures ();
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class ComponentColonistTracker : IUpdatedComponent, IInitializedComponent, INamedComponent
 	{
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "ColonistTracker";
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ComponentColonistTracker ()
 		{
 			ColonistTracker.Instance.Reset ();
 		}
 
+		//
+		// Methods
+		//
 		public void Initialize (UserInterface userInterface)
 		{
 			ColonistTracker.Instance.InitializeWithDefaultColonists ();
@@ -3478,24 +3999,41 @@ namespace EdB.Interface
 			ColonistTracker.Instance.Update ();
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
 
+namespace EdB.Interface
+{
 	public class ComponentColorCodedWorkPassions : IInitializedComponent, IComponentWithPreferences
 	{
+		//
+		// Fields
+		//
 		protected List<IPreference> preferences = new List<IPreference> ();
 
 		protected PreferenceColorCodedWorkPassions preference = new PreferenceColorCodedWorkPassions ();
 
+		//
+		// Properties
+		//
 		public IEnumerable<IPreference> Preferences {
 			get {
 				return this.preferences;
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ComponentColorCodedWorkPassions ()
 		{
 			this.preferences.Add (this.preference);
 		}
 
+		//
+		// Methods
+		//
 		public void Initialize (UserInterface userInterface)
 		{
 			WidgetsWork.PreferenceColorCodedWorkPassions = this.preference;
@@ -3505,29 +4043,47 @@ namespace EdB.Interface
 		{
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
 
+namespace EdB.Interface
+{
 	public class ComponentEmptyStockpile : IInitializedComponent, IComponentWithPreferences
 	{
+		//
+		// Fields
+		//
 		protected List<IPreference> preferences = new List<IPreference> ();
 
 		protected PreferenceEmptyStockpile preference = new PreferenceEmptyStockpile ();
 
+		//
+		// Properties
+		//
 		public IEnumerable<IPreference> Preferences {
 			get {
 				return this.preferences;
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ComponentEmptyStockpile ()
 		{
 			this.preferences.Add (this.preference);
 		}
 
+		//
+		// Methods
+		//
 		public void Initialize (UserInterface userInterface)
 		{
 			MainTabsRoot mainTabsRoot = userInterface.MainTabsRoot;
 			foreach (MainTabDef current in mainTabsRoot.AllTabs) {
-				MainTabWindow window = current.Window;
+				MainTabWindow window = current.get_Window ();
 				if (window != null) {
 					MainTabWindow_Architect mainTabWindow_Architect = window as MainTabWindow_Architect;
 					if (mainTabWindow_Architect != null) {
@@ -3543,24 +4099,42 @@ namespace EdB.Interface
 		{
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
 
+namespace EdB.Interface
+{
 	public class ComponentHideMainTabs : IInitializedComponent, IComponentWithPreferences
 	{
+		//
+		// Fields
+		//
 		protected List<IPreference> preferences = new List<IPreference> ();
 
 		protected PreferenceHideMainTabs preference = new PreferenceHideMainTabs ();
 
+		//
+		// Properties
+		//
 		public IEnumerable<IPreference> Preferences {
 			get {
 				return this.preferences;
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ComponentHideMainTabs ()
 		{
 			this.preferences.Add (this.preference);
 		}
 
+		//
+		// Methods
+		//
 		public void Initialize (UserInterface userInterface)
 		{
 			this.UpdateMainTabVisibility (userInterface.MainTabsRoot, this.preference.SelectedOptions);
@@ -3582,7 +4156,7 @@ namespace EdB.Interface
 			}
 			foreach (MainTabDef current2 in mainTabsRoot.AllTabs) {
 				if (!this.preference.IsTabExcluded (current2.defName)) {
-					if (current2.Window != null) {
+					if (current2.get_Window () != null) {
 						if (hashSet.Contains (current2.defName)) {
 							current2.showTabButton = false;
 						}
@@ -3594,9 +4168,18 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
 
+namespace EdB.Interface
+{
 	public class ComponentInventory : IInitializedComponent, IComponentWithPreferences
 	{
+		//
+		// Fields
+		//
 		private InventoryManager inventoryManager;
 
 		protected PreferenceIncludeUnfinished preferenceIncludeUnfinished = new PreferenceIncludeUnfinished ();
@@ -3605,18 +4188,27 @@ namespace EdB.Interface
 
 		protected List<IPreference> preferences = new List<IPreference> ();
 
+		//
+		// Properties
+		//
 		public IEnumerable<IPreference> Preferences {
 			get {
 				return this.preferences;
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ComponentInventory ()
 		{
 			this.preferences.Add (this.preferenceCompressedStorage);
 			this.preferences.Add (this.preferenceIncludeUnfinished);
 		}
 
+		//
+		// Methods
+		//
 		public void Initialize (UserInterface userInterface)
 		{
 		}
@@ -3627,30 +4219,48 @@ namespace EdB.Interface
 			this.inventoryManager.PreferenceCompressedStorage = this.preferenceCompressedStorage;
 			this.inventoryManager.PreferenceIncludeUnfinished = this.preferenceIncludeUnfinished;
 			MainTabDef mainTabDef = userInterface.MainTabsRoot.FindTabDef ("EdB_Interface_Inventory");
-			MainTabWindow_Inventory mainTabWindow_Inventory = mainTabDef.Window as MainTabWindow_Inventory;
+			MainTabWindow_Inventory mainTabWindow_Inventory = mainTabDef.get_Window () as MainTabWindow_Inventory;
 			if (mainTabWindow_Inventory != null) {
 				mainTabWindow_Inventory.InventoryManager = this.inventoryManager;
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
 
+namespace EdB.Interface
+{
 	public class ComponentMainTabCloseButton : IInitializedComponent, IComponentWithPreferences
 	{
+		//
+		// Fields
+		//
 		protected List<IPreference> preferences = new List<IPreference> ();
 
 		protected PreferenceShowCloseButton preference = new PreferenceShowCloseButton ();
 
+		//
+		// Properties
+		//
 		public IEnumerable<IPreference> Preferences {
 			get {
 				return this.preferences;
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ComponentMainTabCloseButton ()
 		{
 			this.preferences.Add (this.preference);
 		}
 
+		//
+		// Methods
+		//
 		public void Initialize (UserInterface userInterface)
 		{
 			this.UpdateButtonState (userInterface.MainTabsRoot, this.preference.Value);
@@ -3668,7 +4278,7 @@ namespace EdB.Interface
 		{
 			foreach (MainTabDef current in mainTabsRoot.AllTabs) {
 				if (current.showTabButton) {
-					MainTabWindow window = current.Window;
+					MainTabWindow window = current.get_Window ();
 					if (window != null) {
 						window.doCloseX = value;
 					}
@@ -3676,33 +4286,51 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ComponentPauseOnStart : IInitializedComponent, IComponentWithPreferences
 	{
+		//
+		// Fields
+		//
 		protected List<IPreference> preferences = new List<IPreference> ();
 
 		protected PreferencePauseOnStart preference = new PreferencePauseOnStart ();
 
+		//
+		// Properties
+		//
 		public IEnumerable<IPreference> Preferences {
 			get {
 				return this.preferences;
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ComponentPauseOnStart ()
 		{
 			this.preferences.Add (this.preference);
 		}
 
+		//
+		// Methods
+		//
 		public void Initialize (UserInterface userInterface)
 		{
 			if (this.preference.Value) {
 				try {
 					if (MapInitData.startedFromEntry) {
-						Find.TickManager.TogglePaused ();
+						Find.get_TickManager ().TogglePaused ();
 					}
-					else if (!Prefs.PauseOnLoad) {
-						Find.TickManager.TogglePaused ();
+					else if (!Prefs.get_PauseOnLoad ()) {
+						Find.get_TickManager ().TogglePaused ();
 					}
 				}
 				catch (Exception ex) {
@@ -3716,9 +4344,18 @@ namespace EdB.Interface
 		{
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
 
+namespace EdB.Interface
+{
 	public class ComponentSquadManager : IUpdatedComponent, IInitializedComponent, INamedComponent, ICustomTextureComponent, IComponentWithPreferences
 	{
+		//
+		// Fields
+		//
 		protected List<IPreference> preferences = new List<IPreference> ();
 
 		private SquadShortcuts shortcuts = new SquadShortcuts ();
@@ -3737,6 +4374,9 @@ namespace EdB.Interface
 
 		protected PreferenceEnableSquads preferenceEnableSquads = new PreferenceEnableSquads ();
 
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "SquadManager";
@@ -3749,6 +4389,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ComponentSquadManager ()
 		{
 			SquadManager.Instance.Reset ();
@@ -3759,6 +4402,9 @@ namespace EdB.Interface
 			this.preferences.Add (this.preferenceAlwaysShowSquadName);
 		}
 
+		//
+		// Methods
+		//
 		public void Initialize (UserInterface userInterface)
 		{
 			if (SquadManager.Instance.SyncWithMap ()) {
@@ -3790,7 +4436,7 @@ namespace EdB.Interface
 				colonistBarComponent.ColonistBar.AlwaysShowGroupName = value;
 			};
 			MainTabDef squadsWindowTabDef = mainTabsRoot.FindTabDef ("EdB_Interface_Squads");
-			MainTabWindow_Squads mainTabWindow_Squads = squadsWindowTabDef.Window as MainTabWindow_Squads;
+			MainTabWindow_Squads mainTabWindow_Squads = squadsWindowTabDef.get_Window () as MainTabWindow_Squads;
 			if (squadsWindowTabDef != null) {
 				this.preferenceEnableSquads.ValueChanged += delegate (bool value) {
 					this.SquadsEnabledValueChanged (value, squadsWindowTabDef, colonistBarComponent);
@@ -3861,9 +4507,19 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ComponentTabReplacement : IUpdatedComponent, IInitializedComponent, ICustomTextureComponent, IComponentWithPreferences
 	{
+		//
+		// Fields
+		//
 		protected List<IPreference> preferences = new List<IPreference> ();
 
 		protected ITab_Pawn_Health_Vanilla tabHealthVanilla;
@@ -3926,12 +4582,18 @@ namespace EdB.Interface
 
 		protected PreferenceTabGrowing preferenceTabGrowing = new PreferenceTabGrowing ();
 
+		//
+		// Properties
+		//
 		public IEnumerable<IPreference> Preferences {
 			get {
 				return this.preferences;
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ComponentTabReplacement ()
 		{
 			this.preferences.Add (this.preferenceTabBrowseButtons);
@@ -3973,6 +4635,9 @@ namespace EdB.Interface
 			this.tabPrisonerVanilla = new ITab_Pawn_Prisoner_Vanilla (this.preferenceTabBrowseButtons);
 		}
 
+		//
+		// Methods
+		//
 		public ReplacementTabs CreateReplacementTabs ()
 		{
 			this.replacementTabs.Clear ();
@@ -4021,7 +4686,7 @@ namespace EdB.Interface
 			if (this.preferenceTabArt.Value) {
 				dictionary [typeof(ITab_Art)] = this.tabArt;
 			}
-			foreach (ThingDef current in DefDatabase<ThingDef>.AllDefs) {
+			foreach (ThingDef current in DefDatabase<ThingDef>.get_AllDefs ()) {
 				if (current.inspectorTabsResolved != null) {
 					bool flag = false;
 					foreach (ITab current2 in current.inspectorTabsResolved) {
@@ -4119,7 +4784,7 @@ namespace EdB.Interface
 		public void Update ()
 		{
 			if (this.dirtyFlag) {
-				UserInterface userInterface = Find.UIRoot_Map as UserInterface;
+				UserInterface userInterface = Find.get_UIRoot_Map () as UserInterface;
 				if (userInterface != null) {
 					MainTabWindow_Inspect mainTabWindow_Inspect = userInterface.FindMainTabOfType<MainTabWindow_Inspect> ();
 					if (mainTabWindow_Inspect != null) {
@@ -4130,27 +4795,54 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ConceptDeciderComponent : IUpdatedComponent, INamedComponent
 	{
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "ConceptDecider";
 			}
 		}
 
+		//
+		// Methods
+		//
 		public void Update ()
 		{
 			ConceptDecider.ConceptDeciderUpdate ();
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class Controller : MonoBehaviour
 	{
+		//
+		// Static Fields
+		//
 		public static readonly string ModName = "EdB Interface";
 
 		public static readonly string GameObjectName = "EdBInterfaceController";
 
+		//
+		// Fields
+		//
 		protected Type uiRootType;
 
 		protected RootMap replacementRootMap;
@@ -4161,16 +4853,19 @@ namespace EdB.Interface
 
 		protected Window currentWindow;
 
+		//
+		// Properties
+		//
 		public bool ModEnabled {
 			get {
-				InstalledMod installedMod = InstalledModLister.AllInstalledMods.First ((InstalledMod m) => m.Name.Equals (Controller.ModName));
-				return installedMod != null && installedMod.Active;
+				InstalledMod installedMod = InstalledModLister.get_AllInstalledMods ().First ((InstalledMod m) => m.get_Name ().Equals (Controller.ModName));
+				return installedMod != null && installedMod.get_Active ();
 			}
 		}
 
 		public Window TopWindow {
 			get {
-				foreach (Window current in Find.WindowStack.Windows) {
+				foreach (Window current in Find.get_WindowStack ().get_Windows ()) {
 					if (current.GetType ().FullName != "Verse.EditWindow_Log") {
 						return current;
 					}
@@ -4179,9 +4874,12 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Methods
+		//
 		public virtual void GameplayUpdate ()
 		{
-			Root rootRoot = Find.RootRoot;
+			Root rootRoot = Find.get_RootRoot ();
 			if (rootRoot != null) {
 				UIRoot uiRoot = rootRoot.uiRoot;
 				if (uiRoot != null) {
@@ -4198,7 +4896,7 @@ namespace EdB.Interface
 								Log.Error ("Failed to replace gameplay interface with EdB Interface");
 								Log.Error (ex.ToString ());
 							}
-							base.enabled = false;
+							base.set_enabled (false);
 						}
 					}
 					else {
@@ -4227,30 +4925,30 @@ namespace EdB.Interface
 		{
 			if (level == 0) {
 				this.gameplay = false;
-				base.enabled = true;
+				base.set_enabled (true);
 			}
 			else if (level == 1) {
 				this.gameplay = true;
-				base.enabled = true;
+				base.set_enabled (true);
 			}
 		}
 
 		public void ReplaceUIRoot ()
 		{
-			UIRoot_Map uIRoot_Map = Find.UIRoot_Map;
+			UIRoot_Map uIRoot_Map = Find.get_UIRoot_Map ();
 			if (uIRoot_Map == null) {
 				Log.Error ("No user interface found.  Cannot replace with the EdB interface.");
 				return;
 			}
 			UserInterface userInterface = new UserInterface ();
 			userInterface.windows = uIRoot_Map.windows;
-			Root rootRoot = Find.RootRoot;
+			Root rootRoot = Find.get_RootRoot ();
 			rootRoot.uiRoot = userInterface;
 		}
 
 		public virtual void Start ()
 		{
-			base.enabled = true;
+			base.set_enabled (true);
 		}
 
 		protected void UnloadMod ()
@@ -4259,7 +4957,7 @@ namespace EdB.Interface
 			Dictionary<Type, ITab> dictionary = (Dictionary<Type, ITab>)field.GetValue (null);
 			dictionary.Remove (typeof(Bootstrap));
 			GameObject gameObject = GameObject.Find (Controller.GameObjectName);
-			UnityEngine.Object.Destroy (gameObject);
+			Object.Destroy (gameObject);
 			Log.Message ("Unloaded " + Controller.ModName);
 		}
 
@@ -4274,17 +4972,28 @@ namespace EdB.Interface
 				}
 			}
 			catch (Exception ex) {
-				base.enabled = false;
+				base.set_enabled (false);
 				Log.Error (ex.ToString ());
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public static class DateReadout
 	{
+		//
+		// Static Fields
+		//
 		public const float Height = 22;
 
-		private static readonly float TicksPerMinute = 20.83333f;
+		private static readonly float TicksPerMinute = 20.83333;
 
 		private static readonly List<string> fastHourStrings = new List<string> ();
 
@@ -4292,21 +5001,24 @@ namespace EdB.Interface
 
 		private static string dateString;
 
+		//
+		// Static Methods
+		//
 		public static void AlternateDateOnGUI (Rect dateRect, bool amPm, int minuteInterval)
 		{
 			if (Mouse.IsOver (dateRect)) {
 				Widgets.DrawHighlight (dateRect);
 			}
 			GUI.BeginGroup (dateRect);
-			Text.Font = GameFont.Small;
-			Text.Anchor = TextAnchor.MiddleRight;
+			Text.set_Font (1);
+			Text.set_Anchor (5);
 			float num = 9;
-			float num2 = dateRect.width * 0 / num;
-			Text.Font = GameFont.Small;
-			float num3 = dateRect.width / num;
-			Rect rect = new Rect (num2, 0, num3 * 4.25f, 22);
-			int num4 = GenDate.HourInt;
-			int num5 = (Find.TickManager.TicksGame + Find.TickManager.gameStartAbsTick) % 30000;
+			float num2 = dateRect.get_width () * 0 / num;
+			Text.set_Font (1);
+			float num3 = dateRect.get_width () / num;
+			Rect rect = new Rect (num2, 0, num3 * 4.25, 22);
+			int num4 = GenDate.get_HourInt ();
+			int num5 = (Find.get_TickManager ().get_TicksGame () + Find.get_TickManager ().gameStartAbsTick) % 30000;
 			int num6 = (int)((float)(num5 % 1250) / DateReadout.TicksPerMinute) / minuteInterval * minuteInterval;
 			string text = string.Empty;
 			if (amPm) {
@@ -4326,26 +5038,26 @@ namespace EdB.Interface
 				num6,
 				text
 			}));
-			float num7 = dateRect.width * 3 / num;
-			Text.Font = GameFont.Small;
+			float num7 = dateRect.get_width () * 3 / num;
+			Text.set_Font (1);
 			Rect rect2 = new Rect (num7 - 8, 0, num3 * 4, 22);
-			if (GenDate.DayOfMonth != DateReadout.dateStringDay) {
-				DateReadout.dateString = GenDate.CurrentMonthDateShortString;
-				DateReadout.dateStringDay = GenDate.DayOfMonth;
+			if (GenDate.get_DayOfMonth () != DateReadout.dateStringDay) {
+				DateReadout.dateString = GenDate.get_CurrentMonthDateShortString ();
+				DateReadout.dateStringDay = GenDate.get_DayOfMonth ();
 			}
 			Widgets.Label (rect2, DateReadout.dateString);
-			float num8 = dateRect.width * 7 / num;
-			Text.Font = GameFont.Small;
+			float num8 = dateRect.get_width () * 7 / num;
+			Text.set_Font (1);
 			Rect rect3 = new Rect (num8 - 8, 0, num3 * 2, 22);
-			Widgets.Label (rect3, GenString.ToStringCached (GenDate.CurrentYear));
-			Text.Anchor = TextAnchor.UpperLeft;
+			Widgets.Label (rect3, GenString.ToStringCached (GenDate.get_CurrentYear ()));
+			Text.set_Anchor (0);
 			GUI.EndGroup ();
 			TooltipHandler.TipRegion (dateRect, new TipSignal (() => Translator.Translate ("DateReadoutTip", new object[] {
-				GenDate.DaysPassed,
+				GenDate.get_DaysPassed (),
 				10,
-				DateUtility.Label (GenDate.CurrentSeason)
+				DateUtility.Label (GenDate.get_CurrentSeason ())
 			}), 86423));
-			Text.Anchor = TextAnchor.UpperLeft;
+			Text.set_Anchor (0);
 		}
 
 		public static void DateOnGUI (Rect dateRect)
@@ -4354,30 +5066,30 @@ namespace EdB.Interface
 				Widgets.DrawHighlight (dateRect);
 			}
 			GUI.BeginGroup (dateRect);
-			Text.Font = GameFont.Small;
-			Text.Anchor = TextAnchor.MiddleCenter;
-			float num = dateRect.width * 1 / 6;
-			Text.Font = GameFont.Small;
+			Text.set_Font (1);
+			Text.set_Anchor (4);
+			float num = dateRect.get_width () * 1 / 6;
+			Text.set_Font (1);
 			Rect rect = new Rect (num - 50, 0, 100, 22);
-			Widgets.Label (rect, DateReadout.fastHourStrings [GenDate.HourInt]);
-			float num2 = dateRect.width * 3 / 6;
-			Text.Font = GameFont.Small;
+			Widgets.Label (rect, DateReadout.fastHourStrings [GenDate.get_HourInt ()]);
+			float num2 = dateRect.get_width () * 3 / 6;
+			Text.set_Font (1);
 			Rect rect2 = new Rect (num2 - 50, 0, 100, 22);
-			if (GenDate.DayOfMonth != DateReadout.dateStringDay) {
-				DateReadout.dateString = GenDate.CurrentMonthDateShortString;
-				DateReadout.dateStringDay = GenDate.DayOfMonth;
+			if (GenDate.get_DayOfMonth () != DateReadout.dateStringDay) {
+				DateReadout.dateString = GenDate.get_CurrentMonthDateShortString ();
+				DateReadout.dateStringDay = GenDate.get_DayOfMonth ();
 			}
 			Widgets.Label (rect2, DateReadout.dateString);
-			float num3 = dateRect.width * 5 / 6;
-			Text.Font = GameFont.Small;
+			float num3 = dateRect.get_width () * 5 / 6;
+			Text.set_Font (1);
 			Rect rect3 = new Rect (num3 - 50, 0, 100, 22);
-			Widgets.Label (rect3, GenString.ToStringCached (GenDate.CurrentYear));
-			Text.Anchor = TextAnchor.UpperLeft;
+			Widgets.Label (rect3, GenString.ToStringCached (GenDate.get_CurrentYear ()));
+			Text.set_Anchor (0);
 			GUI.EndGroup ();
 			TooltipHandler.TipRegion (dateRect, new TipSignal (() => Translator.Translate ("DateReadoutTip", new object[] {
-				GenDate.DaysPassed,
+				GenDate.get_DaysPassed (),
 				10,
-				DateUtility.Label (GenDate.CurrentSeason)
+				DateUtility.Label (GenDate.get_CurrentSeason ())
 			}), 86423));
 		}
 
@@ -4391,9 +5103,17 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class DebugToolsComponent : IRenderedComponent, INamedComponent
 	{
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "DebugTools";
@@ -4406,16 +5126,30 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI ()
 		{
 			DebugTools.DebugToolsOnGUI ();
 		}
 	}
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class DebugWindowsOpenerComponent : IRenderedComponent, INamedComponent
 	{
+		//
+		// Fields
+		//
 		private DebugWindowsOpener debugWindowsOpener;
 
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "DebugWindowsOpener";
@@ -4428,43 +5162,66 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public DebugWindowsOpenerComponent (DebugWindowsOpener debugWindowsOpener)
 		{
 			this.debugWindowsOpener = debugWindowsOpener;
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI ()
 		{
 			this.debugWindowsOpener.DevToolStarterOnGUI ();
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Verse;
 
-	public class Designator_ZoneAddStockpile_Resources : RimWorld.Designator_ZoneAddStockpile_Resources
+namespace EdB.Interface
+{
+	public class Designator_ZoneAddStockpile_Resources : Designator_ZoneAddStockpile_Resources
 	{
+		//
+		// Fields
+		//
 		protected List<ThingDef> thingDefs = new List<ThingDef> (100);
 
 		private BooleanPreference emptyZonePreference;
 
+		//
+		// Properties
+		//
 		public BooleanPreference EmptyZonePreference {
 			set {
 				this.emptyZonePreference = value;
 			}
 		}
 
+		//
+		// Methods
+		//
 		protected override Zone MakeNewZone ()
 		{
 			Zone_Stockpile zone_Stockpile = new Zone_Stockpile (0);
 			if (this.emptyZonePreference != null && this.emptyZonePreference.Value) {
-				if (Find.ZoneManager.AllZones.Count ((Zone zone) => zone is Zone_Stockpile) > 1) {
+				if (Find.get_ZoneManager ().get_AllZones ().Count ((Zone zone) => zone is Zone_Stockpile) > 1) {
 					ThingFilter filter = zone_Stockpile.GetStoreSettings ().filter;
 					this.thingDefs.Clear ();
-					foreach (ThingDef current in filter.AllowedThingDefs) {
+					foreach (ThingDef current in filter.get_AllowedThingDefs ()) {
 						this.thingDefs.Add (current);
 					}
 					foreach (ThingDef current2 in this.thingDefs) {
 						filter.SetAllow (current2, false);
 					}
-					foreach (SpecialThingFilterDef current3 in DefDatabase<SpecialThingFilterDef>.AllDefs) {
+					foreach (SpecialThingFilterDef current3 in DefDatabase<SpecialThingFilterDef>.get_AllDefs ()) {
 						if (filter.Allowed (current3)) {
 							filter.SetAllow (current3, false);
 						}
@@ -4474,9 +5231,17 @@ namespace EdB.Interface
 			return zone_Stockpile;
 		}
 	}
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class DesignatorManagerComponent : IRenderedComponent, IUpdatedComponent, INamedComponent
 	{
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "DesignatorManager";
@@ -4489,6 +5254,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI ()
 		{
 			DesignatorManager.DesignationManagerOnGUI ();
@@ -4499,12 +5267,21 @@ namespace EdB.Interface
 			DesignatorManager.DesignatorManagerUpdate ();
 		}
 	}
+}
+using System;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class Dialog_InterfaceOptions : Window
 	{
+		//
+		// Static Fields
+		//
 		private static readonly Vector2 WindowSize = new Vector2 (500, 720);
 
-		public static Color DisabledControlColor = new Color (1, 1, 1, 0.5f);
+		public static Color DisabledControlColor = new Color (1, 1, 1, 0.5);
 
 		public static float IndentSize = 16;
 
@@ -4514,10 +5291,16 @@ namespace EdB.Interface
 
 		public static readonly int LabelLineHeight = 30;
 
+		//
+		// Fields
+		//
 		private ScrollView optionListView = new ScrollView ();
 
 		protected bool closed = true;
 
+		//
+		// Properties
+		//
 		public override Vector2 InitialWindowSize {
 			get {
 				int num = 0;
@@ -4535,6 +5318,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public Dialog_InterfaceOptions ()
 		{
 			this.closeOnEscapeKey = true;
@@ -4544,17 +5330,20 @@ namespace EdB.Interface
 			this.forcePause = true;
 		}
 
+		//
+		// Methods
+		//
 		public override void DoWindowContents (Rect inRect)
 		{
 			try {
 				GUI.BeginGroup (inRect);
-				Rect viewRect = new Rect (8, 16, inRect.width - 8, inRect.height - 60);
+				Rect viewRect = new Rect (8, 16, inRect.get_width () - 8, inRect.get_height () - 60);
 				float num = 0;
 				try {
 					this.optionListView.Begin (viewRect);
-					GUI.skin.label.alignment = TextAnchor.UpperLeft;
-					Text.Anchor = TextAnchor.UpperLeft;
-					GUI.color = Color.white;
+					GUI.get_skin ().get_label ().set_alignment (0);
+					Text.set_Anchor (0);
+					GUI.set_color (Color.get_white ());
 					float width = this.optionListView.ContentWidth - Dialog_InterfaceOptions.PreferencePadding.x - Dialog_InterfaceOptions.PreferencePadding.x;
 					foreach (PreferenceGroup current in Preferences.Instance.Groups) {
 						bool flag = false;
@@ -4582,8 +5371,8 @@ namespace EdB.Interface
 			}
 			finally {
 				GUI.EndGroup ();
-				GUI.color = Color.white;
-				Text.Anchor = TextAnchor.UpperLeft;
+				GUI.set_color (Color.get_white ());
+				Text.set_Anchor (0);
 			}
 		}
 
@@ -4600,17 +5389,29 @@ namespace EdB.Interface
 
 		protected void SectionLabel (string message, ref float cursor, float width)
 		{
-			Text.Font = GameFont.Medium;
+			Text.set_Font (2);
 			Widgets.Label (new Rect (Dialog_InterfaceOptions.PreferencePadding.x, cursor, width, (float)Dialog_InterfaceOptions.LabelLineHeight), message);
 			cursor += (float)(Dialog_InterfaceOptions.LabelLineHeight + 6);
-			Text.Font = GameFont.Small;
+			Text.set_Font (1);
 		}
 	}
+}
+using System;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class Dialog_NameSquad : Window
 	{
+		//
+		// Static Fields
+		//
 		private const int MaxNameLength = 20;
 
+		//
+		// Fields
+		//
 		private bool initializedFocus;
 
 		private bool newSquad;
@@ -4619,12 +5420,18 @@ namespace EdB.Interface
 
 		private Squad squad;
 
+		//
+		// Properties
+		//
 		public override Vector2 InitialWindowSize {
 			get {
 				return new Vector2 (500, 200);
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public Dialog_NameSquad (Squad squad, bool newSquad)
 		{
 			this.squad = squad;
@@ -4634,6 +5441,9 @@ namespace EdB.Interface
 			this.absorbInputAroundWindow = true;
 		}
 
+		//
+		// Methods
+		//
 		protected bool ChangeName ()
 		{
 			if (this.currentName.Length > 0) {
@@ -4645,16 +5455,16 @@ namespace EdB.Interface
 
 		public override void DoWindowContents (Rect inRect)
 		{
-			Text.Font = GameFont.Medium;
+			Text.set_Font (2);
 			if (this.newSquad) {
 				Widgets.Label (new Rect (15, 15, 500, 50), Translator.Translate ("EdB.Squads.Window.NameDialog.New"));
 			}
 			else {
 				Widgets.Label (new Rect (15, 15, 500, 50), Translator.Translate ("EdB.Squads.Window.NameDialog.Rename"));
 			}
-			Text.Font = GameFont.Small;
-			bool flag = Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return;
-			Rect rect = new Rect (15, 50, inRect.width / 2 - 20, 35);
+			Text.set_Font (1);
+			bool flag = Event.get_current ().get_type () == 4 && Event.get_current ().get_keyCode () == 13;
+			Rect rect = new Rect (15, 50, inRect.get_width () / 2 - 20, 35);
 			GUI.SetNextControlName ("NameSquad");
 			string text = Widgets.TextField (rect, this.currentName);
 			if (text.Length <= 20) {
@@ -4667,7 +5477,7 @@ namespace EdB.Interface
 					this.initializedFocus = true;
 				}
 				else if (nameOfFocusedControl == "NameSquad") {
-					TextEditor textEditor = (TextEditor)GUIUtility.GetStateObject (typeof(TextEditor), GUIUtility.keyboardControl);
+					TextEditor textEditor = (TextEditor)GUIUtility.GetStateObject (typeof(TextEditor), GUIUtility.get_keyboardControl ());
 					textEditor.SelectAll ();
 					this.initializedFocus = true;
 				}
@@ -4676,21 +5486,32 @@ namespace EdB.Interface
 				this.Close (true);
 				return;
 			}
-			if (!this.newSquad && Widgets.TextButton (new Rect (20, inRect.height - 35, inRect.width / 2 - 20, 35), "Cancel", true, false)) {
+			if (!this.newSquad && Widgets.TextButton (new Rect (20, inRect.get_height () - 35, inRect.get_width () / 2 - 20, 35), "Cancel", true, false)) {
 				this.Close (true);
 				return;
 			}
-			if (Widgets.TextButton (new Rect (inRect.width / 2 + 20, inRect.height - 35, inRect.width / 2 - 20, 35), "OK", true, false) && this.ChangeName ()) {
+			if (Widgets.TextButton (new Rect (inRect.get_width () / 2 + 20, inRect.get_height () - 35, inRect.get_width () / 2 - 20, 35), "OK", true, false) && this.ChangeName ()) {
 				this.Close (true);
 				return;
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
 
+namespace EdB.Interface
+{
 	public class DragBoxComponent : IRenderedComponent, INamedComponent
 	{
+		//
+		// Fields
+		//
 		private Selector selector;
 
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "DragBox";
@@ -4703,23 +5524,40 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public DragBoxComponent (Selector selector)
 		{
 			this.selector = selector;
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI ()
 		{
 			this.selector.dragBox.DragBoxOnGUI ();
 		}
 	}
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class EquippableThing
 	{
+		//
+		// Fields
+		//
 		public Thing thing;
 
 		public float distance;
 
+		//
+		// Constructors
+		//
 		public EquippableThing ()
 		{
 		}
@@ -4729,11 +5567,23 @@ namespace EdB.Interface
 			this.thing = thing;
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class EquippableThings
 	{
+		//
+		// Fields
+		//
 		protected Dictionary<InventoryRecordKey, List<EquippableThing>> thingLookup = new Dictionary<InventoryRecordKey, List<EquippableThing>> ();
 
+		//
+		// Indexer
+		//
 		public List<EquippableThing> this [InventoryRecordKey key] {
 			get {
 				List<EquippableThing> result;
@@ -4747,6 +5597,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Methods
+		//
 		public void Add (InventoryRecordKey key, Thing thing)
 		{
 			List<EquippableThing> list = this [key];
@@ -4762,9 +5615,22 @@ namespace EdB.Interface
 			this.thingLookup.Clear ();
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Verse;
+using Verse.Sound;
 
+namespace EdB.Interface
+{
 	public static class GizmoGridDrawer
 	{
+		//
+		// Static Fields
+		//
 		private static float heightDrawn = 0;
 
 		private static BooleanPreference rightClickMaterialPreference;
@@ -4777,9 +5643,12 @@ namespace EdB.Interface
 
 		private static int heightDrawnFrame;
 
+		//
+		// Static Properties
+		//
 		public static float HeightDrawnRecently {
 			get {
-				if (Time.frameCount > GizmoGridDrawer.heightDrawnFrame + 2) {
+				if (Time.get_frameCount () > GizmoGridDrawer.heightDrawnFrame + 2) {
 					return 0;
 				}
 				return GizmoGridDrawer.heightDrawn;
@@ -4792,6 +5661,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Static Methods
+		//
 		public static void DrawGizmoGrid (IEnumerable<Gizmo> gizmos, float startX, out Gizmo mouseoverGizmo)
 		{
 			GizmoGridDrawer.gizmoGroups.Clear ();
@@ -4820,33 +5692,33 @@ namespace EdB.Interface
 				GizmoGridDrawer.firstGizmos.Add (gizmo);
 			}
 			GizmoGridDrawer.drawnHotKeys.Clear ();
-			float num = (float)(Screen.width - 140);
-			Text.Font = GameFont.Tiny;
-			Vector2 vector = new Vector2 (startX, (float)(Screen.height - 35) - GizmoGridDrawer.GizmoSpacing.y - 75);
+			float num = (float)(Screen.get_width () - 140);
+			Text.set_Font (0);
+			Vector2 vector = new Vector2 (startX, (float)(Screen.get_height () - 35) - GizmoGridDrawer.GizmoSpacing.y - 75);
 			mouseoverGizmo = null;
 			Gizmo interactedGiz = null;
 			Event @event = null;
 			for (int k = 0; k < GizmoGridDrawer.firstGizmos.Count; k++) {
 				Gizmo gizmo2 = GizmoGridDrawer.firstGizmos [k];
-				if (gizmo2.Visible) {
-					if (vector.x + gizmo2.Width + GizmoGridDrawer.GizmoSpacing.x > num) {
+				if (gizmo2.get_Visible ()) {
+					if (vector.x + gizmo2.get_Width () + GizmoGridDrawer.GizmoSpacing.x > num) {
 						vector.x = startX;
 						vector.y -= 75 + GizmoGridDrawer.GizmoSpacing.x;
 					}
-					GizmoGridDrawer.heightDrawnFrame = Time.frameCount;
-					GizmoGridDrawer.heightDrawn = (float)Screen.height - vector.y;
+					GizmoGridDrawer.heightDrawnFrame = Time.get_frameCount ();
+					GizmoGridDrawer.heightDrawn = (float)Screen.get_height () - vector.y;
 					GizmoResult gizmoResult = gizmo2.GizmoOnGUI (vector);
-					if (gizmoResult.State == GizmoState.Interacted) {
-						@event = gizmoResult.InteractEvent;
+					if (gizmoResult.get_State () == 2) {
+						@event = gizmoResult.get_InteractEvent ();
 						interactedGiz = gizmo2;
 					}
-					if (gizmoResult.State >= GizmoState.Mouseover) {
+					if (gizmoResult.get_State () >= 1) {
 						mouseoverGizmo = gizmo2;
 					}
-					Rect rect = new Rect (vector.x, vector.y, gizmo2.Width, 75 + GizmoGridDrawer.GizmoSpacing.y);
+					Rect rect = new Rect (vector.x, vector.y, gizmo2.get_Width (), 75 + GizmoGridDrawer.GizmoSpacing.y);
 					rect = GenUI.ContractedBy (rect, -12);
 					GenUI.AbsorbClicksInRect (rect);
-					vector.x += gizmo2.Width + GizmoGridDrawer.GizmoSpacing.x;
+					vector.x += gizmo2.get_Width () + GizmoGridDrawer.GizmoSpacing.x;
 				}
 			}
 			if (interactedGiz != null) {
@@ -4858,10 +5730,10 @@ namespace EdB.Interface
 					}
 				}
 				if (interactedGiz is Designator_Build) {
-					if (@event.button != 1 && GizmoGridDrawer.rightClickMaterialPreference != null && GizmoGridDrawer.rightClickMaterialPreference.Value) {
+					if (@event.get_button () != 1 && GizmoGridDrawer.rightClickMaterialPreference != null && GizmoGridDrawer.rightClickMaterialPreference.Value) {
 						Command command = interactedGiz as Command;
-						if (command != null && command.CurActivateSound != null) {
-							SoundStarter.PlayOneShotOnCamera (command.CurActivateSound);
+						if (command != null && command.get_CurActivateSound () != null) {
+							SoundStarter.PlayOneShotOnCamera (command.get_CurActivateSound ());
 						}
 						Designator designator = interactedGiz as Designator;
 						if (designator != null) {
@@ -4875,19 +5747,32 @@ namespace EdB.Interface
 				else {
 					interactedGiz.ProcessInput (@event);
 				}
-				Event.current.Use ();
+				Event.get_current ().Use ();
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class GlobalControls
 	{
+		//
+		// Static Fields
+		//
 		public const float Width = 134;
 
 		private const int VisibilityControlsPerRow = 5;
 
-		private static readonly int TempSearchNumRadialCells = GenRadial.NumCellsInRadius (2.9f);
+		private static readonly int TempSearchNumRadialCells = GenRadial.NumCellsInRadius (2.9);
 
+		//
+		// Fields
+		//
 		protected PreferenceMinuteInterval preferenceMinuteInterval;
 
 		protected PreferenceAmPm preferenceAmPm;
@@ -4896,6 +5781,9 @@ namespace EdB.Interface
 
 		private WidgetRow rowVisibility = new WidgetRow ();
 
+		//
+		// Properties
+		//
 		public PreferenceAmPm PreferenceAmPm {
 			set {
 				this.preferenceAmPm = value;
@@ -4914,10 +5802,13 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Static Methods
+		//
 		private static string TemperatureString ()
 		{
 			IntVec3 intVec = Gen.MouseCell ();
-			IntVec3 intVec2 = IntVec3.Invalid;
+			IntVec3 intVec2 = IntVec3.get_Invalid ();
 			Room room = null;
 			for (int i = 0; i < GlobalControls.TempSearchNumRadialCells; i++) {
 				intVec2 = intVec + GenRadial.RadialPattern [i];
@@ -4933,9 +5824,9 @@ namespace EdB.Interface
 				if (edifice != null) {
 					CellRect.CellRectIterator iterator = GenAdj.OccupiedRect (edifice).ExpandedBy (1).ClipInsideMap ().GetIterator ();
 					while (!iterator.Done ()) {
-						IntVec3 current = iterator.Current;
+						IntVec3 current = iterator.get_Current ();
 						room = GridsUtility.GetRoom (current);
-						if (room != null && !room.PsychologicallyOutdoors) {
+						if (room != null && !room.get_PsychologicallyOutdoors ()) {
 							intVec2 = current;
 							break;
 						}
@@ -4944,8 +5835,8 @@ namespace EdB.Interface
 				}
 			}
 			string str;
-			if (GenGrid.InBounds (intVec2) && !GridsUtility.Fogged (intVec2) && room != null && !room.PsychologicallyOutdoors) {
-				if (!room.UsesOutdoorTemperature) {
+			if (GenGrid.InBounds (intVec2) && !GridsUtility.Fogged (intVec2) && room != null && !room.get_PsychologicallyOutdoors ()) {
+				if (!room.get_UsesOutdoorTemperature ()) {
 					str = Translator.Translate ("Indoors");
 				}
 				else {
@@ -4955,62 +5846,75 @@ namespace EdB.Interface
 			else {
 				str = Translator.Translate ("Outdoors");
 			}
-			float num = (room == null || GridsUtility.Fogged (intVec2)) ? GenTemperature.OutdoorTemp : room.Temperature;
+			float num = (room == null || GridsUtility.Fogged (intVec2)) ? GenTemperature.get_OutdoorTemp () : room.get_Temperature ();
 			return str + " " + GenText.ToStringTemperature (num, "F0");
 		}
 
+		//
+		// Methods
+		//
 		public void GlobalControlsOnGUI ()
 		{
-			float num = (float)Screen.width - 134;
-			float num2 = (float)Screen.height;
+			float num = (float)Screen.get_width () - 134;
+			float num2 = (float)Screen.get_height ();
 			num2 -= 35;
-			GenUI.DrawTextWinterShadow (new Rect ((float)(Screen.width - 270), (float)(Screen.height - 450), 270, 450));
+			GenUI.DrawTextWinterShadow (new Rect ((float)(Screen.get_width () - 270), (float)(Screen.get_height () - 450), 270, 450));
 			num2 -= 4;
 			float arg_5E_0 = num2;
 			Vector2 timeButSize = TimeControls.TimeButSize;
 			float num3 = arg_5E_0 - timeButSize.y;
-			this.rowVisibility.Init ((float)Screen.width, num3, 0, 141, 29);
-			Find.PlaySettings.DoPlaySettingsGlobalControls (this.rowVisibility);
-			num2 = this.rowVisibility.FinalY;
+			this.rowVisibility.Init ((float)Screen.get_width (), num3, 0, 141, 29);
+			Find.get_PlaySettings ().DoPlaySettingsGlobalControls (this.rowVisibility);
+			num2 = this.rowVisibility.get_FinalY ();
 			num2 -= 4;
 			Vector2 timeButSize2 = TimeControls.TimeButSize;
 			float y = timeButSize2.y;
 			Rect rect = new Rect (num, num2 - y, 134, y);
 			TimeControls.DoTimeControlsGUI (rect);
-			num2 -= rect.height;
+			num2 -= rect.get_height ();
 			num2 -= 4;
 			if (this.preferenceEnableAlternateTimeDisplay == null || !this.preferenceEnableAlternateTimeDisplay.Value) {
 				Rect dateRect = new Rect (num, num2 - 22, 134, 22);
 				DateReadout.DateOnGUI (dateRect);
-				num2 -= dateRect.height;
+				num2 -= dateRect.get_height ();
 			}
 			else {
 				Rect dateRect2 = new Rect (num - 48, num2 - 22, 182, 22);
 				DateReadout.AlternateDateOnGUI (dateRect2, this.preferenceAmPm.Value, this.preferenceMinuteInterval.Value);
-				num2 -= dateRect2.height;
+				num2 -= dateRect2.get_height ();
 			}
 			Rect rect2 = new Rect (num - 30, num2 - 26, 164, 26);
-			Find.WeatherManager.DoWeatherGUI (rect2);
-			num2 -= rect2.height;
+			Find.get_WeatherManager ().DoWeatherGUI (rect2);
+			num2 -= rect2.get_height ();
 			Rect rect3 = new Rect (num - 100, num2 - 26, 227, 26);
-			Text.Anchor = TextAnchor.MiddleRight;
+			Text.set_Anchor (5);
 			Widgets.Label (rect3, GlobalControls.TemperatureString ());
-			Text.Anchor = TextAnchor.UpperLeft;
+			Text.set_Anchor (0);
 			num2 -= 26;
 			float num4 = 164;
-			float num5 = Find.MapConditionManager.TotalHeightAt (num4 - 15);
+			float num5 = Find.get_MapConditionManager ().TotalHeightAt (num4 - 15);
 			Rect rect4 = new Rect (num - 30, num2 - num5, num4, num5);
-			Find.MapConditionManager.DoConditionsUI (rect4);
-			num2 -= rect4.height;
+			Find.get_MapConditionManager ().DoConditionsUI (rect4);
+			num2 -= rect4.get_height ();
 			num2 -= 10;
-			Find.LetterStack.LettersOnGUI (num2);
+			Find.get_LetterStack ().LettersOnGUI (num2);
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class GlobalControlsComponent : IRenderedComponent, INamedComponent
 	{
+		//
+		// Fields
+		//
 		private GlobalControls globalControls;
 
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "GlobalControls";
@@ -5023,32 +5927,52 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public GlobalControlsComponent (GlobalControls globalControls)
 		{
 			this.globalControls = globalControls;
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI ()
 		{
 			this.globalControls.GlobalControlsOnGUI ();
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class HealthCardUtility
 	{
+		//
+		// Static Fields
+		//
 		private const float ThoughtLevelHeight = 25;
 
 		private static readonly Texture2D BleedingIcon = ContentFinder<Texture2D>.Get ("UI/Icons/Medical/Bleeding", true);
 
 		private static bool showHediffsDebugInfo = false;
 
-		private static Vector2 scrollPosition = Vector2.zero;
+		private static Vector2 scrollPosition = Vector2.get_zero ();
 
 		private static float scrollViewHeight = 0;
 
 		private static bool highlight = true;
 
-		private static Vector2 billsScrollPosition = Vector2.zero;
+		private static Vector2 billsScrollPosition = Vector2.get_zero ();
 
 		private static float billsScrollHeight = 1000;
 
@@ -5058,49 +5982,58 @@ namespace EdB.Interface
 
 		private const float ThoughtLevelSpacing = 4;
 
-		private static readonly Color SeverePainColor = new Color (0.9f, 0.5f, 0);
+		private static readonly Color SeverePainColor = new Color (0.9, 0.5, 0);
 
-		private static readonly Color MediumPainColor = new Color (0.9f, 0.9f, 0);
+		private static readonly Color MediumPainColor = new Color (0.9, 0.9, 0);
 
-		private static readonly Color StaticHighlightColor = new Color (0.75f, 0.75f, 0.85f, 1);
+		private static readonly Color StaticHighlightColor = new Color (0.75, 0.75, 0.85, 1);
 
-		private static readonly Color HighlightColor = new Color (0.5f, 0.5f, 0.5f, 1);
+		private static readonly Color HighlightColor = new Color (0.5, 0.5, 0.5, 1);
 
 		private static readonly Texture2D TreatedWellIcon = ContentFinder<Texture2D>.Get ("UI/Icons/Medical/TreatedWell", true);
 
+		//
+		// Fields
+		//
 		protected MethodInfo visibleHediffGroupsInOrderMethod;
 
 		protected MethodInfo visibleHediffsMethod;
 
+		//
+		// Constructors
+		//
 		public HealthCardUtility ()
 		{
 			this.visibleHediffGroupsInOrderMethod = typeof(HealthCardUtility).GetMethod ("VisibleHediffGroupsInOrder", BindingFlags.Static | BindingFlags.NonPublic);
 			this.visibleHediffsMethod = typeof(HealthCardUtility).GetMethod ("VisibleHediffs", BindingFlags.Static | BindingFlags.NonPublic);
 		}
 
+		//
+		// Static Methods
+		//
 		private static void DoRightRowHighlight (Rect rowRect)
 		{
 			if (HealthCardUtility.highlight) {
-				GUI.color = HealthCardUtility.StaticHighlightColor;
+				GUI.set_color (HealthCardUtility.StaticHighlightColor);
 				GUI.DrawTexture (rowRect, TexUI.HighlightTex);
 			}
 			HealthCardUtility.highlight = !HealthCardUtility.highlight;
-			if (rowRect.Contains (Event.current.mousePosition)) {
-				GUI.color = HealthCardUtility.HighlightColor;
+			if (rowRect.Contains (Event.get_current ().get_mousePosition ())) {
+				GUI.set_color (HealthCardUtility.HighlightColor);
 				GUI.DrawTexture (rowRect, TexUI.HighlightTex);
 			}
 		}
 
 		public static Color GetBleedingRateColor (float rate)
 		{
-			Color result = Color.white;
-			if ((double)rate < 0.15f) {
+			Color result = Color.get_white ();
+			if ((double)rate < 0.15) {
 				result = HealthCardUtility.MediumPainColor;
 			}
-			else if ((double)rate < 0.4f) {
+			else if ((double)rate < 0.4) {
 				result = HealthCardUtility.MediumPainColor;
 			}
-			else if ((double)rate < 0.8f) {
+			else if ((double)rate < 0.8) {
 				result = HealthCardUtility.SeverePainColor;
 			}
 			else {
@@ -5109,51 +6042,54 @@ namespace EdB.Interface
 			return result;
 		}
 
+		//
+		// Methods
+		//
 		public void DrawHediffRow (Rect rect, Pawn pawn, IEnumerable<Hediff> diffs, ref float curY)
 		{
 			float num = 6;
-			float num2 = rect.width * 0.4f;
-			float num3 = rect.width - num2 - 20;
+			float num2 = rect.get_width () * 0.4;
+			float num3 = rect.get_width () - num2 - 20;
 			num2 -= num;
 			float num4;
-			if (diffs.First<Hediff> ().Part == null) {
+			if (diffs.First<Hediff> ().get_Part () == null) {
 				num4 = Text.CalcHeight (Translator.Translate ("WholeBody"), num2);
 			}
 			else {
-				num4 = Text.CalcHeight (diffs.First<Hediff> ().Part.def.LabelCap, num2);
+				num4 = Text.CalcHeight (diffs.First<Hediff> ().get_Part ().def.get_LabelCap (), num2);
 			}
 			float num5 = 0;
 			float num6 = curY;
 			float num7 = 0;
 			foreach (IGrouping<int, Hediff> current in from x in diffs
-			group x by x.UIGroupKey) {
+			group x by x.get_UIGroupKey ()) {
 				int num8 = current.Count<Hediff> ();
-				string text = current.First<Hediff> ().LabelCap;
+				string text = current.First<Hediff> ().get_LabelCap ();
 				if (num8 != 1) {
 					text = text + " x" + num8.ToString ();
 				}
 				num7 += Text.CalcHeight (text, num3);
 			}
 			num5 = num7;
-			Rect rect2 = new Rect (0, curY, rect.width, Mathf.Max (num4, num5));
+			Rect rect2 = new Rect (0, curY, rect.get_width (), Mathf.Max (num4, num5));
 			HealthCardUtility.DoRightRowHighlight (rect2);
 			StringBuilder stringBuilder = new StringBuilder ();
-			if (diffs.First<Hediff> ().Part != null) {
-				stringBuilder.Append (diffs.First<Hediff> ().Part.def.LabelCap + ": ");
-				GUI.color = HealthUtility.GetPartConditionLabel (pawn, diffs.First<Hediff> ().Part).Second;
-				Widgets.Label (new Rect (num, curY + 1, num2, 100), new GUIContent (diffs.First<Hediff> ().Part.def.LabelCap));
-				stringBuilder.Append (" " + pawn.health.hediffSet.GetPartHealth (diffs.First<Hediff> ().Part).ToString () + " / " + diffs.First<Hediff> ().Part.def.GetMaxHealth (pawn).ToString ());
+			if (diffs.First<Hediff> ().get_Part () != null) {
+				stringBuilder.Append (diffs.First<Hediff> ().get_Part ().def.get_LabelCap () + ": ");
+				GUI.set_color (HealthUtility.GetPartConditionLabel (pawn, diffs.First<Hediff> ().get_Part ()).get_Second ());
+				Widgets.Label (new Rect (num, curY + 1, num2, 100), new GUIContent (diffs.First<Hediff> ().get_Part ().def.get_LabelCap ()));
+				stringBuilder.Append (" " + pawn.health.hediffSet.GetPartHealth (diffs.First<Hediff> ().get_Part ()).ToString () + " / " + diffs.First<Hediff> ().get_Part ().def.GetMaxHealth (pawn).ToString ());
 			}
 			else {
 				stringBuilder.Append (Translator.Translate ("WholeBody"));
-				GUI.color = HealthUtility.DarkRedColor;
+				GUI.set_color (HealthUtility.DarkRedColor);
 				Widgets.Label (new Rect (num, curY + 1, num2, 100), new GUIContent (Translator.Translate ("WholeBody")));
 			}
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 			stringBuilder.AppendLine ();
 			stringBuilder.AppendLine ("------------------");
 			foreach (IGrouping<int, Hediff> current2 in from x in diffs
-			group x by x.UIGroupKey) {
+			group x by x.get_UIGroupKey ()) {
 				Hediff hediff = current2.First<Hediff> ();
 				int num9 = 0;
 				bool flag = false;
@@ -5169,34 +6105,34 @@ namespace EdB.Interface
 							texture2D = HealthCardUtility.TreatedPoorIcon;
 						}
 					}
-					float bleedRate = current3.BleedRate;
+					float bleedRate = current3.get_BleedRate ();
 					if ((double)bleedRate > 1E-05) {
 						flag = true;
 					}
-					bool flag2 = HealthCardUtility.showHediffsDebugInfo && !GenText.NullOrEmpty (current3.DebugString);
-					string damageLabel = current3.DamageLabel;
-					if (!GenText.NullOrEmpty (current3.Label) || !GenText.NullOrEmpty (damageLabel) || !GenList.NullOrEmpty<PawnCapacityModifier> (current3.CapMods) || flag2) {
-						stringBuilder.Append (current3.LabelCap);
+					bool flag2 = HealthCardUtility.showHediffsDebugInfo && !GenText.NullOrEmpty (current3.get_DebugString ());
+					string damageLabel = current3.get_DamageLabel ();
+					if (!GenText.NullOrEmpty (current3.get_Label ()) || !GenText.NullOrEmpty (damageLabel) || !GenList.NullOrEmpty<PawnCapacityModifier> (current3.get_CapMods ()) || flag2) {
+						stringBuilder.Append (current3.get_LabelCap ());
 						if (!GenText.NullOrEmpty (damageLabel)) {
 							stringBuilder.Append (": " + damageLabel);
 						}
 						stringBuilder.AppendLine ();
-						stringBuilder.AppendLine (GenText.Indented (GenText.TrimEndNewlines (current3.TipString)));
+						stringBuilder.AppendLine (GenText.Indented (GenText.TrimEndNewlines (current3.get_TipString ())));
 						if (flag2) {
-							stringBuilder.AppendLine (GenText.Indented (GenText.TrimEndNewlines (current3.DebugString)));
+							stringBuilder.AppendLine (GenText.Indented (GenText.TrimEndNewlines (current3.get_DebugString ())));
 						}
 					}
 				}
-				string text2 = hediff.LabelCap;
+				string text2 = hediff.get_LabelCap ();
 				if (num9 != 1) {
 					text2 = text2 + " x" + num9.ToString ();
 				}
-				GUI.color = hediff.LabelColor;
+				GUI.set_color (hediff.get_LabelColor ());
 				float num10 = Text.CalcHeight (text2, num3);
 				Rect rect3 = new Rect (num + num2, curY + 1, num3, num10);
 				Widgets.Label (rect3, text2);
-				GUI.color = Color.white;
-				Rect rect4 = new Rect (rect2.xMax - 20, curY, 20, 20);
+				GUI.set_color (Color.get_white ());
+				Rect rect4 = new Rect (rect2.get_xMax () - 20, curY, 20, 20);
 				if (flag) {
 					GUI.DrawTexture (rect4, HealthCardUtility.BleedingIcon);
 				}
@@ -5205,7 +6141,7 @@ namespace EdB.Interface
 				}
 				curY += num10;
 			}
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 			curY = num6 + Mathf.Max (num4, num5);
 			TooltipHandler.TipRegion (rect2, new TipSignal (stringBuilder.ToString ().TrimEnd (new char[0]), (int)curY + 7857));
 		}
@@ -5213,12 +6149,12 @@ namespace EdB.Interface
 		public void DrawInjuries (Rect leftRect, Pawn pawn, bool showBloodLoss)
 		{
 			float num = 0;
-			Rect rect = new Rect (leftRect.x, num, leftRect.width, leftRect.height - num);
+			Rect rect = new Rect (leftRect.get_x (), num, leftRect.get_width (), leftRect.get_height () - num);
 			GUI.BeginGroup (rect);
-			Rect rect2 = new Rect (0, 0, rect.width, rect.height);
-			Rect rect3 = new Rect (0, 0, rect.width - 16, HealthCardUtility.scrollViewHeight);
-			Rect rect4 = new Rect (rect.x, rect.y, rect.width - 16, rect.height);
-			GUI.color = Color.white;
+			Rect rect2 = new Rect (0, 0, rect.get_width (), rect.get_height ());
+			Rect rect3 = new Rect (0, 0, rect.get_width () - 16, HealthCardUtility.scrollViewHeight);
+			Rect rect4 = new Rect (rect.get_x (), rect.get_y (), rect.get_width () - 16, rect.get_height ());
+			GUI.set_color (Color.get_white ());
 			Widgets.BeginScrollView (rect2, ref HealthCardUtility.scrollPosition, rect3);
 			float num2 = 0;
 			HealthCardUtility.highlight = true;
@@ -5231,39 +6167,39 @@ namespace EdB.Interface
 				this.DrawHediffRow (rect4, pawn, current, ref num2);
 			}
 			if (!flag) {
-				GUI.color = Color.gray;
-				Text.Anchor = TextAnchor.UpperCenter;
-				Widgets.Label (new Rect (0, 0, rect.width, 30), new GUIContent (Translator.Translate ("NoInjuries")));
-				Text.Anchor = TextAnchor.UpperLeft;
+				GUI.set_color (Color.get_gray ());
+				Text.set_Anchor (1);
+				Widgets.Label (new Rect (0, 0, rect.get_width (), 30), new GUIContent (Translator.Translate ("NoInjuries")));
+				Text.set_Anchor (0);
 			}
-			if (Event.current.type == EventType.Layout) {
+			if (Event.get_current ().get_type () == 8) {
 				HealthCardUtility.scrollViewHeight = num2;
 			}
 			Widgets.EndScrollView ();
 			GUI.EndGroup ();
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 		}
 
 		private float DrawLeftRow (Rect leftRect, float curY, string leftLabel, string rightLabel, Color rightLabelColor, string tipLabel)
 		{
-			Rect rect = new Rect (0, curY, leftRect.width, 20);
-			if (rect.Contains (Event.current.mousePosition)) {
-				GUI.color = HealthCardUtility.HighlightColor;
+			Rect rect = new Rect (0, curY, leftRect.get_width (), 20);
+			if (rect.Contains (Event.get_current ().get_mousePosition ())) {
+				GUI.set_color (HealthCardUtility.HighlightColor);
 				GUI.DrawTexture (rect, TexUI.HighlightTex);
 			}
-			float num = leftRect.width * 0.5f;
-			float num2 = leftRect.width - num;
-			GUI.color = TabDrawer.TextColor;
+			float num = leftRect.get_width () * 0.5;
+			float num2 = leftRect.get_width () - num;
+			GUI.set_color (TabDrawer.TextColor);
 			float num3 = 4;
 			Widgets.Label (new Rect (num3, curY, num - num3, 30), new GUIContent (leftLabel));
-			GUI.color = rightLabelColor;
-			TextAnchor anchor = Text.Anchor;
-			Text.Anchor = TextAnchor.UpperRight;
+			GUI.set_color (rightLabelColor);
+			TextAnchor anchor = Text.get_Anchor ();
+			Text.set_Anchor (2);
 			Widgets.Label (new Rect (num, curY, num2 - num3, 30), new GUIContent (rightLabel));
 			if (tipLabel != null) {
-				TooltipHandler.TipRegion (new Rect (0, curY, leftRect.width, 20), new TipSignal (tipLabel));
+				TooltipHandler.TipRegion (new Rect (0, curY, leftRect.get_width (), 20), new TipSignal (tipLabel));
 			}
-			Text.Anchor = anchor;
+			Text.set_Anchor (anchor);
 			curY += 20;
 			return curY;
 		}
@@ -5272,35 +6208,35 @@ namespace EdB.Interface
 		{
 			Bill result = null;
 			GUI.BeginGroup (rect);
-			Text.Font = GameFont.Small;
+			Text.set_Font (1);
 			Rect rect2 = new Rect (0, 0, 150, 29);
-			if (billStack.Count < 10) {
+			if (billStack.get_Count () < 10) {
 				if (Widgets.TextButton (rect2, Translator.Translate ("AddBill"), true, false)) {
-					Find.WindowStack.Add (new FloatMenu (recipeOptionsMaker.Invoke (), false));
+					Find.get_WindowStack ().Add (new FloatMenu (recipeOptionsMaker.Invoke (), false));
 				}
 			}
 			else {
-				GUI.color = new Color (1, 1, 1, 0.3f);
+				GUI.set_color (new Color (1, 1, 1, 0.3));
 				Button.TextButton (rect2, Translator.Translate ("AddBill"), true, false, false);
 			}
-			Text.Anchor = TextAnchor.UpperLeft;
-			GUI.color = Color.white;
-			Rect rect3 = new Rect (0, 35, rect.width, rect.height - 35);
-			Rect rect4 = new Rect (0, 0, rect3.width - 16, viewHeight);
+			Text.set_Anchor (0);
+			GUI.set_color (Color.get_white ());
+			Rect rect3 = new Rect (0, 35, rect.get_width (), rect.get_height () - 35);
+			Rect rect4 = new Rect (0, 0, rect3.get_width () - 16, viewHeight);
 			Widgets.BeginScrollView (rect3, ref scrollPosition, rect4);
 			float num = 0;
-			for (int i = 0; i < billStack.Count; i++) {
-				Bill bill = billStack[i];
-				Rect rect5 = BillDrawer.DrawMedicalBill (billStack, bill, 0, num, rect4.width, i);
-				if (!bill.DeletedOrDereferenced && rect5.Contains (Event.current.mousePosition)) {
+			for (int i = 0; i < billStack.get_Count (); i++) {
+				Bill bill = billStack.get_Item (i);
+				Rect rect5 = BillDrawer.DrawMedicalBill (billStack, bill, 0, num, rect4.get_width (), i);
+				if (!bill.get_DeletedOrDereferenced () && rect5.Contains (Event.get_current ().get_mousePosition ())) {
 					result = bill;
 				}
-				num += rect5.height;
-				if (i < billStack.Count - 1) {
+				num += rect5.get_height ();
+				if (i < billStack.get_Count () - 1) {
 					num += 6;
 				}
 			}
-			if (Event.current.type == EventType.Layout) {
+			if (Event.get_current ().get_type () == 8) {
 				viewHeight = num;
 			}
 			Widgets.EndScrollView ();
@@ -5313,11 +6249,11 @@ namespace EdB.Interface
 			curY += 2;
 			Func<List<FloatMenuOption>> recipeOptionsMaker = delegate {
 				List<FloatMenuOption> list = new List<FloatMenuOption> ();
-				foreach (RecipeDef current in thingForMedBills.def.AllRecipes) {
-					if (current.AvailableNow) {
+				foreach (RecipeDef current in thingForMedBills.def.get_AllRecipes ()) {
+					if (current.get_AvailableNow ()) {
 						IEnumerable<ThingDef> enumerable = current.PotentiallyMissingIngredients (null);
 						if (!enumerable.Any ((ThingDef x) => x.isBodyPartOrImplant)) {
-							IEnumerable<BodyPartRecord> partsToApplyOn = current.Worker.GetPartsToApplyOn (pawn, current);
+							IEnumerable<BodyPartRecord> partsToApplyOn = current.get_Worker ().GetPartsToApplyOn (pawn, current);
 							if (partsToApplyOn.Any<BodyPartRecord> ()) {
 								foreach (BodyPartRecord current2 in partsToApplyOn) {
 									RecipeDef localRecipe = current;
@@ -5327,7 +6263,7 @@ namespace EdB.Interface
 										text = HealthCardUtility.RemoveBodyPartSpecialLabel (pawn, current2);
 									}
 									else {
-										text = localRecipe.LabelCap;
+										text = localRecipe.get_LabelCap ();
 									}
 									if (!current.hideBodyPartNames) {
 										text = text + " (" + current2.def.label + ")";
@@ -5349,26 +6285,26 @@ namespace EdB.Interface
 									}
 									else {
 										action = delegate {
-											if (!Find.ListerPawns.FreeColonists.Any ((Pawn col) => localRecipe.PawnSatisfiesSkillRequirements (col))) {
+											if (!Find.get_ListerPawns ().get_FreeColonists ().Any ((Pawn col) => localRecipe.PawnSatisfiesSkillRequirements (col))) {
 												Bill.CreateNoPawnsWithSkillDialog (localRecipe);
 											}
 											Pawn pawn2 = thingForMedBills as Pawn;
-											if (pawn2 != null && !RestUtility.InBed (pawn) && pawn.RaceProps.Humanlike) {
-												if (!Find.ListerBuildings.allBuildingsColonist.Any ((Building x) => x is Building_Bed && (x as Building_Bed).Medical)) {
-													Messages.Message (Translator.Translate ("MessageNoMedicalBeds"), MessageSound.Negative);
+											if (pawn2 != null && !RestUtility.InBed (pawn) && pawn.get_RaceProps ().get_Humanlike ()) {
+												if (!Find.get_ListerBuildings ().allBuildingsColonist.Any ((Building x) => x is Building_Bed && (x as Building_Bed).get_Medical ())) {
+													Messages.Message (Translator.Translate ("MessageNoMedicalBeds"), 4);
 												}
 											}
 											Bill_Medical bill_Medical = new Bill_Medical (localRecipe);
-											pawn2.BillStack.AddBill (bill_Medical);
-											bill_Medical.Part = localPart;
-											if (pawn2.Faction != null && !pawn2.Faction.def.hidden && !FactionUtility.HostileTo (pawn2.Faction, Faction.OfColony) && localRecipe.Worker.IsViolationOnPawn (pawn2, localPart, Faction.OfColony)) {
+											pawn2.get_BillStack ().AddBill (bill_Medical);
+											bill_Medical.set_Part (localPart);
+											if (pawn2.get_Faction () != null && !pawn2.get_Faction ().def.hidden && !FactionUtility.HostileTo (pawn2.get_Faction (), Faction.get_OfColony ()) && localRecipe.get_Worker ().IsViolationOnPawn (pawn2, localPart, Faction.get_OfColony ())) {
 												Messages.Message (Translator.Translate ("MessageMedicalOperationWillAngerFaction", new object[] {
-													pawn2.Faction
-												}), MessageSound.Negative);
+													pawn2.get_Faction ()
+												}), 4);
 											}
 										};
 									}
-									list.Add (new FloatMenuOption (text, action, MenuOptionPriority.Medium, null, null));
+									list.Add (new FloatMenuOption (text, action, 1, null, null));
 								}
 							}
 						}
@@ -5376,18 +6312,18 @@ namespace EdB.Interface
 				}
 				return list;
 			};
-			Rect rect = new Rect (leftRect.x, curY, leftRect.width, leftRect.height - curY - 3);
-			this.DrawListing (pawn.BillStack, rect, recipeOptionsMaker, ref HealthCardUtility.billsScrollPosition, ref HealthCardUtility.billsScrollHeight);
+			Rect rect = new Rect (leftRect.get_x (), curY, leftRect.get_width (), leftRect.get_height () - curY - 3);
+			this.DrawListing (pawn.get_BillStack (), rect, recipeOptionsMaker, ref HealthCardUtility.billsScrollPosition, ref HealthCardUtility.billsScrollHeight);
 			return curY;
 		}
 
 		public float DrawOverviewTab (Rect leftRect, Pawn pawn, float curY, bool showBloodLoss)
 		{
-			curY += TabDrawer.DrawHeader (0, curY, leftRect.width, Translator.Translate ("EdB.Status"), true, 0);
+			curY += TabDrawer.DrawHeader (0, curY, leftRect.get_width (), Translator.Translate ("EdB.Status"), true, 0);
 			curY += 4;
-			Text.Font = GameFont.Small;
-			float bleedingRate = pawn.health.hediffSet.BleedingRate;
-			if ((double)bleedingRate > 0.01f) {
+			Text.set_Font (1);
+			float bleedingRate = pawn.health.hediffSet.get_BleedingRate ();
+			if ((double)bleedingRate > 0.01) {
 				string rightLabel = string.Concat (new string[] {
 					GenText.ToStringPercent (bleedingRate),
 					"/",
@@ -5397,45 +6333,45 @@ namespace EdB.Interface
 			}
 			if (pawn.def.race.isFlesh) {
 				Pair<string, Color> painLabel = HealthCardUtility.GetPainLabel (pawn);
-				string tipLabel = Translator.Translate ("PainLevel") + ": " + (pawn.health.hediffSet.Pain * 100).ToString ("F0") + "%";
-				curY = this.DrawLeftRow (leftRect, curY, Translator.Translate ("PainLevel"), painLabel.First, painLabel.Second, tipLabel);
+				string tipLabel = Translator.Translate ("PainLevel") + ": " + (pawn.health.hediffSet.get_Pain () * 100).ToString ("F0") + "%";
+				curY = this.DrawLeftRow (leftRect, curY, Translator.Translate ("PainLevel"), painLabel.get_First (), painLabel.get_Second (), tipLabel);
 			}
-			if (!pawn.Dead) {
+			if (!pawn.get_Dead ()) {
 				IEnumerable<PawnCapacityDef> source;
-				if (pawn.def.race.Humanlike) {
-					source = from x in DefDatabase<PawnCapacityDef>.AllDefs
+				if (pawn.def.race.get_Humanlike ()) {
+					source = from x in DefDatabase<PawnCapacityDef>.get_AllDefs ()
 					where x.showOnHumanlikes
 					select x;
 				}
-				else if (pawn.def.race.Animal) {
-					source = from x in DefDatabase<PawnCapacityDef>.AllDefs
+				else if (pawn.def.race.get_Animal ()) {
+					source = from x in DefDatabase<PawnCapacityDef>.get_AllDefs ()
 					where x.showOnAnimals
 					select x;
 				}
 				else {
-					source = from x in DefDatabase<PawnCapacityDef>.AllDefs
+					source = from x in DefDatabase<PawnCapacityDef>.get_AllDefs ()
 					where x.showOnMechanoids
 					select x;
 				}
 				foreach (PawnCapacityDef current in from act in source
 				orderby act.listOrder
 				select act) {
-					if (PawnCapacityUtility.BodyCanEverDoActivity (pawn.RaceProps.body, current)) {
+					if (PawnCapacityUtility.BodyCanEverDoActivity (pawn.get_RaceProps ().body, current)) {
 						Pair<string, Color> efficiencyLabel = HealthCardUtility.GetEfficiencyLabel (pawn, current);
 						string tipLabel2 = Translator.Translate ("Efficiency") + ": " + (pawn.health.capacities.GetEfficiency (current) * 100).ToString ("F0") + "%";
-						curY = this.DrawLeftRow (leftRect, curY, GenText.CapitalizeFirst (current.GetLabelFor (pawn.RaceProps.isFlesh, pawn.RaceProps.Humanlike)), efficiencyLabel.First, efficiencyLabel.Second, tipLabel2);
+						curY = this.DrawLeftRow (leftRect, curY, GenText.CapitalizeFirst (current.GetLabelFor (pawn.get_RaceProps ().isFlesh, pawn.get_RaceProps ().get_Humanlike ())), efficiencyLabel.get_First (), efficiencyLabel.get_Second (), tipLabel2);
 					}
 				}
 			}
 			curY += 16;
-			curY += TabDrawer.DrawHeader (0, curY, leftRect.width, Translator.Translate ("EdB.Injuries"), true, 0);
+			curY += TabDrawer.DrawHeader (0, curY, leftRect.get_width (), Translator.Translate ("EdB.Injuries"), true, 0);
 			curY += 4;
-			Rect rect = new Rect (leftRect.x, curY, leftRect.width, leftRect.height - curY);
+			Rect rect = new Rect (leftRect.get_x (), curY, leftRect.get_width (), leftRect.get_height () - curY);
 			GUI.BeginGroup (rect);
-			Rect rect2 = new Rect (0, 0, rect.width, rect.height);
-			Rect rect3 = new Rect (0, 0, rect.width - 16, HealthCardUtility.scrollViewHeight);
-			Rect rect4 = new Rect (rect.x, rect.y, rect.width - 16, rect.height);
-			GUI.color = Color.white;
+			Rect rect2 = new Rect (0, 0, rect.get_width (), rect.get_height ());
+			Rect rect3 = new Rect (0, 0, rect.get_width () - 16, HealthCardUtility.scrollViewHeight);
+			Rect rect4 = new Rect (rect.get_x (), rect.get_y (), rect.get_width () - 16, rect.get_height ());
+			GUI.set_color (Color.get_white ());
 			Widgets.BeginScrollView (rect2, ref HealthCardUtility.scrollPosition, rect3);
 			float num = 0;
 			HealthCardUtility.highlight = true;
@@ -5448,58 +6384,58 @@ namespace EdB.Interface
 				this.DrawHediffRow (rect4, pawn, current2, ref num);
 			}
 			if (!flag) {
-				GUI.color = Color.gray;
-				Text.Anchor = TextAnchor.UpperCenter;
-				Widgets.Label (new Rect (0, 0, rect.width, 30), new GUIContent (Translator.Translate ("NoInjuries")));
-				Text.Anchor = TextAnchor.UpperLeft;
+				GUI.set_color (Color.get_gray ());
+				Text.set_Anchor (1);
+				Widgets.Label (new Rect (0, 0, rect.get_width (), 30), new GUIContent (Translator.Translate ("NoInjuries")));
+				Text.set_Anchor (0);
 			}
-			if (Event.current.type == EventType.Layout) {
+			if (Event.get_current ().get_type () == 8) {
 				HealthCardUtility.scrollViewHeight = num;
 			}
 			Widgets.EndScrollView ();
 			GUI.EndGroup ();
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 			return curY;
 		}
 
 		public float DrawOverviewTab (Rect leftRect, Pawn pawn, float curY)
 		{
 			curY += 4;
-			if (pawn.playerSettings != null && !pawn.Dead) {
+			if (pawn.playerSettings != null && !pawn.get_Dead ()) {
 				Rect rect = new Rect (0, curY, 140, 28);
 				MedicalCareUtility.MedicalCareSetter (rect, ref pawn.playerSettings.medCare);
 				curY += 32;
 			}
-			Text.Font = GameFont.Small;
+			Text.set_Font (1);
 			if (pawn.def.race.isFlesh) {
 				Pair<string, Color> painLabel = HealthCardUtility.GetPainLabel (pawn);
-				string tipLabel = Translator.Translate ("PainLevel") + ": " + (pawn.health.hediffSet.Pain * 100).ToString ("F0") + "%";
-				curY = this.DrawLeftRow (leftRect, curY, Translator.Translate ("PainLevel"), painLabel.First, painLabel.Second, tipLabel);
+				string tipLabel = Translator.Translate ("PainLevel") + ": " + (pawn.health.hediffSet.get_Pain () * 100).ToString ("F0") + "%";
+				curY = this.DrawLeftRow (leftRect, curY, Translator.Translate ("PainLevel"), painLabel.get_First (), painLabel.get_Second (), tipLabel);
 			}
-			if (!pawn.Dead) {
+			if (!pawn.get_Dead ()) {
 				IEnumerable<PawnCapacityDef> source;
-				if (pawn.def.race.Humanlike) {
-					source = from x in DefDatabase<PawnCapacityDef>.AllDefs
+				if (pawn.def.race.get_Humanlike ()) {
+					source = from x in DefDatabase<PawnCapacityDef>.get_AllDefs ()
 					where x.showOnHumanlikes
 					select x;
 				}
-				else if (pawn.def.race.Animal) {
-					source = from x in DefDatabase<PawnCapacityDef>.AllDefs
+				else if (pawn.def.race.get_Animal ()) {
+					source = from x in DefDatabase<PawnCapacityDef>.get_AllDefs ()
 					where x.showOnAnimals
 					select x;
 				}
 				else {
-					source = from x in DefDatabase<PawnCapacityDef>.AllDefs
+					source = from x in DefDatabase<PawnCapacityDef>.get_AllDefs ()
 					where x.showOnMechanoids
 					select x;
 				}
 				foreach (PawnCapacityDef current in from act in source
 				orderby act.listOrder
 				select act) {
-					if (PawnCapacityUtility.BodyCanEverDoActivity (pawn.RaceProps.body, current)) {
+					if (PawnCapacityUtility.BodyCanEverDoActivity (pawn.get_RaceProps ().body, current)) {
 						Pair<string, Color> efficiencyLabel = HealthCardUtility.GetEfficiencyLabel (pawn, current);
 						string tipLabel2 = Translator.Translate ("Efficiency") + ": " + (pawn.health.capacities.GetEfficiency (current) * 100).ToString ("F0") + "%";
-						curY = this.DrawLeftRow (leftRect, curY, GenText.CapitalizeFirst (current.GetLabelFor (pawn.RaceProps.isFlesh, pawn.RaceProps.Humanlike)), efficiencyLabel.First, efficiencyLabel.Second, tipLabel2);
+						curY = this.DrawLeftRow (leftRect, curY, GenText.CapitalizeFirst (current.GetLabelFor (pawn.get_RaceProps ().isFlesh, pawn.get_RaceProps ().get_Humanlike ())), efficiencyLabel.get_First (), efficiencyLabel.get_Second (), tipLabel2);
 					}
 				}
 			}
@@ -5508,9 +6444,9 @@ namespace EdB.Interface
 
 		public float DrawStatus (Rect leftRect, Pawn pawn, float curY, bool showBloodLoss)
 		{
-			Text.Font = GameFont.Small;
-			float bleedingRate = pawn.health.hediffSet.BleedingRate;
-			if ((double)bleedingRate > 0.01f) {
+			Text.set_Font (1);
+			float bleedingRate = pawn.health.hediffSet.get_BleedingRate ();
+			if ((double)bleedingRate > 0.01) {
 				string rightLabel = string.Concat (new string[] {
 					GenText.ToStringPercent (bleedingRate),
 					"/",
@@ -5520,72 +6456,115 @@ namespace EdB.Interface
 			}
 			if (pawn.def.race.isFlesh) {
 				Pair<string, Color> painLabel = HealthCardUtility.GetPainLabel (pawn);
-				string tipLabel = Translator.Translate ("PainLevel") + ": " + (pawn.health.hediffSet.Pain * 100).ToString ("F0") + "%";
-				curY = this.DrawLeftRow (leftRect, curY, Translator.Translate ("PainLevel"), painLabel.First, painLabel.Second, tipLabel);
+				string tipLabel = Translator.Translate ("PainLevel") + ": " + (pawn.health.hediffSet.get_Pain () * 100).ToString ("F0") + "%";
+				curY = this.DrawLeftRow (leftRect, curY, Translator.Translate ("PainLevel"), painLabel.get_First (), painLabel.get_Second (), tipLabel);
 			}
-			if (!pawn.Dead) {
+			if (!pawn.get_Dead ()) {
 				IEnumerable<PawnCapacityDef> source;
-				if (pawn.def.race.Humanlike) {
-					source = from x in DefDatabase<PawnCapacityDef>.AllDefs
+				if (pawn.def.race.get_Humanlike ()) {
+					source = from x in DefDatabase<PawnCapacityDef>.get_AllDefs ()
 					where x.showOnHumanlikes
 					select x;
 				}
-				else if (pawn.def.race.Animal) {
-					source = from x in DefDatabase<PawnCapacityDef>.AllDefs
+				else if (pawn.def.race.get_Animal ()) {
+					source = from x in DefDatabase<PawnCapacityDef>.get_AllDefs ()
 					where x.showOnAnimals
 					select x;
 				}
 				else {
-					source = from x in DefDatabase<PawnCapacityDef>.AllDefs
+					source = from x in DefDatabase<PawnCapacityDef>.get_AllDefs ()
 					where x.showOnMechanoids
 					select x;
 				}
 				foreach (PawnCapacityDef current in from act in source
 				orderby act.listOrder
 				select act) {
-					if (PawnCapacityUtility.BodyCanEverDoActivity (pawn.RaceProps.body, current)) {
+					if (PawnCapacityUtility.BodyCanEverDoActivity (pawn.get_RaceProps ().body, current)) {
 						Pair<string, Color> efficiencyLabel = HealthCardUtility.GetEfficiencyLabel (pawn, current);
 						string tipLabel2 = Translator.Translate ("Efficiency") + ": " + (pawn.health.capacities.GetEfficiency (current) * 100).ToString ("F0") + "%";
-						curY = this.DrawLeftRow (leftRect, curY, GenText.CapitalizeFirst (current.GetLabelFor (pawn.RaceProps.isFlesh, pawn.RaceProps.Humanlike)), efficiencyLabel.First, efficiencyLabel.Second, tipLabel2);
+						curY = this.DrawLeftRow (leftRect, curY, GenText.CapitalizeFirst (current.GetLabelFor (pawn.get_RaceProps ().isFlesh, pawn.get_RaceProps ().get_Humanlike ())), efficiencyLabel.get_First (), efficiencyLabel.get_Second (), tipLabel2);
 					}
 				}
 			}
 			return curY;
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
 
+namespace EdB.Interface
+{
 	public interface IComponentWithPreferences
 	{
+		//
+		// Properties
+		//
 		IEnumerable<IPreference> Preferences {
 			get;
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public interface ICustomTextureComponent
 	{
+		//
+		// Methods
+		//
 		void ResetTextures ();
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public interface IInitializedComponent
 	{
+		//
+		// Methods
+		//
 		void Initialize (UserInterface userInterface);
 
 		void PrepareDependencies (UserInterface userInterface);
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public interface INamedComponent
 	{
+		//
+		// Properties
+		//
 		string Name {
 			get;
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	internal static class InspectGizmoGrid
 	{
+		//
+		// Static Fields
+		//
 		private static List<object> objList = new List<object> ();
 
 		private static List<Gizmo> gizmoList = new List<Gizmo> ();
 
+		//
+		// Static Methods
+		//
 		public static void DrawInspectGizmoGridFor (IEnumerable<object> selectedObjects)
 		{
 			try {
@@ -5603,10 +6582,10 @@ namespace EdB.Interface
 				for (int j = 0; j < InspectGizmoGrid.objList.Count; j++) {
 					Thing t = InspectGizmoGrid.objList [j] as Thing;
 					if (t != null) {
-						List<Designator> allDesignators = ReverseDesignatorDatabase.AllDesignators;
+						List<Designator> allDesignators = ReverseDesignatorDatabase.get_AllDesignators ();
 						for (int k = 0; k < allDesignators.Count; k++) {
 							Designator des = allDesignators [k];
-							if (des.CanDesignateThing (t).Accepted) {
+							if (des.CanDesignateThing (t).get_Accepted ()) {
 								Command_Action command_Action = new Command_Action ();
 								command_Action.defaultLabel = des.LabelCapReverseDesignating (t);
 								command_Action.icon = des.IconReverseDesignating (t);
@@ -5632,9 +6611,20 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Linq;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	internal class InspectPaneFiller
 	{
+		//
+		// Static Fields
+		//
 		private const float BarHeight = 16;
 
 		private static bool debug_inspectStringExceptionErrored;
@@ -5651,18 +6641,24 @@ namespace EdB.Interface
 
 		private const float BarWidth = 93;
 
+		//
+		// Constructors
+		//
 		static InspectPaneFiller ()
 		{
 			ColorInt colorInt = new ColorInt (10, 10, 10);
-			InspectPaneFiller.BarBGTex = SolidColorMaterials.NewSolidColorTexture (colorInt.ToColor);
+			InspectPaneFiller.BarBGTex = SolidColorMaterials.NewSolidColorTexture (colorInt.get_ToColor ());
 			ColorInt colorInt2 = new ColorInt (35, 35, 35);
-			InspectPaneFiller.HealthTex = SolidColorMaterials.NewSolidColorTexture (colorInt2.ToColor);
+			InspectPaneFiller.HealthTex = SolidColorMaterials.NewSolidColorTexture (colorInt2.get_ToColor ());
 			ColorInt colorInt3 = new ColorInt (26, 52, 52);
-			InspectPaneFiller.MoodTex = SolidColorMaterials.NewSolidColorTexture (colorInt3.ToColor);
+			InspectPaneFiller.MoodTex = SolidColorMaterials.NewSolidColorTexture (colorInt3.get_ToColor ());
 			InspectPaneFiller.debug_inspectLengthWarned = false;
 			InspectPaneFiller.debug_inspectStringExceptionErrored = false;
 		}
 
+		//
+		// Static Methods
+		//
 		public static void DoPaneContentsFor (ISelectable sel, Rect rect)
 		{
 			try {
@@ -5672,7 +6668,7 @@ namespace EdB.Interface
 				Pawn pawn = sel as Pawn;
 				if (thing != null) {
 					num += 3;
-					WidgetRow row = new WidgetRow (0, num, UIDirection.RightThenUp, 2000, 29);
+					WidgetRow row = new WidgetRow (0, num, 2, 2000, 29);
 					InspectPaneFiller.DrawHealth (row, thing);
 					if (pawn != null) {
 						InspectPaneFiller.DrawMood (row, pawn);
@@ -5688,7 +6684,7 @@ namespace EdB.Interface
 			catch (Exception ex) {
 				Log.ErrorOnce (string.Concat (new object[] {
 					"Error in DoPaneContentsFor ",
-					Find.Selector.FirstSelectedObject,
+					Find.get_Selector ().get_FirstSelectedObject (),
 					": ",
 					ex.ToString ()
 				}), 754672);
@@ -5700,14 +6696,14 @@ namespace EdB.Interface
 
 		private static void DrawAreaAllowed (WidgetRow row, Pawn pawn)
 		{
-			if (pawn.playerSettings == null || pawn.HostFaction != null) {
+			if (pawn.playerSettings == null || pawn.get_HostFaction () != null) {
 				return;
 			}
 			row.DoGap (6);
-			bool flag = pawn.playerSettings != null && pawn.playerSettings.AreaRestriction != null;
+			bool flag = pawn.playerSettings != null && pawn.playerSettings.get_AreaRestriction () != null;
 			Texture2D texture2D;
 			if (flag) {
-				texture2D = pawn.playerSettings.AreaRestriction.ColorTexture;
+				texture2D = pawn.playerSettings.get_AreaRestriction ().get_ColorTexture ();
 			}
 			else {
 				texture2D = BaseContent.GreyTex;
@@ -5715,15 +6711,15 @@ namespace EdB.Interface
 			Rect rect = row.DoBar (93, 16, 1, AreaUtility.AreaAllowedLabel (pawn), texture2D, null);
 			if (Mouse.IsOver (rect)) {
 				if (flag) {
-					pawn.playerSettings.AreaRestriction.MarkForDraw ();
+					pawn.playerSettings.get_AreaRestriction ().MarkForDraw ();
 				}
 				Rect rect2 = GenUI.ContractedBy (rect, -1);
 				Widgets.DrawBox (rect2, 1);
 			}
 			if (Widgets.InvisibleButton (rect)) {
-				AllowedAreaMode allowedAreaMode = pawn.RaceProps.Humanlike ? AllowedAreaMode.Humanlike : AllowedAreaMode.Animal;
+				AllowedAreaMode allowedAreaMode = pawn.get_RaceProps ().get_Humanlike () ? 1 : 2;
 				AreaUtility.MakeAllowedAreaListFloatMenu (delegate (Area a) {
-					pawn.playerSettings.AreaRestriction = a;
+					pawn.playerSettings.set_AreaRestriction (a);
 				}, allowedAreaMode, true, true);
 			}
 		}
@@ -5737,28 +6733,28 @@ namespace EdB.Interface
 				if (!t.def.useHitPoints) {
 					return;
 				}
-				if (t.HitPoints >= t.MaxHitPoints) {
-					GUI.color = Color.white;
+				if (t.get_HitPoints () >= t.get_MaxHitPoints ()) {
+					GUI.set_color (Color.get_white ());
 				}
-				else if ((double)((float)t.HitPoints) > (double)((float)t.MaxHitPoints) * 0.5f) {
-					GUI.color = Color.yellow;
+				else if ((double)((float)t.get_HitPoints ()) > (double)((float)t.get_MaxHitPoints ()) * 0.5) {
+					GUI.set_color (Color.get_yellow ());
 				}
-				else if (t.HitPoints > 0) {
-					GUI.color = Color.red;
+				else if (t.get_HitPoints () > 0) {
+					GUI.set_color (Color.get_red ());
 				}
 				else {
-					GUI.color = Color.grey;
+					GUI.set_color (Color.get_grey ());
 				}
-				num = (float)t.HitPoints / (float)t.MaxHitPoints;
-				text = GenString.ToStringCached (t.HitPoints) + " / " + GenString.ToStringCached (t.MaxHitPoints);
+				num = (float)t.get_HitPoints () / (float)t.get_MaxHitPoints ();
+				text = GenString.ToStringCached (t.get_HitPoints ()) + " / " + GenString.ToStringCached (t.get_MaxHitPoints ());
 			}
 			else {
-				GUI.color = Color.white;
-				num = pawn.health.summaryHealth.SummaryHealthPercent;
+				GUI.set_color (Color.get_white ());
+				num = pawn.health.summaryHealth.get_SummaryHealthPercent ();
 				text = HealthUtility.GetGeneralConditionLabel (pawn);
 			}
 			row.DoBar (93, 16, num, text, InspectPaneFiller.HealthTex, InspectPaneFiller.BarBGTex);
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 		}
 
 		public static void DrawInspectStringFor (ISelectable t, ref float y)
@@ -5768,25 +6764,28 @@ namespace EdB.Interface
 				text = t.GetInspectString ();
 			}
 			catch (Exception ex) {
-				text = "GetInspectString exception on " + t.ToString () + ":\n" + ex.ToString ();
+				text = "GetInspectString exception on " + t.ToString () + ":
+" + ex.ToString ();
 				if (!InspectPaneFiller.debug_inspectStringExceptionErrored) {
 					Log.Error (text);
 					InspectPaneFiller.debug_inspectStringExceptionErrored = true;
 				}
 			}
-			Text.Font = GameFont.Small;
+			Text.set_Font (1);
 			float arg_65_1 = 0;
 			float arg_65_2 = y;
 			Vector2 paneInnerSize = MainTabWindow_Inspect.PaneInnerSize;
 			Rect rect = new Rect (arg_65_1, arg_65_2, paneInnerSize.x, 100);
 			Widgets.Label (rect, text);
-			if (Prefs.DevMode) {
+			if (Prefs.get_DevMode ()) {
 				text = text.Trim ();
 				if (!InspectPaneFiller.debug_inspectLengthWarned) {
-					if (text.Count ((char f) => f == '\n') > 5) {
+					if (text.Count ((char f) => f == '
+') > 5) {
 						Log.ErrorOnce (string.Concat (new object[] {
 							t,
-							" gave an inspect string over six lines (some may be empty):\n",
+							" gave an inspect string over six lines (some may be empty):
+",
 							text,
 							"END"
 						}), 778772);
@@ -5802,32 +6801,50 @@ namespace EdB.Interface
 				return;
 			}
 			row.DoGap (6);
-			row.DoBar (93, 16, pawn.needs.mood.CurLevel, GenText.CapitalizeFirst (pawn.needs.mood.MoodString), InspectPaneFiller.MoodTex, InspectPaneFiller.BarBGTex);
+			row.DoBar (93, 16, pawn.needs.mood.get_CurLevel (), GenText.CapitalizeFirst (pawn.needs.mood.get_MoodString ()), InspectPaneFiller.MoodTex, InspectPaneFiller.BarBGTex);
 		}
 
 		private static void DrawTimetableSetting (WidgetRow row, Pawn pawn)
 		{
 			row.DoGap (6);
-			row.DoBar (93, 16, 1, pawn.timetable.CurrentAssignment.LabelCap, pawn.timetable.CurrentAssignment.ColorTexture, null);
+			row.DoBar (93, 16, 1, pawn.timetable.get_CurrentAssignment ().get_LabelCap (), pawn.timetable.get_CurrentAssignment ().get_ColorTexture (), null);
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public abstract class IntegerOptionsPreference : IPreference
 	{
 		public delegate void ValueChangedHandler (int value);
 
+		//
+		// Static Fields
+		//
 		public static float LabelMargin = IntegerOptionsPreference.RadioButtonWidth + IntegerOptionsPreference.RadioButtonMargin;
 
 		public static float RadioButtonMargin = 18;
 
 		public static float RadioButtonWidth = 24;
 
+		//
+		// Fields
+		//
 		private string stringValue;
 
 		private int? intValue;
 
 		public int tooltipId;
 
+		//
+		// Properties
+		//
 		public abstract int DefaultValue {
 			get;
 		}
@@ -5932,15 +6949,21 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public IntegerOptionsPreference ()
 		{
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI (float positionX, ref float positionY, float width)
 		{
 			bool disabled = this.Disabled;
 			if (disabled) {
-				GUI.color = Dialog_InterfaceOptions.DisabledControlColor;
+				GUI.set_color (Dialog_InterfaceOptions.DisabledControlColor);
 			}
 			float num = (!this.Indent) ? 0 : Dialog_InterfaceOptions.IndentSize;
 			foreach (int current in this.OptionValues) {
@@ -5964,20 +6987,53 @@ namespace EdB.Interface
 				positionY += num2 + Dialog_InterfaceOptions.PreferencePadding.y;
 			}
 			positionY -= Dialog_InterfaceOptions.PreferencePadding.y;
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 		}
 
-		public event IntegerOptionsPreference.ValueChangedHandler ValueChanged;
+		//
+		// Events
+		//
+		public event IntegerOptionsPreference.ValueChangedHandler ValueChanged {
+			add {
+				IntegerOptionsPreference.ValueChangedHandler valueChangedHandler = this.ValueChanged;
+				IntegerOptionsPreference.ValueChangedHandler valueChangedHandler2;
+				do {
+					valueChangedHandler2 = valueChangedHandler;
+					valueChangedHandler = Interlocked.CompareExchange<IntegerOptionsPreference.ValueChangedHandler> (ref this.ValueChanged, (IntegerOptionsPreference.ValueChangedHandler)Delegate.Combine (valueChangedHandler2, value), valueChangedHandler);
+				}
+				while (valueChangedHandler != valueChangedHandler2);
+			}
+			remove {
+				IntegerOptionsPreference.ValueChangedHandler valueChangedHandler = this.ValueChanged;
+				IntegerOptionsPreference.ValueChangedHandler valueChangedHandler2;
+				do {
+					valueChangedHandler2 = valueChangedHandler;
+					valueChangedHandler = Interlocked.CompareExchange<IntegerOptionsPreference.ValueChangedHandler> (ref this.ValueChanged, (IntegerOptionsPreference.ValueChangedHandler)Delegate.Remove (valueChangedHandler2, value), valueChangedHandler);
+				}
+				while (valueChangedHandler != valueChangedHandler2);
+			}
+		}
 	}
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class InventoryCount
 	{
+		//
+		// Fields
+		//
 		public InventoryRecordKey key = new InventoryRecordKey ();
 
 		public int count;
 
 		public int deepStorageCount;
 
+		//
+		// Constructors
+		//
 		public InventoryCount (ThingDef thingDef, int count, bool isDeepStorage = false)
 		{
 			this.key.ThingDef = thingDef;
@@ -5994,23 +7050,51 @@ namespace EdB.Interface
 			this.deepStorageCount = ((!isDeepStorage) ? 0 : count);
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
+using Verse;
 
+namespace EdB.Interface
+{
 	public interface InventoryCounter
 	{
+		//
+		// Methods
+		//
 		InventoryRecord CountThing (Thing thing, Dictionary<InventoryRecordKey, InventoryRecord> recordLookup, InventoryState state, out bool equippable);
 	}
+}
+using RimWorld;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
+using Verse;
+using Verse.AI;
 
+namespace EdB.Interface
+{
 	public class InventoryCounterDefault : InventoryCounter
 	{
+		//
+		// Fields
+		//
 		public HashSet<Thing> reservedThings = new HashSet<Thing> ();
 
 		protected FieldInfo reservationsField;
 
+		//
+		// Constructors
+		//
 		public InventoryCounterDefault ()
 		{
 			this.reservationsField = typeof(ReservationManager).GetField ("reservations", BindingFlags.Instance | BindingFlags.NonPublic);
 		}
 
+		//
+		// Methods
+		//
 		public InventoryRecord CountThing (Thing thing, Dictionary<InventoryRecordKey, InventoryRecord> recordLookup, InventoryState state, out bool equippable)
 		{
 			equippable = false;
@@ -6043,12 +7127,12 @@ namespace EdB.Interface
 				}
 			}
 			InventoryRecord inventoryRecord = null;
-			if (!recordLookup.TryGetValue (new InventoryRecordKey (thingDef, thing.Stuff), out inventoryRecord)) {
-				if (thing.Stuff == null) {
+			if (!recordLookup.TryGetValue (new InventoryRecordKey (thingDef, thing.get_Stuff ()), out inventoryRecord)) {
+				if (thing.get_Stuff () == null) {
 					Log.Warning ("Did not find record for " + thingDef.defName);
 				}
 				else {
-					Log.Warning ("Did not find record for " + thingDef.defName + " made out of " + thing.Stuff.defName);
+					Log.Warning ("Did not find record for " + thingDef.defName + " made out of " + thing.get_Stuff ().defName);
 				}
 				return null;
 			}
@@ -6064,10 +7148,10 @@ namespace EdB.Interface
 			if (thingDef.building == null) {
 				TextureColorPair textureColorPair = MaterialResolver.Resolve (thing);
 				inventoryRecord.texture = textureColorPair.texture;
-				inventoryRecord.color = thing.DrawColor;
+				inventoryRecord.color = thing.get_DrawColor ();
 			}
 			else {
-				inventoryRecord.color = thing.DrawColor;
+				inventoryRecord.color = thing.get_DrawColor ();
 			}
 			if (thingDef.equipmentType != null || thingDef.apparel != null) {
 				bool flag = ThingSelectionUtility.SelectableNow (thing);
@@ -6094,7 +7178,7 @@ namespace EdB.Interface
 		public void Prepare ()
 		{
 			this.reservedThings.Clear ();
-			ReservationManager reservations = Find.Reservations;
+			ReservationManager reservations = Find.get_Reservations ();
 			IList list = this.reservationsField.GetValue (reservations) as IList;
 			if (list == null) {
 				return;
@@ -6103,15 +7187,27 @@ namespace EdB.Interface
 			for (int i = 0; i < count; i++) {
 				object obj = list [i];
 				TargetInfo targetInfo = (TargetInfo)obj.GetType ().GetField ("target", BindingFlags.Instance | BindingFlags.NonPublic).GetValue (obj);
-				if (targetInfo != null && targetInfo.HasThing) {
-					this.reservedThings.Add (targetInfo.Thing);
+				if (targetInfo != null && targetInfo.get_HasThing ()) {
+					this.reservedThings.Add (targetInfo.get_Thing ());
 				}
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class InventoryManager
 	{
+		//
+		// Fields
+		//
 		protected Dictionary<InventoryRecordKey, InventoryRecord> allRecords = new Dictionary<InventoryRecordKey, InventoryRecord> ();
 
 		protected bool initialized;
@@ -6130,6 +7226,9 @@ namespace EdB.Interface
 
 		protected Dictionary<InventoryType, Dictionary<InventoryRecordKey, InventoryRecord>> categorizedRecords = new Dictionary<InventoryType, Dictionary<InventoryRecordKey, InventoryRecord>> ();
 
+		//
+		// Properties
+		//
 		public bool CompressedStorage {
 			get {
 				return this.state.compressedStorage;
@@ -6163,9 +7262,12 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Methods
+		//
 		protected InventoryType CategorizeDefinition (ThingDef def)
 		{
-			if (def.category == ThingCategory.Projectile) {
+			if (def.category == 6) {
 				return InventoryType.UNKNOWN;
 			}
 			if (def.thingCategories != null) {
@@ -6173,7 +7275,7 @@ namespace EdB.Interface
 					return InventoryType.UNKNOWN;
 				}
 			}
-			if (def.IsFrame) {
+			if (def.get_IsFrame ()) {
 				return InventoryType.UNKNOWN;
 			}
 			if (def.building != null) {
@@ -6219,13 +7321,13 @@ namespace EdB.Interface
 				if (def.ingestible != null) {
 					return InventoryType.ITEM_FOOD;
 				}
-				if (!def.CountAsResource) {
+				if (!def.get_CountAsResource ()) {
 					return InventoryType.ITEM_OTHER;
 				}
 				if (this.schematicDef != null && def.thingCategories != null && def.thingCategories.Contains (this.schematicDef)) {
 					return InventoryType.ITEM_SCHEMATIC;
 				}
-				if (def.CountAsResource) {
+				if (def.get_CountAsResource ()) {
 					return InventoryType.ITEM_RESOURCE;
 				}
 				return InventoryType.UNKNOWN;
@@ -6387,8 +7489,8 @@ namespace EdB.Interface
 		{
 			this.schematicDef = DefDatabase<ThingCategoryDef>.GetNamedSilentFail ("Schematic");
 			Dictionary<StuffCategoryDef, HashSet<ThingDef>> dictionary = new Dictionary<StuffCategoryDef, HashSet<ThingDef>> ();
-			foreach (ThingDef current in DefDatabase<ThingDef>.AllDefs) {
-				if (current.IsStuff && current.stuffProps != null) {
+			foreach (ThingDef current in DefDatabase<ThingDef>.get_AllDefs ()) {
+				if (current.get_IsStuff () && current.stuffProps != null) {
 					foreach (StuffCategoryDef current2 in current.stuffProps.categories) {
 						HashSet<ThingDef> hashSet = null;
 						if (!dictionary.TryGetValue (current2, out hashSet)) {
@@ -6399,8 +7501,8 @@ namespace EdB.Interface
 					}
 				}
 			}
-			foreach (ThingDef current3 in DefDatabase<ThingDef>.AllDefs) {
-				if (current3.MadeFromStuff) {
+			foreach (ThingDef current3 in DefDatabase<ThingDef>.get_AllDefs ()) {
+				if (current3.get_MadeFromStuff ()) {
 					if (current3.stuffCategories != null) {
 						foreach (StuffCategoryDef current4 in current3.stuffCategories) {
 							HashSet<ThingDef> hashSet2;
@@ -6463,8 +7565,8 @@ namespace EdB.Interface
 				record.proportions = new Vector2 (thingDef.graphic.drawSize.x / thingDef.graphic.drawSize.y, 1);
 				float num = (thingDef.graphic.drawSize.x <= thingDef.graphic.drawSize.y) ? thingDef.graphic.drawSize.y : thingDef.graphic.drawSize.x;
 				float num2 = (float)((thingDef.size.x <= thingDef.size.z) ? thingDef.size.z : thingDef.size.x);
-				float num3 = 0.5f;
-				float num4 = 1.75f;
+				float num3 = 0.5;
+				float num4 = 1.75;
 				float num5 = num / num2;
 				float buildingScale = (num5 - num3) / num4 + num3;
 				record.buildingScale = buildingScale;
@@ -6474,7 +7576,7 @@ namespace EdB.Interface
 				record.buildingScale = 1;
 			}
 			if (record.stuffDef != null) {
-				record.color = ((record.stuffDef.graphic == null) ? Color.white : record.stuffDef.graphic.color);
+				record.color = ((record.stuffDef.graphic == null) ? Color.get_white () : record.stuffDef.graphic.color);
 			}
 		}
 
@@ -6506,11 +7608,11 @@ namespace EdB.Interface
 				this.Initialize ();
 			}
 			this.ClearInventory ();
-			foreach (Building current in Find.ListerBuildings.allBuildingsColonist) {
+			foreach (Building current in Find.get_ListerBuildings ().allBuildingsColonist) {
 				this.Count (current);
 				Building_Storage building_Storage = current as Building_Storage;
 				if (building_Storage != null && building_Storage.GetSlotGroup () != null) {
-					foreach (Thing current2 in building_Storage.GetSlotGroup ().HeldThings) {
+					foreach (Thing current2 in building_Storage.GetSlotGroup ().get_HeldThings ()) {
 						this.Count (current2);
 					}
 				}
@@ -6523,44 +7625,55 @@ namespace EdB.Interface
 						}
 					}
 				}
-
+			}
+			using (List<Zone>.Enumerator enumerator4 = Find.get_ZoneManager ().get_AllZones ().FindAll ((Zone zone) => zone is Zone_Stockpile).GetEnumerator ()) {
 				while (enumerator4.MoveNext ()) {
 					Zone_Stockpile zone_Stockpile = (Zone_Stockpile)enumerator4.Current;
 					if (zone_Stockpile.GetSlotGroup () != null) {
-						foreach (Thing current4 in zone_Stockpile.GetSlotGroup ().HeldThings) {
+						foreach (Thing current4 in zone_Stockpile.GetSlotGroup ().get_HeldThings ()) {
 							this.Count (current4);
 						}
 					}
 				}
 			}
-			foreach (Pawn current5 in Find.ListerPawns.FreeColonists) {
+			foreach (Pawn current5 in Find.get_ListerPawns ().get_FreeColonists ()) {
 				if (current5.equipment != null) {
-					foreach (Thing current6 in current5.equipment.AllEquipment) {
+					foreach (Thing current6 in current5.equipment.get_AllEquipment ()) {
 						this.Count (current6);
 					}
 				}
 				if (current5.apparel != null) {
-					foreach (Thing current7 in current5.apparel.WornApparel) {
+					foreach (Thing current7 in current5.apparel.get_WornApparel ()) {
 						this.Count (current7);
 					}
 				}
 				if (current5.inventory != null && current5.inventory.container != null) {
 					ThingContainer container = current5.inventory.container;
-					int count = container.Count;
+					int count = container.get_Count ();
 					for (int i = 0; i < count; i++) {
-						this.Count (container[i]);
+						this.Count (container.get_Item (i));
 					}
 				}
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class InventoryPreferences
 	{
+		//
+		// Fields
+		//
 		private PreferenceIncludeUnfinished includeUnfinished;
 
 		private PreferenceCompressedStorage compressedStorage;
 
+		//
+		// Properties
+		//
 		public PreferenceCompressedStorage CompressedStorage {
 			get {
 				return this.compressedStorage;
@@ -6579,9 +7692,18 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class InventoryRecord
 	{
+		//
+		// Fields
+		//
 		public ThingDef thingDef;
 
 		public int reservedCount;
@@ -6608,6 +7730,9 @@ namespace EdB.Interface
 
 		public Color color;
 
+		//
+		// Methods
+		//
 		public void ResetCounts ()
 		{
 			this.count = 0;
@@ -6617,9 +7742,17 @@ namespace EdB.Interface
 			this.reservedCount = 0;
 		}
 	}
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class InventoryRecordKey
 	{
+		//
+		// Properties
+		//
 		public ThingDef StuffDef {
 			get;
 			set;
@@ -6630,6 +7763,9 @@ namespace EdB.Interface
 			set;
 		}
 
+		//
+		// Constructors
+		//
 		public InventoryRecordKey ()
 		{
 		}
@@ -6646,6 +7782,9 @@ namespace EdB.Interface
 			this.StuffDef = stuffDef;
 		}
 
+		//
+		// Methods
+		//
 		public override bool Equals (object o)
 		{
 			if (o == null) {
@@ -6662,26 +7801,57 @@ namespace EdB.Interface
 			return 31 * num + num2;
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
+using Verse;
 
+namespace EdB.Interface
+{
 	public interface InventoryResolver
 	{
+		//
+		// Methods
+		//
 		List<InventoryCount> GetInventoryCounts (Thing thing, InventoryPreferences prefs);
 	}
+}
+using System;
+using System.Collections.Generic;
 
+namespace EdB.Interface
+{
 	public class InventoryState
 	{
+		//
+		// Fields
+		//
 		public bool compressedStorage;
 
 		public InventoryPreferences prefs = new InventoryPreferences ();
 
 		public Dictionary<InventoryType, Dictionary<InventoryRecordKey, InventoryRecord>> categorizedRecords;
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Verse;
+using Verse.AI;
+using Verse.Sound;
 
+namespace EdB.Interface
+{
 	public abstract class InventoryTab
 	{
+		//
+		// Static Fields
+		//
 		protected static float SectionPaddingSides = 12;
 
-		protected static GameFont SectionLabelFont = GameFont.Small;
+		protected static GameFont SectionLabelFont = 1;
 
 		protected static float SectionLabelHorizontalPadding = 4;
 
@@ -6695,6 +7865,9 @@ namespace EdB.Interface
 
 		protected static Vector2 LabelOffset = new Vector2 (0, 12);
 
+		//
+		// Fields
+		//
 		public string title = "Untitled";
 
 		protected FloatMenu equipmentAssignmentFloatMenu;
@@ -6705,10 +7878,13 @@ namespace EdB.Interface
 
 		protected float scrollViewHeight;
 
-		protected Vector2 scrollPosition = Vector2.zero;
+		protected Vector2 scrollPosition = Vector2.get_zero ();
 
 		protected bool backgroundToggle;
 
+		//
+		// Properties
+		//
 		public InventoryManager InventoryManager {
 			get {
 				return this.manager;
@@ -6718,17 +7894,23 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public InventoryTab (string title, int order)
 		{
 			this.title = Translator.Translate (title);
 			this.order = order;
 		}
 
+		//
+		// Methods
+		//
 		protected void AssignEquipmentToPawn (InventoryRecord record, Pawn pawn)
 		{
 			Thing thing = this.FindClosestValidThing (record, pawn);
 			if (thing == null) {
-				Messages.Message (Translator.Translate ("EdB.Inventory.Equipment.Error"), MessageSound.Negative);
+				Messages.Message (Translator.Translate ("EdB.Inventory.Equipment.Error"), 4);
 				SoundStarter.PlayOneShotOnCamera (SoundDefOf.DesignateFailed);
 				return;
 			}
@@ -6752,7 +7934,7 @@ namespace EdB.Interface
 
 		protected Vector2 DrawResources (float width, List<InventoryRecord> records, Vector2 position, Vector2 iconSize, Vector2 offset, Vector2 slotSize, InventoryPreferences prefs)
 		{
-			if (this.equipmentAssignmentFloatMenu != null && Find.WindowStack[0] != this.equipmentAssignmentFloatMenu) {
+			if (this.equipmentAssignmentFloatMenu != null && Find.get_WindowStack ().get_Item (0) != this.equipmentAssignmentFloatMenu) {
 				this.equipmentAssignmentFloatMenu = null;
 			}
 			Vector2 result = new Vector2 (position.x, position.y);
@@ -6765,26 +7947,26 @@ namespace EdB.Interface
 					}
 					if (current.texture != null) {
 						Vector2 vector = new Vector2 (0, 0);
-						if (current.thingDef.apparel != null && current.thingDef.apparel.LastLayer == ApparelLayer.Overhead) {
+						if (current.thingDef.apparel != null && current.thingDef.apparel.get_LastLayer () == 4) {
 							vector.y += 10;
 						}
 						Rect rect = new Rect (result.x + offset.x + vector.x, result.y + offset.y + vector.y, iconSize.x, iconSize.y);
-						GUI.color = current.color;
+						GUI.set_color (current.color);
 						if (current.thingDef.building == null) {
 							GUI.DrawTexture (rect, current.thingDef.uiIcon);
-							if (current.availableCount > 0 && this.equipmentAssignmentFloatMenu == null && Widgets.InvisibleButton (rect) && Event.current.button == 1) {
+							if (current.availableCount > 0 && this.equipmentAssignmentFloatMenu == null && Widgets.InvisibleButton (rect) && Event.get_current ().get_button () == 1) {
 								List<FloatMenuOption> list = new List<FloatMenuOption> ();
-								foreach (Pawn current2 in Find.ListerPawns.FreeColonists) {
+								foreach (Pawn current2 in Find.get_ListerPawns ().get_FreeColonists ()) {
 									if (current2.health.capacities.CapableOf (PawnCapacityDefOf.Manipulation)) {
 										InventoryRecord assignedRecord = current;
 										Pawn assignedPawn = current2;
-										list.Add (new FloatMenuOption (current2.LabelBaseShort, delegate {
+										list.Add (new FloatMenuOption (current2.get_LabelBaseShort (), delegate {
 											this.AssignEquipmentToPawn (assignedRecord, assignedPawn);
-										}, MenuOptionPriority.Medium, null, null));
+										}, 1, null, null));
 									}
 								}
 								this.equipmentAssignmentFloatMenu = new FloatMenu (list, Translator.Translate ("EdB.Inventory.Equipment.Assign"), false, false);
-								Find.WindowStack.Add (this.equipmentAssignmentFloatMenu);
+								Find.get_WindowStack ().Add (this.equipmentAssignmentFloatMenu);
 							}
 						}
 						else {
@@ -6793,23 +7975,29 @@ namespace EdB.Interface
 							}
 							Widgets.DrawTextureFitted (rect, current.texture as Texture2D, current.buildingScale, current.proportions, new Rect (0, 0, 1, 1));
 						}
-						/* FIXME: if (this.equipmentAssignmentFloatMenu == null) {
+						if (this.equipmentAssignmentFloatMenu == null) {
 							InventoryTab.<DrawResources>c__AnonStoreyF <DrawResources>c__AnonStoreyF = new InventoryTab.<DrawResources>c__AnonStoreyF ();
-							<DrawResources>c__AnonStoreyF.tooltipText = GenText.CapitalizeFirst (GenLabel.ThingLabel (current.thingDef, current.stuffDef, 1)) + (string.IsNullOrEmpty (current.thingDef.description) ? string.Empty : ("\n\n" + current.thingDef.description));
+							<DrawResources>c__AnonStoreyF.tooltipText = GenText.CapitalizeFirst (GenLabel.ThingLabel (current.thingDef, current.stuffDef, 1)) + (string.IsNullOrEmpty (current.thingDef.description) ? string.Empty : ("
+
+" + current.thingDef.description));
 							if (current.availableCount > -1) {
 								InventoryTab.<DrawResources>c__AnonStoreyF arg_432_0 = <DrawResources>c__AnonStoreyF;
 								string tooltipText = <DrawResources>c__AnonStoreyF.tooltipText;
 								arg_432_0.tooltipText = string.Concat (new string[] {
 									tooltipText,
-									"\n\n",
+									"
+
+",
 									Translator.Translate ("EdB.Inventory.Equipment.Equipped", new object[] {
 										current.count - current.reservedCount - current.availableCount
 									}),
-									"\n",
+									"
+",
 									Translator.Translate ("EdB.Inventory.Equipment.Reserved", new object[] {
 										current.reservedCount
 									}),
-									"\n",
+									"
+",
 									Translator.Translate ("EdB.Inventory.Equipment.Available", new object[] {
 										current.availableCount
 									})
@@ -6817,10 +8005,10 @@ namespace EdB.Interface
 							}
 							TipSignal tipSignal = new TipSignal (() => <DrawResources>c__AnonStoreyF.tooltipText, <DrawResources>c__AnonStoreyF.tooltipText.GetHashCode ());
 							TooltipHandler.TipRegion (rect, tipSignal);
-						} */
-						Text.Anchor = TextAnchor.UpperCenter;
-						GUI.color = Color.white;
-						Text.Font = GameFont.Tiny;
+						}
+						Text.set_Anchor (1);
+						GUI.set_color (Color.get_white ());
+						Text.set_Font (0);
 						string text;
 						if (prefs.IncludeUnfinished.Value && current.thingDef.building != null) {
 							text = string.Empty + current.count + ((current.unfinishedCount <= 0) ? string.Empty : (" / " + (current.count + current.unfinishedCount)));
@@ -6874,19 +8062,19 @@ namespace EdB.Interface
 			}
 			float num2 = this.MeasureResourceSection (width, label, records, slotSize, prefs);
 			if (this.backgroundToggle) {
-				GUI.color = new Color (0.082f, 0.0977f, 0.1133f);
+				GUI.set_color (new Color (0.082, 0.0977, 0.1133));
 			}
 			else {
-				GUI.color = new Color (0.1094f, 0.125f, 0.1406f);
+				GUI.set_color (new Color (0.1094, 0.125, 0.1406));
 			}
 			GUI.DrawTexture (new Rect (0, vector.y, width + 16, num2), BaseContent.WhiteTex);
-			GUI.color = new Color (0.3294f, 0.3294f, 0.3294f);
+			GUI.set_color (new Color (0.3294, 0.3294, 0.3294));
 			Widgets.DrawLineHorizontal (0, vector.y + num2 - 1, width + 16);
 			this.backgroundToggle = !this.backgroundToggle;
 			vector.y += InventoryTab.SectionPaddingTop;
-			Text.Anchor = TextAnchor.UpperLeft;
-			GUI.color = Color.white;
-			Text.Font = InventoryTab.SectionLabelFont;
+			Text.set_Anchor (0);
+			GUI.set_color (Color.get_white ());
+			Text.set_Font (InventoryTab.SectionLabelFont);
 			float num3 = Text.CalcHeight (label, num);
 			Rect rect = new Rect (InventoryTab.SectionPaddingSides + InventoryTab.SectionLabelHorizontalPadding, vector.y, num - InventoryTab.SectionLabelHorizontalPadding, num3);
 			Widgets.Label (rect, label);
@@ -6905,14 +8093,14 @@ namespace EdB.Interface
 			List<EquippableThing> list = this.manager.EquippableThings [new InventoryRecordKey (record.thingDef, record.stuffDef)];
 			foreach (EquippableThing current in list) {
 				Thing thing2 = current.thing;
-				current.distance = (pawn.Position - thing2.Position).LengthHorizontalSquared;
+				current.distance = (pawn.get_Position () - thing2.get_Position ()).get_LengthHorizontalSquared ();
 			}
 			IEnumerable<Thing> enumerable = from thing in list
 			orderby thing.distance
 			select thing.thing;
 			foreach (Thing current2 in enumerable) {
-				if (Reachability.CanReach (pawn, current2, PathEndMode.ClosestTouch, Danger.Deadly, false)) {
-					if (ReservationUtility.CanReserveAndReach (pawn, new TargetInfo (current2), PathEndMode.ClosestTouch, Danger.Deadly, 1)) {
+				if (Reachability.CanReach (pawn, current2, 3, 2, false)) {
+					if (ReservationUtility.CanReserveAndReach (pawn, new TargetInfo (current2), 3, 2, 1)) {
 						return current2;
 					}
 				}
@@ -6926,8 +8114,8 @@ namespace EdB.Interface
 		{
 			float num = width - 20;
 			Vector2 vector = new Vector2 (InventoryTab.SectionPaddingSides, InventoryTab.SectionPaddingTop);
-			Text.Anchor = TextAnchor.UpperLeft;
-			Text.Font = InventoryTab.SectionLabelFont;
+			Text.set_Anchor (0);
+			Text.set_Font (InventoryTab.SectionLabelFont);
 			vector.y += Text.CalcHeight (label, num) + InventoryTab.SectionPaddingBelowLabel;
 			foreach (InventoryRecord current in records) {
 				if (current.count != 0 || (current.compressedCount != 0 && prefs.CompressedStorage.Value) || (current.unfinishedCount != 0 && prefs.IncludeUnfinished.Value)) {
@@ -6947,17 +8135,33 @@ namespace EdB.Interface
 			return vector.y;
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class InventoryTab_Buildings : InventoryTab
 	{
+		//
+		// Static Fields
+		//
 		protected static Vector2 BuildingSlotSize = new Vector2 (86, 86);
 
 		protected static Vector2 BuildingImageSize = new Vector2 (72, 72);
 
 		protected static Vector2 BuildingImageOffset;
 
+		//
+		// Fields
+		//
 		protected Dictionary<string, string> labels = new Dictionary<string, string> ();
 
+		//
+		// Constructors
+		//
 		public InventoryTab_Buildings () : base ("EdB.Inventory.Tab.Buildings", 500)
 		{
 			InventoryTab_Buildings.BuildingImageOffset = new Vector2 (InventoryTab_Buildings.BuildingSlotSize.x / 2 - InventoryTab_Buildings.BuildingImageSize.x / 2, InventoryTab_Buildings.BuildingSlotSize.y - InventoryTab.LabelOffset.y - InventoryTab_Buildings.BuildingImageSize.y);
@@ -6965,6 +8169,9 @@ namespace EdB.Interface
 			this.InitializeCategoryLabels ();
 		}
 
+		//
+		// Methods
+		//
 		private void InitializeCategoryLabels ()
 		{
 			string[] array = new string[] {
@@ -6981,9 +8188,9 @@ namespace EdB.Interface
 			string[] array2 = array;
 			for (int i = 0; i < array2.Length; i++) {
 				string text = array2 [i];
-				foreach (DesignationCategoryDef current in DefDatabase<DesignationCategoryDef>.AllDefs) {
+				foreach (DesignationCategoryDef current in DefDatabase<DesignationCategoryDef>.get_AllDefs ()) {
 					if (text.Equals (current.defName)) {
-						this.labels.Add (text, current.LabelCap);
+						this.labels.Add (text, current.get_LabelCap ());
 						break;
 					}
 				}
@@ -6997,30 +8204,30 @@ namespace EdB.Interface
 		{
 			InventoryPreferences preferences = this.manager.Preferences;
 			Rect rect = new Rect (23, 93, 928, 510);
-			GUI.color = new Color (0.08235f, 0.09804f, 0.1137f);
+			GUI.set_color (new Color (0.08235, 0.09804, 0.1137));
 			GUI.DrawTexture (rect, BaseContent.WhiteTex);
-			GUI.color = new Color (0.5394f, 0.5394f, 0.5394f);
+			GUI.set_color (new Color (0.5394, 0.5394, 0.5394));
 			Widgets.DrawBox (rect, 1);
 			try {
 				Rect rect2 = GenUI.ContractedBy (rect, 1);
 				GUI.BeginGroup (rect2);
-				Rect rect3 = new Rect (0, 0, rect2.width, rect2.height);
-				Rect rect4 = new Rect (rect3.x, rect3.y, rect3.width - 16, this.scrollViewHeight);
+				Rect rect3 = new Rect (0, 0, rect2.get_width (), rect2.get_height ());
+				Rect rect4 = new Rect (rect3.get_x (), rect3.get_y (), rect3.get_width () - 16, this.scrollViewHeight);
 				try {
 					Widgets.BeginScrollView (rect3, ref this.scrollPosition, rect4);
 					this.backgroundToggle = false;
 					Vector2 position = new Vector2 (InventoryTab.SectionPaddingSides, 0);
-					position = base.DrawResourceSection (rect4.width, this.labels ["Furniture"], this.manager.GetInventoryRecord (InventoryType.BUILDING_FURNITURE), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
-					position = base.DrawResourceSection (rect4.width, this.labels ["Production"], this.manager.GetInventoryRecord (InventoryType.BUILDING_PRODUCTION), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
-					position = base.DrawResourceSection (rect4.width, this.labels ["Power"], this.manager.GetInventoryRecord (InventoryType.BUILDING_POWER), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
-					position = base.DrawResourceSection (rect4.width, this.labels ["Security"], this.manager.GetInventoryRecord (InventoryType.BUILDING_SECURITY), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
-					position = base.DrawResourceSection (rect4.width, this.labels ["Joy"], this.manager.GetInventoryRecord (InventoryType.BUILDING_JOY), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
-					position = base.DrawResourceSection (rect4.width, this.labels ["Temperature"], this.manager.GetInventoryRecord (InventoryType.BUILDING_TEMPERATURE), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
-					position = base.DrawResourceSection (rect4.width, this.labels ["Ship"], this.manager.GetInventoryRecord (InventoryType.BUILDING_SHIP), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
-					position = base.DrawResourceSection (rect4.width, this.labels ["Structure"], this.manager.GetInventoryRecord (InventoryType.BUILDING_STRUCTURE), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
-					position = base.DrawResourceSection (rect4.width, this.labels ["FoodUtilities"], this.manager.GetInventoryRecord (InventoryType.BUILDING_FOOD_UTILITIES), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
-					position = base.DrawResourceSection (rect4.width, Translator.Translate ("EdB.Inventory.Section.Other"), this.manager.GetInventoryRecord (InventoryType.BUILDING_OTHER), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
-					if (Event.current.type == EventType.Layout) {
+					position = base.DrawResourceSection (rect4.get_width (), this.labels ["Furniture"], this.manager.GetInventoryRecord (InventoryType.BUILDING_FURNITURE), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
+					position = base.DrawResourceSection (rect4.get_width (), this.labels ["Production"], this.manager.GetInventoryRecord (InventoryType.BUILDING_PRODUCTION), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
+					position = base.DrawResourceSection (rect4.get_width (), this.labels ["Power"], this.manager.GetInventoryRecord (InventoryType.BUILDING_POWER), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
+					position = base.DrawResourceSection (rect4.get_width (), this.labels ["Security"], this.manager.GetInventoryRecord (InventoryType.BUILDING_SECURITY), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
+					position = base.DrawResourceSection (rect4.get_width (), this.labels ["Joy"], this.manager.GetInventoryRecord (InventoryType.BUILDING_JOY), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
+					position = base.DrawResourceSection (rect4.get_width (), this.labels ["Temperature"], this.manager.GetInventoryRecord (InventoryType.BUILDING_TEMPERATURE), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
+					position = base.DrawResourceSection (rect4.get_width (), this.labels ["Ship"], this.manager.GetInventoryRecord (InventoryType.BUILDING_SHIP), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
+					position = base.DrawResourceSection (rect4.get_width (), this.labels ["Structure"], this.manager.GetInventoryRecord (InventoryType.BUILDING_STRUCTURE), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
+					position = base.DrawResourceSection (rect4.get_width (), this.labels ["FoodUtilities"], this.manager.GetInventoryRecord (InventoryType.BUILDING_FOOD_UTILITIES), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
+					position = base.DrawResourceSection (rect4.get_width (), Translator.Translate ("EdB.Inventory.Section.Other"), this.manager.GetInventoryRecord (InventoryType.BUILDING_OTHER), position, InventoryTab_Buildings.BuildingSlotSize, InventoryTab_Buildings.BuildingImageOffset, InventoryTab_Buildings.BuildingImageSize, preferences);
+					if (Event.get_current ().get_type () == 8) {
 						this.scrollViewHeight = position.y - 1;
 					}
 				}
@@ -7030,23 +8237,32 @@ namespace EdB.Interface
 			}
 			finally {
 				GUI.EndGroup ();
-				Text.Anchor = TextAnchor.UpperLeft;
-				GUI.color = Color.white;
+				Text.set_Anchor (0);
+				GUI.set_color (Color.get_white ());
 			}
-			Text.Anchor = TextAnchor.UpperLeft;
-			GUI.color = Color.white;
-			Text.Font = GameFont.Small;
+			Text.set_Anchor (0);
+			GUI.set_color (Color.get_white ());
+			Text.set_Font (1);
 			string text = Translator.Translate ("EdB.Inventory.Prefs.IncludeUnfinished");
 			float num = Text.CalcSize (text).x + 40;
 			float num2 = 22;
 			bool value = preferences.IncludeUnfinished.Value;
-			Widgets.LabelCheckbox (new Rect (fillRect.x + fillRect.width - num - num2, fillRect.y + fillRect.height - 38, num, 30), text, ref value, false);
+			Widgets.LabelCheckbox (new Rect (fillRect.get_x () + fillRect.get_width () - num - num2, fillRect.get_y () + fillRect.get_height () - 38, num, 30), text, ref value, false);
 			preferences.IncludeUnfinished.Value = value;
 		}
 	}
+}
+using System;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class InventoryTab_Items : InventoryTab
 	{
+		//
+		// Static Fields
+		//
 		protected static Vector2 ItemSlotSize = new Vector2 (72, 68);
 
 		protected static Vector2 WeaponImageOffset;
@@ -7063,6 +8279,9 @@ namespace EdB.Interface
 
 		protected static Vector2 WeaponSlotSize = new Vector2 (76, 78);
 
+		//
+		// Constructors
+		//
 		public InventoryTab_Items () : base ("EdB.Inventory.Tab.ItemsAndResources", 1000)
 		{
 			InventoryTab_Items.WeaponImageOffset = new Vector2 (InventoryTab_Items.ItemSlotSize.x / 2 - InventoryTab_Items.WeaponImageSize.x / 2, InventoryTab_Items.ItemSlotSize.y - InventoryTab.LabelOffset.y - InventoryTab_Items.WeaponImageSize.y);
@@ -7073,30 +8292,33 @@ namespace EdB.Interface
 			InventoryTab_Items.ApparelImageOffset.y = InventoryTab_Items.ApparelImageOffset.y - 6;
 		}
 
+		//
+		// Methods
+		//
 		public override void InventoryTabOnGui (Rect fillRect)
 		{
 			InventoryPreferences preferences = this.manager.Preferences;
 			Rect rect = new Rect (23, 93, 928, 510);
-			GUI.color = new Color (0.08235f, 0.09804f, 0.1137f);
+			GUI.set_color (new Color (0.08235, 0.09804, 0.1137));
 			GUI.DrawTexture (rect, BaseContent.WhiteTex);
-			GUI.color = new Color (0.5394f, 0.5394f, 0.5394f);
+			GUI.set_color (new Color (0.5394, 0.5394, 0.5394));
 			Widgets.DrawBox (rect, 1);
 			try {
 				Rect rect2 = GenUI.ContractedBy (rect, 1);
 				GUI.BeginGroup (rect2);
-				Rect rect3 = new Rect (0, 0, rect2.width, rect2.height);
-				Rect rect4 = new Rect (rect3.x, rect3.y, rect3.width - 16, this.scrollViewHeight);
+				Rect rect3 = new Rect (0, 0, rect2.get_width (), rect2.get_height ());
+				Rect rect4 = new Rect (rect3.get_x (), rect3.get_y (), rect3.get_width () - 16, this.scrollViewHeight);
 				try {
 					Widgets.BeginScrollView (rect3, ref this.scrollPosition, rect4);
 					this.backgroundToggle = false;
 					Vector2 position = new Vector2 (InventoryTab.SectionPaddingSides, 0);
-					position = base.DrawResourceSection (rect4.width, Translator.Translate ("EdB.Inventory.Section.Resources"), this.manager.GetInventoryRecord (InventoryType.ITEM_RESOURCE), position, InventoryTab_Items.ItemSlotSize, InventoryTab_Items.ResourceImageOffset, InventoryTab_Items.ResourceImageSize, preferences);
-					position = base.DrawResourceSection (rect4.width, Translator.Translate ("EdB.Inventory.Section.Food"), this.manager.GetInventoryRecord (InventoryType.ITEM_FOOD), position, InventoryTab_Items.ItemSlotSize, InventoryTab_Items.ResourceImageOffset, InventoryTab_Items.ResourceImageSize, preferences);
-					position = base.DrawResourceSection (rect4.width, Translator.Translate ("EdB.Inventory.Section.Weapons"), this.manager.GetInventoryRecord (InventoryType.ITEM_EQUIPMENT), position, InventoryTab_Items.WeaponSlotSize, InventoryTab_Items.WeaponImageOffset, InventoryTab_Items.WeaponImageSize, preferences);
-					position = base.DrawResourceSection (rect4.width, Translator.Translate ("EdB.Inventory.Section.Apparel"), this.manager.GetInventoryRecord (InventoryType.ITEM_APPAREL), position, InventoryTab_Items.ItemSlotSize, InventoryTab_Items.ApparelImageOffset, InventoryTab_Items.ApparelImageSize, preferences);
-					position = base.DrawResourceSection (rect4.width, Translator.Translate ("EdB.Inventory.Section.Schematics"), this.manager.GetInventoryRecord (InventoryType.ITEM_SCHEMATIC), position, InventoryTab_Items.ItemSlotSize, InventoryTab_Items.ResourceImageOffset, InventoryTab_Items.ResourceImageSize, preferences);
-					position = base.DrawResourceSection (rect4.width, Translator.Translate ("EdB.Inventory.Section.Other"), this.manager.GetInventoryRecord (InventoryType.ITEM_OTHER), position, InventoryTab_Items.ItemSlotSize, InventoryTab_Items.ResourceImageOffset, InventoryTab_Items.ResourceImageSize, preferences);
-					if (Event.current.type == EventType.Layout) {
+					position = base.DrawResourceSection (rect4.get_width (), Translator.Translate ("EdB.Inventory.Section.Resources"), this.manager.GetInventoryRecord (InventoryType.ITEM_RESOURCE), position, InventoryTab_Items.ItemSlotSize, InventoryTab_Items.ResourceImageOffset, InventoryTab_Items.ResourceImageSize, preferences);
+					position = base.DrawResourceSection (rect4.get_width (), Translator.Translate ("EdB.Inventory.Section.Food"), this.manager.GetInventoryRecord (InventoryType.ITEM_FOOD), position, InventoryTab_Items.ItemSlotSize, InventoryTab_Items.ResourceImageOffset, InventoryTab_Items.ResourceImageSize, preferences);
+					position = base.DrawResourceSection (rect4.get_width (), Translator.Translate ("EdB.Inventory.Section.Weapons"), this.manager.GetInventoryRecord (InventoryType.ITEM_EQUIPMENT), position, InventoryTab_Items.WeaponSlotSize, InventoryTab_Items.WeaponImageOffset, InventoryTab_Items.WeaponImageSize, preferences);
+					position = base.DrawResourceSection (rect4.get_width (), Translator.Translate ("EdB.Inventory.Section.Apparel"), this.manager.GetInventoryRecord (InventoryType.ITEM_APPAREL), position, InventoryTab_Items.ItemSlotSize, InventoryTab_Items.ApparelImageOffset, InventoryTab_Items.ApparelImageSize, preferences);
+					position = base.DrawResourceSection (rect4.get_width (), Translator.Translate ("EdB.Inventory.Section.Schematics"), this.manager.GetInventoryRecord (InventoryType.ITEM_SCHEMATIC), position, InventoryTab_Items.ItemSlotSize, InventoryTab_Items.ResourceImageOffset, InventoryTab_Items.ResourceImageSize, preferences);
+					position = base.DrawResourceSection (rect4.get_width (), Translator.Translate ("EdB.Inventory.Section.Other"), this.manager.GetInventoryRecord (InventoryType.ITEM_OTHER), position, InventoryTab_Items.ItemSlotSize, InventoryTab_Items.ResourceImageOffset, InventoryTab_Items.ResourceImageSize, preferences);
+					if (Event.get_current ().get_type () == 8) {
 						this.scrollViewHeight = position.y - 1;
 					}
 				}
@@ -7106,24 +8328,28 @@ namespace EdB.Interface
 			}
 			finally {
 				GUI.EndGroup ();
-				Text.Anchor = TextAnchor.UpperLeft;
-				GUI.color = Color.white;
+				Text.set_Anchor (0);
+				GUI.set_color (Color.get_white ());
 			}
-			Text.Anchor = TextAnchor.UpperLeft;
-			GUI.color = Color.white;
-			Text.Font = GameFont.Small;
+			Text.set_Anchor (0);
+			GUI.set_color (Color.get_white ());
+			Text.set_Font (1);
 			if (this.manager.CompressedStorage) {
 				string text = Translator.Translate ("EdB.Inventory.Prefs.CompressedStorage");
 				float num = Text.CalcSize (text).x + 32;
 				float num2 = 22;
-				Rect rect5 = new Rect (fillRect.x + fillRect.width - num - num2, fillRect.y + fillRect.height - 38, num, 30);
+				Rect rect5 = new Rect (fillRect.get_x () + fillRect.get_width () - num - num2, fillRect.get_y () + fillRect.get_height () - 38, num, 30);
 				bool value = preferences.CompressedStorage.Value;
 				Widgets.LabelCheckbox (rect5, text, ref value, false);
 				preferences.CompressedStorage.Value = value;
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public enum InventoryType
 	{
 		UNKNOWN,
@@ -7144,9 +8370,16 @@ namespace EdB.Interface
 		BUILDING_TEMPERATURE,
 		BUILDING_FOOD_UTILITIES
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public interface IPreference
 	{
+		//
+		// Properties
+		//
 		bool DisplayInOptions {
 			get;
 		}
@@ -7164,28 +8397,58 @@ namespace EdB.Interface
 			set;
 		}
 
+		//
+		// Methods
+		//
 		void OnGUI (float positionX, ref float positionY, float width);
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public interface IRenderedComponent
 	{
+		//
+		// Properties
+		//
 		bool RenderWithScreenshots {
 			get;
 		}
 
+		//
+		// Methods
+		//
 		void OnGUI ();
 	}
+}
+using RimWorld;
+using System;
+using System.Reflection;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ITab_Art_Alternate : ITab_Art
 	{
+		//
+		// Static Fields
+		//
 		protected static string cachedImageDescription;
 
 		protected static CompArt cachedImageSource;
 
 		protected static TaleReference cachedTaleRef;
 
+		//
+		// Fields
+		//
 		protected MethodInfo selectedCompArtGetter;
 
+		//
+		// Constructors
+		//
 		public ITab_Art_Alternate ()
 		{
 			this.size = new Vector2 (TabDrawer.TabPanelSize.x, 320);
@@ -7193,76 +8456,119 @@ namespace EdB.Interface
 			this.selectedCompArtGetter = property.GetGetMethod (true);
 		}
 
+		//
+		// Methods
+		//
 		protected override void FillTab ()
 		{
 			Rect rect = GenUI.ContractedBy (new Rect (0, 0, this.size.x, this.size.y), 20);
 			Rect rect2 = rect;
-			Text.Font = GameFont.Medium;
+			Text.set_Font (2);
 			CompArt compArt = (CompArt)this.selectedCompArtGetter.Invoke (this, null);
-			Widgets.Label (rect2, compArt.Title);
-			if (ITab_Art_Alternate.cachedImageSource != compArt || ITab_Art_Alternate.cachedTaleRef != compArt.TaleRef) {
+			Widgets.Label (rect2, compArt.get_Title ());
+			if (ITab_Art_Alternate.cachedImageSource != compArt || ITab_Art_Alternate.cachedTaleRef != compArt.get_TaleRef ()) {
 				ITab_Art_Alternate.cachedImageDescription = compArt.ImageDescription ();
 				ITab_Art_Alternate.cachedImageSource = compArt;
-				ITab_Art_Alternate.cachedTaleRef = compArt.TaleRef;
+				ITab_Art_Alternate.cachedTaleRef = compArt.get_TaleRef ();
 			}
 			Rect rect3 = rect;
-			rect3.yMin = rect3.yMin + 35;
-			Text.Font = GameFont.Small;
+			rect3.set_yMin (rect3.get_yMin () + 35);
+			Text.set_Font (1);
 			Widgets.Label (rect3, ITab_Art_Alternate.cachedImageDescription);
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ITab_Bills_Alternate : ITab_Bills
 	{
+		//
+		// Static Fields
+		//
 		private static readonly Vector2 WinSize = new Vector2 (TabDrawer.TabPanelSize.x, 480);
 
+		//
+		// Fields
+		//
 		private ScrollView scrollView = new ScrollView ();
 
 		protected FieldInfo mouseoverBillField;
 
+		//
+		// Constructors
+		//
 		public ITab_Bills_Alternate ()
 		{
 			this.size = ITab_Bills_Alternate.WinSize;
 			this.mouseoverBillField = typeof(ITab_Bills).GetField ("mouseoverBill", BindingFlags.Instance | BindingFlags.NonPublic);
 		}
 
+		//
+		// Methods
+		//
 		protected override void FillTab ()
 		{
-			ConceptDatabase.KnowledgeDemonstrated (ConceptDefOf.BillsTab, KnowledgeAmount.GuiFrame);
+			ConceptDatabase.KnowledgeDemonstrated (ConceptDefOf.BillsTab, 1);
 			Rect rect = GenUI.ContractedBy (new Rect (0, 0, ITab_Bills_Alternate.WinSize.x, ITab_Bills_Alternate.WinSize.y), 10);
 			Func<List<FloatMenuOption>> recipeOptionsMaker = delegate {
 				List<FloatMenuOption> list = new List<FloatMenuOption> ();
-				for (int i = 0; i < base.SelTable.def.AllRecipes.Count; i++) {
-					RecipeDef recipe = base.SelTable.def.AllRecipes [i];
-					list.Add (new FloatMenuOption (recipe.LabelCap, delegate {
-						if (!Find.ListerPawns.FreeColonists.Any ((Pawn col) => recipe.PawnSatisfiesSkillRequirements (col))) {
+				for (int i = 0; i < base.get_SelTable ().def.get_AllRecipes ().Count; i++) {
+					RecipeDef recipe = base.get_SelTable ().def.get_AllRecipes () [i];
+					list.Add (new FloatMenuOption (recipe.get_LabelCap (), delegate {
+						if (!Find.get_ListerPawns ().get_FreeColonists ().Any ((Pawn col) => recipe.PawnSatisfiesSkillRequirements (col))) {
 							Bill.CreateNoPawnsWithSkillDialog (recipe);
 						}
 						Bill bill = BillUtility.MakeNewBill (recipe);
-						this.SelTable.billStack.AddBill (bill);
-					}, MenuOptionPriority.Medium, null, null));
+						this.get_SelTable ().billStack.AddBill (bill);
+					}, 1, null, null));
 				}
 				return list;
 			};
-			Bill value = BillDrawer.DrawListing (base.SelTable.billStack, rect, recipeOptionsMaker, this.scrollView);
+			Bill value = BillDrawer.DrawListing (base.get_SelTable ().billStack, rect, recipeOptionsMaker, this.scrollView);
 			this.mouseoverBillField.SetValue (this, value);
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Linq;
+using UnityEngine;
+using Verse;
+using Verse.Sound;
 
+namespace EdB.Interface
+{
 	public class ITab_Growing_Alternate : ITab_Growing
 	{
+		//
+		// Static Fields
+		//
 		private static readonly Vector2 WinSize = new Vector2 (TabDrawer.TabPanelSize.x, 480);
 
 		private static readonly Vector2 PaddingSize = new Vector2 (26, 30);
 
 		private static Vector2 ContentSize;
 
+		//
+		// Fields
+		//
 		protected FloatMenu infoFloatMenu;
 
 		protected ThingDef rightClicked;
 
 		protected ScrollView scrollView = new ScrollView ();
 
+		//
+		// Constructors
+		//
 		public ITab_Growing_Alternate ()
 		{
 			this.size = ITab_Growing_Alternate.WinSize;
@@ -7270,45 +8576,48 @@ namespace EdB.Interface
 			ITab_Growing_Alternate.ContentSize.y = ITab_Growing_Alternate.ContentSize.y - 2;
 		}
 
+		//
+		// Methods
+		//
 		protected override void FillTab ()
 		{
-			if (this.rightClicked != null && this.infoFloatMenu != null && Find.WindowStack.Top () != this.infoFloatMenu) {
+			if (this.rightClicked != null && this.infoFloatMenu != null && Find.get_WindowStack ().Top () != this.infoFloatMenu) {
 				this.rightClicked = null;
 				this.infoFloatMenu = null;
 			}
-			Text.Font = GameFont.Small;
-			IPlantToGrowSettable plantToGrowSettable = (IPlantToGrowSettable)Find.Selector.SelectedObjects.First<object> ();
+			Text.set_Font (1);
+			IPlantToGrowSettable plantToGrowSettable = (IPlantToGrowSettable)Find.get_Selector ().get_SelectedObjects ().First<object> ();
 			Rect rect = new Rect (ITab_Growing_Alternate.PaddingSize.x, ITab_Growing_Alternate.PaddingSize.y, ITab_Growing_Alternate.ContentSize.x, ITab_Growing_Alternate.ContentSize.y);
 			GUI.BeginGroup (rect);
-			Rect viewRect = new Rect (0, 0, rect.width, rect.height);
+			Rect viewRect = new Rect (0, 0, rect.get_width (), rect.get_height ());
 			this.scrollView.Begin (viewRect);
 			float num = 0;
 			int num2 = 0;
-			foreach (ThingDef current in GenPlant.ValidPlantTypesForGrower (Find.Selector.SingleSelectedObject)) {
-				float num3 = Text.CalcHeight (current.LabelCap, ITab_Growing_Alternate.ContentSize.x - 32);
+			foreach (ThingDef current in GenPlant.ValidPlantTypesForGrower (Find.get_Selector ().get_SingleSelectedObject ())) {
+				float num3 = Text.CalcHeight (current.get_LabelCap (), ITab_Growing_Alternate.ContentSize.x - 32);
 				if (num3 < 30) {
 					num3 = 30;
 				}
-				GUI.color = Color.white;
+				GUI.set_color (Color.get_white ());
 				Rect rect2 = new Rect (0, num + 1, ITab_Growing_Alternate.ContentSize.x - 28, num3);
-				Rect rect3 = new Rect (0, rect2.y - 1, rect2.width, rect2.height + 2);
-				Vector2 mousePosition = Event.current.mousePosition;
+				Rect rect3 = new Rect (0, rect2.get_y () - 1, rect2.get_width (), rect2.get_height () + 2);
+				Vector2 mousePosition = Event.get_current ().get_mousePosition ();
 				if (rect3.Contains (mousePosition) && mousePosition.y > this.scrollView.Position.y && mousePosition.y < this.scrollView.Position.y + this.scrollView.ViewHeight) {
 					GUI.DrawTexture (rect3, TexUI.HighlightTex);
 				}
 				else if (num2 % 2 == 0) {
 					GUI.DrawTexture (rect3, TabDrawer.AlternateRowTexture);
 				}
-				rect2.x = rect2.x + 6;
-				rect2.y = rect2.y + 3;
-				rect2.width = rect2.width - 4;
-				Widgets.InfoCardButton (rect2.x, rect2.y, current);
-				rect2.x = rect2.x + 34;
-				rect2.width = rect2.width - 34;
-				if ((Widgets.InvisibleButton (new Rect (rect2.x, rect2.y, rect2.width - 36, rect2.height)) || WidgetDrawer.DrawLabeledRadioButton (rect2, current.LabelCap, current == plantToGrowSettable.GetPlantDefToGrow (), false)) && plantToGrowSettable.GetPlantDefToGrow () != current) {
+				rect2.set_x (rect2.get_x () + 6);
+				rect2.set_y (rect2.get_y () + 3);
+				rect2.set_width (rect2.get_width () - 4);
+				Widgets.InfoCardButton (rect2.get_x (), rect2.get_y (), current);
+				rect2.set_x (rect2.get_x () + 34);
+				rect2.set_width (rect2.get_width () - 34);
+				if ((Widgets.InvisibleButton (new Rect (rect2.get_x (), rect2.get_y (), rect2.get_width () - 36, rect2.get_height ())) || WidgetDrawer.DrawLabeledRadioButton (rect2, current.get_LabelCap (), current == plantToGrowSettable.GetPlantDefToGrow (), false)) && plantToGrowSettable.GetPlantDefToGrow () != current) {
 					plantToGrowSettable.SetPlantDefToGrow (current);
 					SoundStarter.PlayOneShotOnCamera (SoundDefOf.RadioButtonClicked);
-					ConceptDatabase.KnowledgeDemonstrated (ConceptDefOf.SetGrowingZonePlant, KnowledgeAmount.Total);
+					ConceptDatabase.KnowledgeDemonstrated (ConceptDefOf.SetGrowingZonePlant, 6);
 				}
 				num += num3;
 				num += 2;
@@ -7319,15 +8628,31 @@ namespace EdB.Interface
 			GUI.EndGroup ();
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ITab_Pawn_Character_Alternate : ITab_Pawn_Character
 	{
+		//
+		// Static Fields
+		//
 		private static readonly Vector2 PaddingSize = new Vector2 (26, 20);
 
 		private static readonly Vector2 PanelSize = TabDrawer.TabPanelSize;
 
 		private static readonly Vector2 ContentSize = new Vector2 (ITab_Pawn_Character_Alternate.PanelSize.x - ITab_Pawn_Character_Alternate.PaddingSize.x * 2, ITab_Pawn_Character_Alternate.PanelSize.y - ITab_Pawn_Character_Alternate.PaddingSize.y * 2);
 
+		//
+		// Fields
+		//
 		protected SkillDrawer skillDrawer = new SkillDrawer ();
 
 		protected float HeightWithoutSkills = 362;
@@ -7336,14 +8661,17 @@ namespace EdB.Interface
 
 		protected SelectorUtility pawnSelector = new SelectorUtility ();
 
+		//
+		// Properties
+		//
 		private Pawn PawnToShowInfoAbout {
 			get {
 				Pawn pawn = null;
-				if (base.SelPawn != null) {
-					pawn = base.SelPawn;
+				if (base.get_SelPawn () != null) {
+					pawn = base.get_SelPawn ();
 				}
 				else {
-					Corpse corpse = base.SelThing as Corpse;
+					Corpse corpse = base.get_SelThing () as Corpse;
 					if (corpse != null) {
 						pawn = corpse.innerPawn;
 					}
@@ -7361,12 +8689,18 @@ namespace EdB.Interface
 			set;
 		}
 
+		//
+		// Constructors
+		//
 		public ITab_Pawn_Character_Alternate (PreferenceTabBrowseButtons prefBrowseButtons)
 		{
 			this.size = TabDrawer.TabPanelSize;
 			this.PreferenceTabBrowseButtons = prefBrowseButtons;
 		}
 
+		//
+		// Methods
+		//
 		protected override void FillTab ()
 		{
 			Pawn pawnToShowInfoAbout = this.PawnToShowInfoAbout;
@@ -7374,13 +8708,13 @@ namespace EdB.Interface
 				GUI.BeginGroup (new Rect (ITab_Pawn_Character_Alternate.PaddingSize.x, ITab_Pawn_Character_Alternate.PaddingSize.y, ITab_Pawn_Character_Alternate.ContentSize.x, ITab_Pawn_Character_Alternate.ContentSize.y));
 				float num = 0;
 				float num2 = 12;
-				bool allowRename = !pawnToShowInfoAbout.Dead && !pawnToShowInfoAbout.Destroyed;
+				bool allowRename = !pawnToShowInfoAbout.get_Dead () && !pawnToShowInfoAbout.get_Destroyed ();
 				num += TabDrawer.DrawNameAndBasicInfo (0, num, this.PawnToShowInfoAbout, ITab_Pawn_Character_Alternate.ContentSize.x, allowRename);
 				num += num2;
 				num += TabDrawer.DrawHeader (0, num, ITab_Pawn_Character_Alternate.ContentSize.x, Translator.Translate ("Backstory"), true, 0);
 				num += 2;
-				Text.Font = GameFont.Small;
-				GUI.color = TabDrawer.TextColor;
+				Text.set_Font (1);
+				GUI.set_color (TabDrawer.TextColor);
 				Vector2 vector = new Vector2 (ITab_Pawn_Character_Alternate.ContentSize.x, 24);
 				Vector2 vector2 = new Vector2 (90, 24);
 				Vector2 vector3 = new Vector2 (3, 2);
@@ -7390,18 +8724,18 @@ namespace EdB.Interface
 					while (enumerator.MoveNext ()) {
 						BackstorySlot backstorySlot = (BackstorySlot)enumerator.Current;
 						Rect rect = new Rect (0, num, vector.x, vector.y);
-						if (rect.Contains (Event.current.mousePosition)) {
+						if (rect.Contains (Event.get_current ().get_mousePosition ())) {
 							Widgets.DrawHighlight (rect);
 						}
 						TooltipHandler.TipRegion (rect, pawnToShowInfoAbout.story.GetBackstory (backstorySlot).FullDescriptionFor (pawnToShowInfoAbout));
-						rect.x = rect.x + vector3.x;
-						rect.width = rect.width - vector3.x * 2;
-						rect.y = rect.y + vector3.y;
-						GUI.skin.label.alignment = TextAnchor.MiddleLeft;
-						string str = (backstorySlot == BackstorySlot.Adulthood) ? Translator.Translate ("Adulthood") : Translator.Translate ("Childhood");
+						rect.set_x (rect.get_x () + vector3.x);
+						rect.set_width (rect.get_width () - vector3.x * 2);
+						rect.set_y (rect.get_y () + vector3.y);
+						GUI.get_skin ().get_label ().set_alignment (3);
+						string str = (backstorySlot == 1) ? Translator.Translate ("Adulthood") : Translator.Translate ("Childhood");
 						Widgets.Label (rect, str + ":");
-						GUI.skin.label.alignment = TextAnchor.UpperLeft;
-						Rect rect2 = new Rect (rect.x + vector2.x, rect.y, vector.x - vector2.x, vector.y);
+						GUI.get_skin ().get_label ().set_alignment (0);
+						Rect rect2 = new Rect (rect.get_x () + vector2.x, rect.get_y (), vector.x - vector2.x, vector.y);
 						string title = pawnToShowInfoAbout.story.GetBackstory (backstorySlot).title;
 						Widgets.Label (rect2, title);
 						num += vector.y + 2;
@@ -7418,31 +8752,31 @@ namespace EdB.Interface
 				num += num2;
 				num += TabDrawer.DrawHeader (0, num, ITab_Pawn_Character_Alternate.ContentSize.x, Translator.Translate ("Skills"), true, 0);
 				num += 6;
-				float num4 = (float)DefDatabase<SkillDef>.AllDefs.Count<SkillDef> () * 24;
+				float num4 = (float)DefDatabase<SkillDef>.get_AllDefs ().Count<SkillDef> () * 24;
 				Rect rect3 = new Rect (0, num, 390, num4);
-				GUI.color = TabDrawer.TextColor;
+				GUI.set_color (TabDrawer.TextColor);
 				GUI.BeginGroup (rect3);
 				this.skillDrawer.DrawSkillsOf (pawnToShowInfoAbout, new Vector2 (0, 0));
 				GUI.EndGroup ();
-				num += rect3.height;
+				num += rect3.get_height ();
 				num += num2;
 				float num5 = num;
-				float num6 = ITab_Pawn_Character_Alternate.ContentSize.x * 0.4f - ITab_Pawn_Character_Alternate.PaddingSize.x / 2;
-				float num7 = ITab_Pawn_Character_Alternate.ContentSize.x * 0.6f - ITab_Pawn_Character_Alternate.PaddingSize.x / 2;
+				float num6 = ITab_Pawn_Character_Alternate.ContentSize.x * 0.4 - ITab_Pawn_Character_Alternate.PaddingSize.x / 2;
+				float num7 = ITab_Pawn_Character_Alternate.ContentSize.x * 0.6 - ITab_Pawn_Character_Alternate.PaddingSize.x / 2;
 				float num8 = num6 + ITab_Pawn_Character_Alternate.PaddingSize.x;
 				num += TabDrawer.DrawHeader (0, num, num6, Translator.Translate ("IncapableOf"), true, 0);
 				num += 4;
 				Vector2 vector4 = new Vector2 (num6, 22);
-				Text.Font = GameFont.Small;
-				GUI.color = TabDrawer.TextColor;
-				List<WorkTags> list = pawnToShowInfoAbout.story.DisabledWorkTags.ToList<WorkTags> ();
-				GUI.skin.label.alignment = TextAnchor.UpperLeft;
+				Text.set_Font (1);
+				GUI.set_color (TabDrawer.TextColor);
+				List<WorkTags> list = pawnToShowInfoAbout.story.get_DisabledWorkTags ().ToList<WorkTags> ();
+				GUI.get_skin ().get_label ().set_alignment (0);
 				if (list.Count == 0) {
 					Rect rect4 = new Rect (0, num, num6, vector4.y);
-					GUI.color = TabDrawer.SeparatorColor;
+					GUI.set_color (TabDrawer.SeparatorColor);
 					Widgets.Label (rect4, Translator.Translate ("NoneLower"));
-					GUI.color = TabDrawer.TextColor;
-					num += rect4.height - 1;
+					GUI.set_color (TabDrawer.TextColor);
+					num += rect4.get_height () - 1;
 				}
 				else {
 					foreach (WorkTags current in list) {
@@ -7455,17 +8789,17 @@ namespace EdB.Interface
 				num += TabDrawer.DrawHeader (num8, num, num7, Translator.Translate ("Traits"), true, 0);
 				num += 4;
 				Vector2 vector5 = new Vector2 (num7, 22);
-				Text.Font = GameFont.Small;
-				GUI.color = TabDrawer.TextColor;
+				Text.set_Font (1);
+				GUI.set_color (TabDrawer.TextColor);
 				float num9 = 0;
 				foreach (Trait current2 in pawnToShowInfoAbout.story.traits.allTraits) {
 					num9 += vector5.y + 2;
 					Rect rect6 = new Rect (num8, num, num7, vector5.y);
-					if (rect6.Contains (Event.current.mousePosition)) {
+					if (rect6.Contains (Event.get_current ().get_mousePosition ())) {
 						Widgets.DrawHighlight (rect6);
 					}
-					rect6.x = rect6.x + 2;
-					Widgets.Label (rect6, current2.LabelCap);
+					rect6.set_x (rect6.get_x () + 2);
+					Widgets.Label (rect6, current2.get_LabelCap ());
 					TooltipHandler.TipRegion (rect6, current2.TipString (pawnToShowInfoAbout));
 					num += vector5.y - 1;
 				}
@@ -7476,20 +8810,29 @@ namespace EdB.Interface
 			if (this.PreferenceTabBrowseButtons != null && this.PreferenceTabBrowseButtons.Value && pawnToShowInfoAbout != null) {
 				BrowseButtonDrawer.DrawBrowseButtons (this.size, pawnToShowInfoAbout);
 			}
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 		}
 	}
+}
+using RimWorld;
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ITab_Pawn_Character_Vanilla : ITab_Pawn_Character
 	{
+		//
+		// Properties
+		//
 		private Pawn PawnToShowInfoAbout {
 			get {
 				Pawn pawn = null;
-				if (base.SelPawn != null) {
-					pawn = base.SelPawn;
+				if (base.get_SelPawn () != null) {
+					pawn = base.get_SelPawn ();
 				}
 				else {
-					Corpse corpse = base.SelThing as Corpse;
+					Corpse corpse = base.get_SelThing () as Corpse;
 					if (corpse != null) {
 						pawn = corpse.innerPawn;
 					}
@@ -7507,11 +8850,17 @@ namespace EdB.Interface
 			set;
 		}
 
+		//
+		// Constructors
+		//
 		public ITab_Pawn_Character_Vanilla (PreferenceTabBrowseButtons prefBrowseButtons)
 		{
 			this.PreferenceTabBrowseButtons = prefBrowseButtons;
 		}
 
+		//
+		// Methods
+		//
 		protected override void FillTab ()
 		{
 			base.FillTab ();
@@ -7523,18 +8872,30 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ITab_Pawn_Gear_Alternate : ITab_Pawn_Gear
 	{
+		//
+		// Static Fields
+		//
 		private const float TopPadding = 20;
 
 		public static float LineHeight = 25;
 
 		private static readonly Vector2 PanelSize = new Vector2 (TabDrawer.TabPanelSize.x, 480);
 
-		private static readonly Color HighlightColor = new Color (0.5f, 0.5f, 0.5f, 1);
+		private static readonly Color HighlightColor = new Color (0.5, 0.5, 0.5, 1);
 
-		private static readonly Color ThingLabelColor = new Color (0.9f, 0.9f, 0.9f, 1);
+		private static readonly Color ThingLabelColor = new Color (0.9, 0.9, 0.9, 1);
 
 		private const float SeparatorLabelHeight = 20;
 
@@ -7546,13 +8907,19 @@ namespace EdB.Interface
 
 		private const float InfoRectHeight = 100;
 
-		private Vector2 scrollPosition = Vector2.zero;
+		//
+		// Fields
+		//
+		private Vector2 scrollPosition = Vector2.get_zero ();
 
 		private float scrollViewHeight;
 
+		//
+		// Properties
+		//
 		private bool CanEdit {
 			get {
-				return this.SelPawnForGear.IsColonistPlayerControlled;
+				return this.SelPawnForGear.get_IsColonistPlayerControlled ();
 			}
 		}
 
@@ -7563,42 +8930,48 @@ namespace EdB.Interface
 
 		private Pawn SelPawnForGear {
 			get {
-				if (base.SelPawn != null) {
-					return base.SelPawn;
+				if (base.get_SelPawn () != null) {
+					return base.get_SelPawn ();
 				}
-				Corpse corpse = base.SelThing as Corpse;
+				Corpse corpse = base.get_SelThing () as Corpse;
 				if (corpse != null) {
 					return corpse.innerPawn;
 				}
-				throw new InvalidOperationException ("Gear tab on non-pawn non-corpse " + base.SelThing);
+				throw new InvalidOperationException ("Gear tab on non-pawn non-corpse " + base.get_SelThing ());
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ITab_Pawn_Gear_Alternate (PreferenceTabBrowseButtons preferenceTabBrowseButtons)
 		{
 			this.size = ITab_Pawn_Gear_Alternate.PanelSize;
 			this.PreferenceTabBrowseButtons = preferenceTabBrowseButtons;
 		}
 
+		//
+		// Methods
+		//
 		private void DrawThingRow (ref float y, float width, Thing thing)
 		{
 			Rect rect = new Rect (36, y + 2, width - 38, 28);
-			string text = thing.LabelCap;
+			string text = thing.get_LabelCap ();
 			if (thing is Apparel && this.SelPawnForGear.outfits != null && this.SelPawnForGear.outfits.forcedHandler.IsForced ((Apparel)thing)) {
 				text = text + ", " + Translator.Translate ("ApparelForcedLower");
 			}
-			float num = Text.CalcHeight (text, rect.width);
-			rect.height = (num >= 28) ? num : 28;
-			Rect rect2 = new Rect (0, y, width, rect.height + 4);
-			if (rect2.Contains (Event.current.mousePosition)) {
-				GUI.color = ITab_Pawn_Gear_Alternate.HighlightColor;
+			float num = Text.CalcHeight (text, rect.get_width ());
+			rect.set_height ((num >= 28) ? num : 28);
+			Rect rect2 = new Rect (0, y, width, rect.get_height () + 4);
+			if (rect2.Contains (Event.get_current ().get_mousePosition ())) {
+				GUI.set_color (ITab_Pawn_Gear_Alternate.HighlightColor);
 				GUI.DrawTexture (rect2, TexUI.HighlightTex);
 			}
-			if (Widgets.InvisibleButton (rect2) && Event.current.button == 1) {
+			if (Widgets.InvisibleButton (rect2) && Event.get_current ().get_button () == 1) {
 				List<FloatMenuOption> list = new List<FloatMenuOption> ();
 				list.Add (new FloatMenuOption (Translator.Translate ("ThingInfo"), delegate {
-					Find.WindowStack.Add (new Dialog_InfoCard (thing));
-				}, MenuOptionPriority.Medium, null, null));
+					Find.get_WindowStack ().Add (new Dialog_InfoCard (thing));
+				}, 1, null, null));
 				if (this.CanEdit) {
 					Action action = null;
 					ThingWithComps eq = thing as ThingWithComps;
@@ -7606,104 +8979,104 @@ namespace EdB.Interface
 					if (ap != null) {
 						Apparel unused;
 						action = delegate {
-							this.SelPawnForGear.apparel.TryDrop (ap, out unused, this.SelPawnForGear.Position, true);
+							this.SelPawnForGear.apparel.TryDrop (ap, ref unused, this.SelPawnForGear.get_Position (), true);
 						};
 					}
-					else if (eq != null && this.SelPawnForGear.equipment.AllEquipment.Contains (eq)) {
+					else if (eq != null && this.SelPawnForGear.equipment.get_AllEquipment ().Contains (eq)) {
 						ThingWithComps unused;
 						action = delegate {
-							this.SelPawnForGear.equipment.TryDropEquipment (eq, out unused, this.SelPawnForGear.Position, true);
+							this.SelPawnForGear.equipment.TryDropEquipment (eq, ref unused, this.SelPawnForGear.get_Position (), true);
 						};
 					}
 					else if (!thing.def.destroyOnDrop) {
 						Thing unused;
 						action = delegate {
-							this.SelPawnForGear.inventory.container.TryDrop (thing, this.SelPawnForGear.Position, ThingPlaceMode.Near, out unused);
+							this.SelPawnForGear.inventory.container.TryDrop (thing, this.SelPawnForGear.get_Position (), 1, ref unused);
 						};
 					}
-					list.Add (new FloatMenuOption (Translator.Translate ("DropThing"), action, MenuOptionPriority.Medium, null, null));
+					list.Add (new FloatMenuOption (Translator.Translate ("DropThing"), action, 1, null, null));
 				}
-				FloatMenu floatMenu = new FloatMenu (list, thing.LabelCap, false, false);
-				Find.WindowStack.Add (floatMenu);
+				FloatMenu floatMenu = new FloatMenu (list, thing.get_LabelCap (), false, false);
+				Find.get_WindowStack ().Add (floatMenu);
 			}
-			if (thing.def.DrawMatSingle != null && thing.def.DrawMatSingle.mainTexture != null) {
+			if (thing.def.get_DrawMatSingle () != null && thing.def.get_DrawMatSingle ().get_mainTexture () != null) {
 				Widgets.ThingIcon (new Rect (2, y + 2, 28, 28), thing);
 			}
-			Text.Anchor = TextAnchor.MiddleLeft;
-			GUI.color = ITab_Pawn_Gear_Alternate.ThingLabelColor;
-			rect.y = rect.y + 1;
+			Text.set_Anchor (3);
+			GUI.set_color (ITab_Pawn_Gear_Alternate.ThingLabelColor);
+			rect.set_y (rect.get_y () + 1);
 			Widgets.Label (rect, text);
-			y += rect.height + 4;
+			y += rect.get_height () + 4;
 		}
 
 		protected override void FillTab ()
 		{
-			Text.Font = GameFont.Small;
+			Text.set_Font (1);
 			Rect rect = new Rect (0, 8, this.size.x, this.size.y - 8);
 			Rect rect2 = GenUI.ContractedBy (rect, 24);
-			Rect rect3 = new Rect (rect2.x, rect2.y, rect2.width, rect2.height - 24);
+			Rect rect3 = new Rect (rect2.get_x (), rect2.get_y (), rect2.get_width (), rect2.get_height () - 24);
 			try {
 				GUI.BeginGroup (rect3);
-				Text.Font = GameFont.Small;
-				GUI.color = Color.white;
-				Rect rect4 = new Rect (0, 0, rect3.width, rect3.height);
-				Rect rect5 = new Rect (0, 0, rect3.width - 16, this.scrollViewHeight);
+				Text.set_Font (1);
+				GUI.set_color (Color.get_white ());
+				Rect rect4 = new Rect (0, 0, rect3.get_width (), rect3.get_height ());
+				Rect rect5 = new Rect (0, 0, rect3.get_width () - 16, this.scrollViewHeight);
 				Widgets.BeginScrollView (rect4, ref this.scrollPosition, rect5);
 				float num = 0;
 				bool flag = false;
 				if (this.SelPawnForGear.equipment != null) {
-					num += TabDrawer.DrawHeader (0, num, rect5.width, Translator.Translate ("Equipment"), true, 0);
-					foreach (ThingWithComps current in this.SelPawnForGear.equipment.AllEquipment) {
-						this.DrawThingRow (ref num, rect5.width, current);
+					num += TabDrawer.DrawHeader (0, num, rect5.get_width (), Translator.Translate ("Equipment"), true, 0);
+					foreach (ThingWithComps current in this.SelPawnForGear.equipment.get_AllEquipment ()) {
+						this.DrawThingRow (ref num, rect5.get_width (), current);
 						flag = true;
 					}
 					if (!flag) {
 						num += 4;
-						Rect rect6 = new Rect (0, num, rect5.width, 24);
-						GUI.color = TabDrawer.SeparatorColor;
+						Rect rect6 = new Rect (0, num, rect5.get_width (), 24);
+						GUI.set_color (TabDrawer.SeparatorColor);
 						Widgets.Label (rect6, Translator.Translate ("NoneLower"));
-						GUI.color = TabDrawer.TextColor;
+						GUI.set_color (TabDrawer.TextColor);
 						num += ITab_Pawn_Gear_Alternate.LineHeight;
 					}
 				}
 				flag = false;
 				if (this.SelPawnForGear.apparel != null) {
 					num += 10;
-					num += TabDrawer.DrawHeader (0, num, rect5.width, Translator.Translate ("Apparel"), true, 0);
+					num += TabDrawer.DrawHeader (0, num, rect5.get_width (), Translator.Translate ("Apparel"), true, 0);
 					num += 4;
-					foreach (Apparel current2 in from ap in this.SelPawnForGear.apparel.WornApparel
+					foreach (Apparel current2 in from ap in this.SelPawnForGear.apparel.get_WornApparel ()
 					orderby ap.def.apparel.bodyPartGroups [0].listOrder descending
 					select ap) {
-						this.DrawThingRow (ref num, rect5.width, current2);
+						this.DrawThingRow (ref num, rect5.get_width (), current2);
 						flag = true;
 					}
 					if (!flag) {
 						num += 4;
-						Rect rect7 = new Rect (0, num, rect5.width, 24);
-						GUI.color = TabDrawer.SeparatorColor;
+						Rect rect7 = new Rect (0, num, rect5.get_width (), 24);
+						GUI.set_color (TabDrawer.SeparatorColor);
 						Widgets.Label (rect7, Translator.Translate ("NoneLower"));
-						GUI.color = TabDrawer.TextColor;
+						GUI.set_color (TabDrawer.TextColor);
 						num += ITab_Pawn_Gear_Alternate.LineHeight;
 					}
 				}
 				flag = false;
 				if (this.SelPawnForGear.inventory != null) {
 					num += 10;
-					num += TabDrawer.DrawHeader (0, num, rect5.width, Translator.Translate ("Inventory"), true, 0);
+					num += TabDrawer.DrawHeader (0, num, rect5.get_width (), Translator.Translate ("Inventory"), true, 0);
 					foreach (Thing current3 in this.SelPawnForGear.inventory.container) {
-						this.DrawThingRow (ref num, rect5.width, current3);
+						this.DrawThingRow (ref num, rect5.get_width (), current3);
 						flag = true;
 					}
 					if (!flag) {
 						num += 4;
-						Rect rect8 = new Rect (0, num, rect5.width, 24);
-						GUI.color = TabDrawer.SeparatorColor;
+						Rect rect8 = new Rect (0, num, rect5.get_width (), 24);
+						GUI.set_color (TabDrawer.SeparatorColor);
 						Widgets.Label (rect8, Translator.Translate ("NoneLower"));
-						GUI.color = TabDrawer.TextColor;
+						GUI.set_color (TabDrawer.TextColor);
 						num += ITab_Pawn_Gear_Alternate.LineHeight;
 					}
 				}
-				if (Event.current.type == EventType.Layout) {
+				if (Event.get_current ().get_type () == 8) {
 					this.scrollViewHeight = num + 8;
 				}
 				Widgets.EndScrollView ();
@@ -7717,13 +9090,22 @@ namespace EdB.Interface
 					BrowseButtonDrawer.DrawBrowseButtons (this.size, selPawnForGear);
 				}
 			}
-			GUI.color = Color.white;
-			Text.Anchor = TextAnchor.UpperLeft;
+			GUI.set_color (Color.get_white ());
+			Text.set_Anchor (0);
 		}
 	}
+}
+using RimWorld;
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ITab_Pawn_Gear_Vanilla : ITab_Pawn_Gear
 	{
+		//
+		// Properties
+		//
 		public PreferenceTabBrowseButtons PreferenceTabBrowseButtons {
 			get;
 			set;
@@ -7731,22 +9113,28 @@ namespace EdB.Interface
 
 		private Pawn SelPawnForGear {
 			get {
-				if (base.SelPawn != null) {
-					return base.SelPawn;
+				if (base.get_SelPawn () != null) {
+					return base.get_SelPawn ();
 				}
-				Corpse corpse = base.SelThing as Corpse;
+				Corpse corpse = base.get_SelThing () as Corpse;
 				if (corpse != null) {
 					return corpse.innerPawn;
 				}
-				throw new InvalidOperationException ("Gear tab on non-pawn non-corpse " + base.SelThing);
+				throw new InvalidOperationException ("Gear tab on non-pawn non-corpse " + base.get_SelThing ());
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ITab_Pawn_Gear_Vanilla (PreferenceTabBrowseButtons prefBrowseButtons)
 		{
 			this.PreferenceTabBrowseButtons = prefBrowseButtons;
 		}
 
+		//
+		// Methods
+		//
 		protected override void FillTab ()
 		{
 			base.FillTab ();
@@ -7758,15 +9146,27 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using UnityEngine;
 
+namespace EdB.Interface
+{
 	public class ITab_Pawn_Guest_Alternate : ITab_Pawn_Visitor_Alternate
 	{
+		//
+		// Properties
+		//
 		public override bool IsVisible {
 			get {
-				return base.SelPawn.HostFaction == Faction.OfColony && !base.SelPawn.IsPrisoner;
+				return base.get_SelPawn ().get_HostFaction () == Faction.get_OfColony () && !base.get_SelPawn ().get_IsPrisoner ();
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ITab_Pawn_Guest_Alternate (PreferenceTabBrowseButtons preferenceTabBrowseButtons)
 		{
 			this.labelKey = "TabGuest";
@@ -7774,33 +9174,60 @@ namespace EdB.Interface
 			this.size = new Vector2 (TabDrawer.TabPanelSize.x, 200);
 		}
 	}
+}
+using RimWorld;
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ITab_Pawn_Guest_Vanilla : ITab_Pawn_Guest
 	{
+		//
+		// Properties
+		//
 		public PreferenceTabBrowseButtons PreferenceTabBrowseButtons {
 			get;
 			set;
 		}
 
+		//
+		// Constructors
+		//
 		public ITab_Pawn_Guest_Vanilla (PreferenceTabBrowseButtons prefBrowseButtons)
 		{
 			this.PreferenceTabBrowseButtons = prefBrowseButtons;
 		}
 
+		//
+		// Methods
+		//
 		protected override void FillTab ()
 		{
 			base.FillTab ();
 			if (this.PreferenceTabBrowseButtons != null && this.PreferenceTabBrowseButtons.Value) {
-				Pawn selPawn = base.SelPawn;
+				Pawn selPawn = base.get_SelPawn ();
 				if (selPawn != null) {
 					BrowseButtonDrawer.DrawBrowseButtons (this.size, selPawn);
 				}
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ITab_Pawn_Health_Alternate : ITab_Pawn_Health
 	{
+		//
+		// Static Fields
+		//
 		private const float ThoughtLevelHeight = 25;
 
 		private static readonly Vector2 PanelSize;
@@ -7817,6 +9244,9 @@ namespace EdB.Interface
 
 		private const float ThoughtLevelSpacing = 20;
 
+		//
+		// Fields
+		//
 		protected ScrollView injuriesScrollView = new ScrollView (false);
 
 		protected ScrollView operationsScrollView = new ScrollView (false);
@@ -7827,9 +9257,12 @@ namespace EdB.Interface
 
 		private bool highlight = true;
 
+		//
+		// Properties
+		//
 		private bool HideBloodLoss {
 			get {
-				return this.SelCorpse != null && this.SelCorpse.Age > 60000;
+				return this.SelCorpse != null && this.SelCorpse.get_Age () > 60000;
 			}
 		}
 
@@ -7840,23 +9273,26 @@ namespace EdB.Interface
 
 		private Corpse SelCorpse {
 			get {
-				return base.SelThing as Corpse;
+				return base.get_SelThing () as Corpse;
 			}
 		}
 
 		private Pawn SelPawnForHealth {
 			get {
-				if (base.SelPawn != null) {
-					return base.SelPawn;
+				if (base.get_SelPawn () != null) {
+					return base.get_SelPawn ();
 				}
-				Corpse corpse = base.SelThing as Corpse;
+				Corpse corpse = base.get_SelThing () as Corpse;
 				if (corpse != null) {
 					return corpse.innerPawn;
 				}
-				throw new InvalidOperationException ("Health tab on non-pawn non-corpse " + base.SelThing);
+				throw new InvalidOperationException ("Health tab on non-pawn non-corpse " + base.get_SelThing ());
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ITab_Pawn_Health_Alternate (PreferenceTabBrowseButtons preferenceTabBrowseButtons)
 		{
 			this.size = ITab_Pawn_Health_Alternate.PanelSize;
@@ -7866,26 +9302,32 @@ namespace EdB.Interface
 		static ITab_Pawn_Health_Alternate ()
 		{
 			ITab_Pawn_Health_Alternate.TabAtlasTex = null;
-			ITab_Pawn_Health_Alternate.highlightColor = new Color (0.5f, 0.5f, 0.5f, 1);
-			ITab_Pawn_Health_Alternate.staticHighlightColor = new Color (0.75f, 0.75f, 0.85f, 1);
+			ITab_Pawn_Health_Alternate.highlightColor = new Color (0.5, 0.5, 0.5, 1);
+			ITab_Pawn_Health_Alternate.staticHighlightColor = new Color (0.75, 0.75, 0.85, 1);
 			ITab_Pawn_Health_Alternate.PanelSize = TabDrawer.TabPanelSize;
 			ITab_Pawn_Health_Alternate.ResetTextures ();
 		}
 
+		//
+		// Static Methods
+		//
 		public static void ResetTextures ()
 		{
 			ITab_Pawn_Health_Alternate.TabAtlasTex = ContentFinder<Texture2D>.Get ("EdB/Interface/TabReplacement/TabAtlas", true);
 		}
 
+		//
+		// Methods
+		//
 		private void DoRightRowHighlight (Rect rowRect)
 		{
 			if (this.highlight) {
-				GUI.color = ITab_Pawn_Health_Alternate.staticHighlightColor;
+				GUI.set_color (ITab_Pawn_Health_Alternate.staticHighlightColor);
 				GUI.DrawTexture (rowRect, TexUI.HighlightTex);
 			}
 			this.highlight = !this.highlight;
-			if (rowRect.Contains (Event.current.mousePosition)) {
-				GUI.color = ITab_Pawn_Health_Alternate.highlightColor;
+			if (rowRect.Contains (Event.get_current ().get_mousePosition ())) {
+				GUI.set_color (ITab_Pawn_Health_Alternate.highlightColor);
 				GUI.DrawTexture (rowRect, TexUI.HighlightTex);
 			}
 		}
@@ -7893,11 +9335,11 @@ namespace EdB.Interface
 		protected override void FillTab ()
 		{
 			Pawn pawn = null;
-			if (base.SelPawn != null) {
-				pawn = base.SelPawn;
+			if (base.get_SelPawn () != null) {
+				pawn = base.get_SelPawn ();
 			}
 			else {
-				Corpse corpse = base.SelThing as Corpse;
+				Corpse corpse = base.get_SelThing () as Corpse;
 				if (corpse != null) {
 					pawn = corpse.innerPawn;
 				}
@@ -7906,15 +9348,15 @@ namespace EdB.Interface
 				Log.Error ("Health tab found no selected pawn to display.");
 				return;
 			}
-			Corpse corpse2 = base.SelThing as Corpse;
-			bool showBloodLoss = corpse2 == null || corpse2.Age < 60000;
-			bool flag = !pawn.RaceProps.Humanlike && pawn.Downed;
-			bool flag2 = base.SelThing.def.AllRecipes.Any<RecipeDef> ();
-			bool flag3 = flag2 && !pawn.Dead && (pawn.IsColonist || pawn.IsPrisonerOfColony || flag);
-			TextAnchor anchor = Text.Anchor;
+			Corpse corpse2 = base.get_SelThing () as Corpse;
+			bool showBloodLoss = corpse2 == null || corpse2.get_Age () < 60000;
+			bool flag = !pawn.get_RaceProps ().get_Humanlike () && pawn.get_Downed ();
+			bool flag2 = base.get_SelThing ().def.get_AllRecipes ().Any<RecipeDef> ();
+			bool flag3 = flag2 && !pawn.get_Dead () && (pawn.get_IsColonist () || pawn.get_IsPrisonerOfColony () || flag);
+			TextAnchor anchor = Text.get_Anchor ();
 			Rect rect = new Rect (20, 51, ITab_Pawn_Health_Alternate.PanelSize.x - 40, 345);
-			float num = this.size.y - rect.height - 109;
-			Rect rect2 = new Rect (rect.x, rect.y + rect.height + 16, rect.width, num);
+			float num = this.size.y - rect.get_height () - 109;
+			Rect rect2 = new Rect (rect.get_x (), rect.get_y () + rect.get_height () + 16, rect.get_width (), num);
 			if (!flag3) {
 				this.operationsTabSelected = false;
 			}
@@ -7924,40 +9366,40 @@ namespace EdB.Interface
 			}, !this.operationsTabSelected));
 			if (flag3) {
 				string text;
-				if (pawn.RaceProps.mechanoid) {
+				if (pawn.get_RaceProps ().mechanoid) {
 					text = Translator.Translate ("MedicalOperationsMechanoidsShort", new object[] {
-						pawn.BillStack.Count
+						pawn.get_BillStack ().get_Count ()
 					});
 				}
 				else {
 					text = Translator.Translate ("MedicalOperationsShort", new object[] {
-						pawn.BillStack.Count
+						pawn.get_BillStack ().get_Count ()
 					});
 				}
 				list.Add (new TabRecord (text, delegate {
 					this.operationsTabSelected = true;
 				}, this.operationsTabSelected));
 			}
-			GUI.color = TabDrawer.BoxColor;
+			GUI.set_color (TabDrawer.BoxColor);
 			GUI.DrawTexture (rect, TabDrawer.WhiteTexture);
-			GUI.color = TabDrawer.BoxBorderColor;
+			GUI.set_color (TabDrawer.BoxBorderColor);
 			Widgets.DrawBox (rect, 1);
-			GUI.color = Color.white;
-			TabDrawer.DrawTabs (new Rect (rect.x, rect.y, rect.width - 90, rect.height), list, ITab_Pawn_Health_Alternate.TabAtlasTex);
+			GUI.set_color (Color.get_white ());
+			TabDrawer.DrawTabs (new Rect (rect.get_x (), rect.get_y (), rect.get_width () - 90, rect.get_height ()), list, ITab_Pawn_Health_Alternate.TabAtlasTex);
 			float num2 = 0;
-			GUI.color = Color.white;
-			Text.Anchor = TextAnchor.UpperLeft;
+			GUI.set_color (Color.get_white ());
+			Text.set_Anchor (0);
 			if (!this.operationsTabSelected) {
 				Rect rect3 = GenUI.ContractedBy (rect, 12);
-				if (pawn.playerSettings != null && !pawn.Dead) {
-					Rect rect4 = new Rect (rect3.x + 4, rect3.y + 8, rect3.width, 32);
+				if (pawn.playerSettings != null && !pawn.get_Dead ()) {
+					Rect rect4 = new Rect (rect3.get_x () + 4, rect3.get_y () + 8, rect3.get_width (), 32);
 					MedicalCareUtility.MedicalCareSetter (rect4, ref pawn.playerSettings.medCare);
-					rect3.y = rect3.y + 50;
-					rect3.height = rect3.height - 50;
+					rect3.set_y (rect3.get_y () + 50);
+					rect3.set_height (rect3.get_height () - 50);
 				}
 				try {
 					GUI.BeginGroup (rect3);
-					Rect leftRect = new Rect (0, num2, rect3.width, rect3.height - num2);
+					Rect leftRect = new Rect (0, num2, rect3.get_width (), rect3.get_height () - num2);
 					num2 = this.healthCardUtility.DrawStatus (leftRect, pawn, num2, showBloodLoss);
 				}
 				finally {
@@ -7968,32 +9410,32 @@ namespace EdB.Interface
 				Rect rect5 = GenUI.ContractedBy (rect, 12);
 				try {
 					GUI.BeginGroup (rect5);
-					Rect rect6 = new Rect (0, 0, rect5.width, rect5.height);
+					Rect rect6 = new Rect (0, 0, rect5.get_width (), rect5.get_height ());
 					this.operationsScrollView.Begin (rect6);
-					ConceptDatabase.KnowledgeDemonstrated (ConceptDefOf.MedicalOperations, KnowledgeAmount.GuiFrame);
-					num2 = this.healthCardUtility.DrawMedOperationsTab (rect6, pawn, base.SelThing, num2);
+					ConceptDatabase.KnowledgeDemonstrated (ConceptDefOf.MedicalOperations, 1);
+					num2 = this.healthCardUtility.DrawMedOperationsTab (rect6, pawn, base.get_SelThing (), num2);
 					this.operationsScrollView.End (num2);
 				}
 				finally {
 					GUI.EndGroup ();
 				}
 			}
-			Text.Font = GameFont.Small;
-			GUI.color = Color.white;
-			Text.Anchor = TextAnchor.UpperLeft;
+			Text.set_Font (1);
+			GUI.set_color (Color.get_white ());
+			Text.set_Anchor (0);
 			GUI.BeginGroup (rect2);
-			Rect leftRect2 = new Rect (0, 0, rect2.width, rect2.height);
+			Rect leftRect2 = new Rect (0, 0, rect2.get_width (), rect2.get_height ());
 			this.healthCardUtility.DrawInjuries (leftRect2, pawn, showBloodLoss);
 			GUI.EndGroup ();
-			GUI.color = Color.white;
-			Text.Anchor = TextAnchor.UpperLeft;
+			GUI.set_color (Color.get_white ());
+			Text.set_Anchor (0);
 			if (this.PreferenceTabBrowseButtons != null && this.PreferenceTabBrowseButtons.Value) {
 				Pawn pawn2 = null;
-				if (base.SelPawn != null) {
-					pawn2 = base.SelPawn;
+				if (base.get_SelPawn () != null) {
+					pawn2 = base.get_SelPawn ();
 				}
 				else {
-					Corpse corpse3 = base.SelThing as Corpse;
+					Corpse corpse3 = base.get_SelThing () as Corpse;
 					if (corpse3 != null) {
 						pawn2 = corpse3.innerPawn;
 					}
@@ -8002,37 +9444,52 @@ namespace EdB.Interface
 					BrowseButtonDrawer.DrawBrowseButtons (this.size, pawn2);
 				}
 			}
-			GUI.color = Color.white;
-			Text.Anchor = anchor;
+			GUI.set_color (Color.get_white ());
+			Text.set_Anchor (anchor);
 			Rect rect7 = new Rect (0, 0, this.size.x, this.size.y);
-			if (Event.current.type == EventType.ScrollWheel && Mouse.IsOver (rect7)) {
-				Event.current.Use ();
+			if (Event.get_current ().get_type () == 6 && Mouse.IsOver (rect7)) {
+				Event.get_current ().Use ();
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ITab_Pawn_Health_Vanilla : ITab_Pawn_Health
 	{
+		//
+		// Properties
+		//
 		public PreferenceTabBrowseButtons PreferenceTabBrowseButtons {
 			get;
 			set;
 		}
 
+		//
+		// Constructors
+		//
 		public ITab_Pawn_Health_Vanilla (PreferenceTabBrowseButtons prefBrowseButtons)
 		{
 			this.PreferenceTabBrowseButtons = prefBrowseButtons;
 		}
 
+		//
+		// Methods
+		//
 		protected override void FillTab ()
 		{
 			base.FillTab ();
 			if (this.PreferenceTabBrowseButtons != null && this.PreferenceTabBrowseButtons.Value) {
 				Pawn pawn = null;
-				if (base.SelPawn != null) {
-					pawn = base.SelPawn;
+				if (base.get_SelPawn () != null) {
+					pawn = base.get_SelPawn ();
 				}
 				else {
-					Corpse corpse = base.SelThing as Corpse;
+					Corpse corpse = base.get_SelThing () as Corpse;
 					if (corpse != null) {
 						pawn = corpse.innerPawn;
 					}
@@ -8043,9 +9500,23 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ITab_Pawn_Needs_Alternate : ITab_Pawn_Needs
 	{
+		//
+		// Static Fields
+		//
 		private const float ThoughtHeight = 20;
 
 		public static float ThoughtValueWidth;
@@ -8072,6 +9543,9 @@ namespace EdB.Interface
 
 		private static List<ThoughtDef> thoughtTypesPresent;
 
+		//
+		// Fields
+		//
 		private List<float> threshPercentsForMood = new List<float> ();
 
 		private List<Need> displayNeeds = new List<Need> ();
@@ -8080,9 +9554,12 @@ namespace EdB.Interface
 
 		protected FieldInfo threshPercentsField;
 
+		//
+		// Properties
+		//
 		public override bool IsVisible {
 			get {
-				return base.SelPawn.needs != null && base.SelPawn.needs.AllNeeds.Count > 0;
+				return base.get_SelPawn ().needs != null && base.get_SelPawn ().needs.get_AllNeeds ().Count > 0;
 			}
 		}
 
@@ -8091,12 +9568,15 @@ namespace EdB.Interface
 			set;
 		}
 
+		//
+		// Constructors
+		//
 		static ITab_Pawn_Needs_Alternate ()
 		{
 			ITab_Pawn_Needs_Alternate.thoughtTypesPresent = new List<ThoughtDef> ();
-			ITab_Pawn_Needs_Alternate.NoEffectColor = new Color (0.5f, 0.5f, 0.5f, 0.75f);
-			ITab_Pawn_Needs_Alternate.MoodColorNegative = new Color (0.8f, 0.4f, 0.4f);
-			ITab_Pawn_Needs_Alternate.MoodColor = new Color (0.1f, 1, 0.1f);
+			ITab_Pawn_Needs_Alternate.NoEffectColor = new Color (0.5, 0.5, 0.5, 0.75);
+			ITab_Pawn_Needs_Alternate.MoodColorNegative = new Color (0.8, 0.4, 0.4);
+			ITab_Pawn_Needs_Alternate.MoodColor = new Color (0.1, 1, 0.1);
 			ITab_Pawn_Needs_Alternate.FullSize = new Vector2 (580, 520);
 			ITab_Pawn_Needs_Alternate.ThoughtValueWidth = 40;
 			ITab_Pawn_Needs_Alternate.BarInstantMarkerTex = ContentFinder<Texture2D>.Get ("UI/Misc/BarInstantMarker", true);
@@ -8110,15 +9590,18 @@ namespace EdB.Interface
 			this.threshPercentsField = typeof(Need).GetField ("threshPercents", BindingFlags.Instance | BindingFlags.NonPublic);
 		}
 
+		//
+		// Methods
+		//
 		protected void DoMoodAndThoughts (Rect rect)
 		{
 			GUI.BeginGroup (rect);
-			Rect rect2 = new Rect (0, 0, rect.width, 70);
-			this.DrawMood (rect2, base.SelPawn, base.SelPawn.needs.mood);
-			Rect rect3 = new Rect (0, 80, rect.width, rect.height - 120);
+			Rect rect2 = new Rect (0, 0, rect.get_width (), 70);
+			this.DrawMood (rect2, base.get_SelPawn (), base.get_SelPawn ().needs.mood);
+			Rect rect3 = new Rect (0, 80, rect.get_width (), rect.get_height () - 120);
 			rect3 = GenUI.ContractedBy (rect3, 10);
-			rect3.x = rect3.x + 10;
-			rect3.width = rect3.width - 20;
+			rect3.set_x (rect3.get_x () + 10);
+			rect3.set_width (rect3.get_width () - 20);
 			this.DrawThoughtListing (rect3);
 			GUI.EndGroup ();
 		}
@@ -8126,7 +9609,7 @@ namespace EdB.Interface
 		private float DoNeeds (Rect rect)
 		{
 			this.displayNeeds.Clear ();
-			List<Need> allNeeds = base.SelPawn.needs.AllNeeds;
+			List<Need> allNeeds = base.get_SelPawn ().needs.get_AllNeeds ();
 			for (int i = 0; i < allNeeds.Count; i++) {
 				if (allNeeds [i].def.showOnNeedList) {
 					this.displayNeeds.Add (allNeeds [i]);
@@ -8141,20 +9624,20 @@ namespace EdB.Interface
 			float num6 = 0;
 			for (int j = 0; j < num3; j++) {
 				Need need = this.displayNeeds [j];
-				Rect rect2 = new Rect (rect.x, rect.y + num2, rect.width, Mathf.Min (90, rect.height / (float)num5));
+				Rect rect2 = new Rect (rect.get_x (), rect.get_y () + num2, rect.get_width (), Mathf.Min (90, rect.get_height () / (float)num5));
 				this.DrawNeed (rect2, need);
-				num2 = rect2.yMax - 10;
+				num2 = rect2.get_yMax () - 10;
 				if (num2 > num6) {
 					num6 = num2;
 				}
 			}
-			float num7 = rect.width + 4;
+			float num7 = rect.get_width () + 4;
 			num2 = num;
 			for (int k = num3; k < this.displayNeeds.Count; k++) {
 				Need need2 = this.displayNeeds [k];
-				Rect rect3 = new Rect (num7, rect.y + num2, rect.width, Mathf.Min (90, rect.height / (float)num5));
+				Rect rect3 = new Rect (num7, rect.get_y () + num2, rect.get_width (), Mathf.Min (90, rect.get_height () / (float)num5));
 				this.DrawNeed (rect3, need2);
-				num2 = rect3.yMax - 10;
+				num2 = rect3.get_yMax () - 10;
 				if (num2 > num6) {
 					num6 = num2;
 				}
@@ -8168,45 +9651,45 @@ namespace EdB.Interface
 				Log.ErrorOnce (need.def + " drawing bar percent > 1 : " + pct, 6932178);
 			}
 			float num = 12;
-			if (barRect.width < 150) {
+			if (barRect.get_width () < 150) {
 				num /= 2;
 			}
-			Vector2 vector = new Vector2 (barRect.x + barRect.width * pct, barRect.y + barRect.height);
+			Vector2 vector = new Vector2 (barRect.get_x () + barRect.get_width () * pct, barRect.get_y () + barRect.get_height ());
 			Rect rect = new Rect (vector.x - num / 2, vector.y, num, num);
 			GUI.DrawTexture (rect, ITab_Pawn_Needs_Alternate.BarInstantMarkerTex);
 		}
 
 		private void DrawBarThreshold (Rect barRect, float threshPct, Need need)
 		{
-			float num = (float)((barRect.width > 60) ? 2 : 1);
-			Rect rect = new Rect (barRect.x + barRect.width * threshPct - (num - 1), barRect.y + barRect.height / 2, num, barRect.height / 2);
+			float num = (float)((barRect.get_width () > 60) ? 2 : 1);
+			Rect rect = new Rect (barRect.get_x () + barRect.get_width () * threshPct - (num - 1), barRect.get_y () + barRect.get_height () / 2, num, barRect.get_height () / 2);
 			Texture2D texture2D;
-			if (threshPct < need.CurLevel) {
+			if (threshPct < need.get_CurLevel ()) {
 				texture2D = BaseContent.BlackTex;
-				GUI.color = new Color (1, 1, 1, 0.9f);
+				GUI.set_color (new Color (1, 1, 1, 0.9));
 			}
 			else {
 				texture2D = BaseContent.GreyTex;
-				GUI.color = new Color (1, 1, 1, 0.5f);
+				GUI.set_color (new Color (1, 1, 1, 0.5));
 			}
 			GUI.DrawTexture (rect, texture2D);
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 		}
 
 		protected void DrawMood (Rect rect, Pawn pawn, Need_Mood mood)
 		{
 			this.threshPercentsForMood.Clear ();
-			this.threshPercentsForMood.Add (pawn.mindState.breaker.HardBreakThreshold);
-			this.threshPercentsForMood.Add (pawn.mindState.breaker.SoftBreakThreshold);
+			this.threshPercentsForMood.Add (pawn.mindState.breaker.get_HardBreakThreshold ());
+			this.threshPercentsForMood.Add (pawn.mindState.breaker.get_SoftBreakThreshold ());
 			this.DrawNeed (rect, mood, this.threshPercentsForMood);
 		}
 
 		public void DrawNeed (Rect rect, Need need, List<float> threshPercents)
 		{
-			if (rect.height > 70) {
-				float num = (rect.height - 70) / 2;
-				rect.height = 70;
-				rect.y = rect.y + num;
+			if (rect.get_height () > 70) {
+				float num = (rect.get_height () - 70) / 2;
+				rect.set_height (70);
+				rect.set_y (rect.get_y () + num);
 			}
 			if (Mouse.IsOver (rect)) {
 				Widgets.DrawHighlight (rect);
@@ -8214,28 +9697,28 @@ namespace EdB.Interface
 			TooltipHandler.TipRegion (rect, new TipSignal (() => need.GetTipString (), rect.GetHashCode ()));
 			float num2 = 14;
 			float num3 = num2 + 15;
-			if (rect.height < 50) {
-				num2 *= Mathf.InverseLerp (0, 50, rect.height);
+			if (rect.get_height () < 50) {
+				num2 *= Mathf.InverseLerp (0, 50, rect.get_height ());
 			}
-			Text.Font = (rect.height > 55) ? GameFont.Small : GameFont.Tiny;
-			Text.Anchor = TextAnchor.LowerCenter;
-			Rect rect2 = new Rect (rect.x, rect.y, rect.width, rect.height / 2);
-			Widgets.Label (rect2, need.LabelCap);
-			Text.Anchor = TextAnchor.UpperLeft;
-			Rect rect3 = new Rect (rect.x, rect.y + rect.height / 2, rect.width, rect.height / 2);
-			rect3 = new Rect (rect3.x + num3, rect3.y, rect3.width - num3 * 2, rect3.height - num2);
-			Widgets.FillableBar (rect3, need.CurLevel);
-			Widgets.FillableBarChangeArrows (rect3, need.GUIChangeArrow);
+			Text.set_Font ((rect.get_height () > 55) ? 1 : 0);
+			Text.set_Anchor (7);
+			Rect rect2 = new Rect (rect.get_x (), rect.get_y (), rect.get_width (), rect.get_height () / 2);
+			Widgets.Label (rect2, need.get_LabelCap ());
+			Text.set_Anchor (0);
+			Rect rect3 = new Rect (rect.get_x (), rect.get_y () + rect.get_height () / 2, rect.get_width (), rect.get_height () / 2);
+			rect3 = new Rect (rect3.get_x () + num3, rect3.get_y (), rect3.get_width () - num3 * 2, rect3.get_height () - num2);
+			Widgets.FillableBar (rect3, need.get_CurLevel ());
+			Widgets.FillableBarChangeArrows (rect3, need.get_GUIChangeArrow ());
 			if (threshPercents != null) {
 				for (int i = 0; i < threshPercents.Count; i++) {
 					this.DrawBarThreshold (rect3, threshPercents [i], need);
 				}
 			}
-			float curInstantLevel = need.CurInstantLevel;
+			float curInstantLevel = need.get_CurInstantLevel ();
 			if (curInstantLevel >= 0) {
 				this.DrawBarInstantMarkerAt (rect3, curInstantLevel, need);
 			}
-			Text.Font = GameFont.Small;
+			Text.set_Font (1);
 		}
 
 		protected void DrawNeed (Rect rect, Need need)
@@ -8248,86 +9731,86 @@ namespace EdB.Interface
 		{
 			float num = 12;
 			float num2 = 4;
-			float num3 = rect.width - num - num2 - ITab_Pawn_Needs_Alternate.ThoughtValueWidth - 16;
+			float num3 = rect.get_width () - num - num2 - ITab_Pawn_Needs_Alternate.ThoughtValueWidth - 16;
 			float num4 = num + num3;
 			try {
-				List<Thought> list = base.SelPawn.needs.mood.thoughts.ThoughtsOfDef (def).ToList<Thought> ();
+				List<Thought> list = base.get_SelPawn ().needs.mood.thoughts.ThoughtsOfDef (def).ToList<Thought> ();
 				int index = 0;
 				int num5 = -1;
 				for (int i = 0; i < list.Count; i++) {
-					if (list [i].CurStageIndex > num5) {
-						num5 = list [i].CurStageIndex;
+					if (list [i].get_CurStageIndex () > num5) {
+						num5 = list [i].get_CurStageIndex ();
 						index = i;
 					}
 				}
-				if (!list [index].Visible) {
+				if (!list [index].get_Visible ()) {
 					return false;
 				}
 				if (Mouse.IsOver (rect)) {
 					Widgets.DrawHighlight (rect);
 				}
-				if (def.DurationTicks > 5) {
+				if (def.get_DurationTicks () > 5) {
 					StringBuilder stringBuilder = new StringBuilder ();
-					stringBuilder.Append (list [index].Description);
+					stringBuilder.Append (list [index].get_Description ());
 					stringBuilder.AppendLine ();
 					stringBuilder.AppendLine ();
 					Thought_Memory thought_Memory = list [index] as Thought_Memory;
 					if (thought_Memory != null) {
 						if (list.Count == 1) {
 							stringBuilder.Append (Translator.Translate ("ThoughtExpiresIn", new object[] {
-								GenDate.TickstoDaysString (def.DurationTicks - thought_Memory.age)
+								GenDate.TickstoDaysString (def.get_DurationTicks () - thought_Memory.age)
 							}));
 						}
 						else {
 							Thought_Memory thought_Memory2 = (Thought_Memory)list [list.Count - 1];
 							stringBuilder.Append (Translator.Translate ("ThoughtStartsExpiringIn", new object[] {
-								GenDate.TickstoDaysString (def.DurationTicks - thought_Memory.age)
+								GenDate.TickstoDaysString (def.get_DurationTicks () - thought_Memory.age)
 							}));
 							stringBuilder.AppendLine ();
 							stringBuilder.Append (Translator.Translate ("ThoughtFinishesExpiringIn", new object[] {
-								GenDate.TickstoDaysString (def.DurationTicks - thought_Memory2.age)
+								GenDate.TickstoDaysString (def.get_DurationTicks () - thought_Memory2.age)
 							}));
 						}
 					}
 					TooltipHandler.TipRegion (rect, new TipSignal (stringBuilder.ToString (), 7291));
 				}
 				else {
-					TooltipHandler.TipRegion (rect, new TipSignal (list [index].Description, 7141));
+					TooltipHandler.TipRegion (rect, new TipSignal (list [index].get_Description (), 7141));
 				}
-				Text.WordWrap = false;
-				Text.Anchor = TextAnchor.MiddleLeft;
-				Rect rect2 = new Rect (rect.x + num, rect.y, num3, rect.height);
-				rect2.yMin = rect2.yMin - 3;
-				rect2.yMax = rect2.yMax + 3;
-				string text = list [index].LabelCap;
+				Text.set_WordWrap (false);
+				Text.set_Anchor (3);
+				Rect rect2 = new Rect (rect.get_x () + num, rect.get_y (), num3, rect.get_height ());
+				rect2.set_yMin (rect2.get_yMin () - 3);
+				rect2.set_yMax (rect2.get_yMax () + 3);
+				string text = list [index].get_LabelCap ();
 				if (list.Count > 1) {
 					text = text + " x" + list.Count;
 				}
 				Widgets.Label (rect2, text);
-				Text.Anchor = TextAnchor.MiddleCenter;
-				float num6 = base.SelPawn.needs.mood.thoughts.MoodOffsetOfThoughtGroup (def);
+				Text.set_Anchor (4);
+				float num6 = base.get_SelPawn ().needs.mood.thoughts.MoodOffsetOfThoughtGroup (def);
 				if (num6 == 0) {
-					GUI.color = ITab_Pawn_Needs_Alternate.NoEffectColor;
+					GUI.set_color (ITab_Pawn_Needs_Alternate.NoEffectColor);
 				}
 				else if (num6 > 0) {
-					GUI.color = ITab_Pawn_Needs_Alternate.MoodColor;
+					GUI.set_color (ITab_Pawn_Needs_Alternate.MoodColor);
 				}
 				else {
-					GUI.color = ITab_Pawn_Needs_Alternate.MoodColorNegative;
+					GUI.set_color (ITab_Pawn_Needs_Alternate.MoodColorNegative);
 				}
-				Rect rect3 = new Rect (rect.x + num4, rect.y, ITab_Pawn_Needs_Alternate.ThoughtValueWidth, rect.height);
-				Text.Anchor = TextAnchor.MiddleRight;
+				Rect rect3 = new Rect (rect.get_x () + num4, rect.get_y (), ITab_Pawn_Needs_Alternate.ThoughtValueWidth, rect.get_height ());
+				Text.set_Anchor (5);
 				Widgets.Label (rect3, num6.ToString ("##0"));
-				Text.Anchor = TextAnchor.UpperLeft;
-				GUI.color = Color.white;
-				Text.WordWrap = true;
+				Text.set_Anchor (0);
+				GUI.set_color (Color.get_white ());
+				Text.set_WordWrap (true);
 			}
 			catch (Exception ex) {
 				Log.ErrorOnce (string.Concat (new object[] {
 					"Exception in DrawThoughtGroup for ",
 					def,
 					" on ",
-					base.SelPawn,
+					base.get_SelPawn (),
 					": ",
 					ex.ToString ()
 				}), 3452698);
@@ -8337,23 +9820,23 @@ namespace EdB.Interface
 
 		private void DrawThoughtListing (Rect listingRect)
 		{
-			Text.Font = GameFont.Small;
+			Text.set_Font (1);
 			ITab_Pawn_Needs_Alternate.thoughtTypesPresent.Clear ();
-			ITab_Pawn_Needs_Alternate.thoughtTypesPresent.AddRange (from th in base.SelPawn.needs.mood.thoughts.DistinctThoughtDefs
-			orderby base.SelPawn.needs.mood.thoughts.MoodOffsetOfThoughtGroup (th) descending
+			ITab_Pawn_Needs_Alternate.thoughtTypesPresent.AddRange (from th in base.get_SelPawn ().needs.mood.thoughts.get_DistinctThoughtDefs ()
+			orderby base.get_SelPawn ().needs.mood.thoughts.MoodOffsetOfThoughtGroup (th) descending
 			select th);
 			float num = (float)ITab_Pawn_Needs_Alternate.thoughtTypesPresent.Count * 24;
-			Widgets.BeginScrollView (listingRect, ref this.thoughtScrollPosition, new Rect (0, 0, listingRect.width - 16, num));
-			Text.Anchor = TextAnchor.MiddleLeft;
+			Widgets.BeginScrollView (listingRect, ref this.thoughtScrollPosition, new Rect (0, 0, listingRect.get_width () - 16, num));
+			Text.set_Anchor (3);
 			float num2 = 0;
 			for (int i = 0; i < ITab_Pawn_Needs_Alternate.thoughtTypesPresent.Count; i++) {
-				Rect rect = new Rect (0, num2, listingRect.width, 20);
+				Rect rect = new Rect (0, num2, listingRect.get_width (), 20);
 				if (this.DrawThoughtGroup (rect, ITab_Pawn_Needs_Alternate.thoughtTypesPresent [i])) {
 					num2 += 24;
 				}
 			}
 			Widgets.EndScrollView ();
-			Text.Anchor = TextAnchor.UpperLeft;
+			Text.set_Anchor (0);
 		}
 
 		protected override void FillTab ()
@@ -8361,20 +9844,20 @@ namespace EdB.Interface
 			Rect rect = GenUI.ContractedBy (new Rect (0, 0, this.size.x, this.size.y), 1);
 			try {
 				GUI.BeginGroup (rect);
-				Rect rect2 = new Rect (0, 0, rect.width / 2, this.size.y);
+				Rect rect2 = new Rect (0, 0, rect.get_width () / 2, this.size.y);
 				float num = this.DoNeeds (rect2);
 				num += 10;
-				if (base.SelPawn.needs.mood != null) {
-					Rect rect3 = new Rect (0, num, rect.width, rect.height - num);
+				if (base.get_SelPawn ().needs.mood != null) {
+					Rect rect3 = new Rect (0, num, rect.get_width (), rect.get_height () - num);
 					this.DoMoodAndThoughts (rect3);
 				}
 			}
 			finally {
 				GUI.EndGroup ();
-				GUI.color = Color.white;
+				GUI.set_color (Color.get_white ());
 			}
 			if (this.PreferenceTabBrowseButtons != null && this.PreferenceTabBrowseButtons.Value) {
-				Pawn selPawn = base.SelPawn;
+				Pawn selPawn = base.get_SelPawn ();
 				if (selPawn != null) {
 					BrowseButtonDrawer.DrawBrowseButtons (this.size, selPawn);
 				}
@@ -8390,7 +9873,7 @@ namespace EdB.Interface
 		private void UpdateDisplayNeeds ()
 		{
 			this.displayNeeds.Clear ();
-			List<Need> allNeeds = base.SelPawn.needs.AllNeeds;
+			List<Need> allNeeds = base.get_SelPawn ().needs.get_AllNeeds ();
 			for (int i = 0; i < allNeeds.Count; i++) {
 				if (allNeeds [i].def.showOnNeedList) {
 					this.displayNeeds.Add (allNeeds [i]);
@@ -8402,7 +9885,7 @@ namespace EdB.Interface
 		protected override void UpdateSize ()
 		{
 			this.UpdateDisplayNeeds ();
-			if (base.SelPawn.needs.mood != null) {
+			if (base.get_SelPawn ().needs.mood != null) {
 				this.size = TabDrawer.TabPanelSize;
 			}
 			else {
@@ -8410,39 +9893,65 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ITab_Pawn_Needs_Vanilla : ITab_Pawn_Needs
 	{
+		//
+		// Properties
+		//
 		public PreferenceTabBrowseButtons PreferenceTabBrowseButtons {
 			get;
 			set;
 		}
 
+		//
+		// Constructors
+		//
 		public ITab_Pawn_Needs_Vanilla (PreferenceTabBrowseButtons prefBrowseButtons)
 		{
 			this.PreferenceTabBrowseButtons = prefBrowseButtons;
 		}
 
+		//
+		// Methods
+		//
 		protected override void FillTab ()
 		{
 			base.FillTab ();
 			if (this.PreferenceTabBrowseButtons != null && this.PreferenceTabBrowseButtons.Value) {
-				Pawn selPawn = base.SelPawn;
+				Pawn selPawn = base.get_SelPawn ();
 				if (selPawn != null) {
 					BrowseButtonDrawer.DrawBrowseButtons (this.size, selPawn);
 				}
 			}
 		}
 	}
+}
+using System;
+using UnityEngine;
 
+namespace EdB.Interface
+{
 	public class ITab_Pawn_Prisoner_Alternate : ITab_Pawn_Visitor_Alternate
 	{
+		//
+		// Properties
+		//
 		public override bool IsVisible {
 			get {
-				return base.SelPawn.IsPrisonerOfColony;
+				return base.get_SelPawn ().get_IsPrisonerOfColony ();
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ITab_Pawn_Prisoner_Alternate (PreferenceTabBrowseButtons preferenceTabBrowseButtons)
 		{
 			this.labelKey = "TabPrisoner";
@@ -8451,155 +9960,235 @@ namespace EdB.Interface
 			this.size = new Vector2 (TabDrawer.TabPanelSize.x, 356);
 		}
 	}
+}
+using RimWorld;
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ITab_Pawn_Prisoner_Vanilla : ITab_Pawn_Prisoner
 	{
+		//
+		// Properties
+		//
 		public PreferenceTabBrowseButtons PreferenceTabBrowseButtons {
 			get;
 			set;
 		}
 
+		//
+		// Constructors
+		//
 		public ITab_Pawn_Prisoner_Vanilla (PreferenceTabBrowseButtons prefBrowseButtons)
 		{
 			this.PreferenceTabBrowseButtons = prefBrowseButtons;
 		}
 
+		//
+		// Methods
+		//
 		protected override void FillTab ()
 		{
 			base.FillTab ();
 			if (this.PreferenceTabBrowseButtons != null && this.PreferenceTabBrowseButtons.Value) {
-				Pawn selPawn = base.SelPawn;
+				Pawn selPawn = base.get_SelPawn ();
 				if (selPawn != null) {
 					BrowseButtonDrawer.DrawBrowseButtons (this.size, selPawn);
 				}
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ITab_Pawn_Training_Alternate : ITab_Pawn_Training
 	{
+		//
+		// Properties
+		//
 		public PreferenceTabBrowseButtons PreferenceTabBrowseButtons {
 			get;
 			set;
 		}
 
+		//
+		// Constructors
+		//
 		public ITab_Pawn_Training_Alternate (PreferenceTabBrowseButtons prefBrowseButtons)
 		{
 			this.PreferenceTabBrowseButtons = prefBrowseButtons;
 			this.size = new Vector2 (TabDrawer.TabPanelSize.x, 356);
 		}
 
+		//
+		// Methods
+		//
 		protected override void FillTab ()
 		{
 			Rect rect = GenUI.ContractedBy (new Rect (0, 0, this.size.x, this.size.y), 20);
-			TrainingCardUtility.DrawTrainingCard (rect, base.SelPawn);
+			TrainingCardUtility.DrawTrainingCard (rect, base.get_SelPawn ());
 			if (this.PreferenceTabBrowseButtons != null && this.PreferenceTabBrowseButtons.Value) {
-				Pawn selPawn = base.SelPawn;
+				Pawn selPawn = base.get_SelPawn ();
 				if (selPawn != null) {
 					BrowseButtonDrawer.DrawBrowseButtons (this.size, selPawn);
 				}
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ITab_Pawn_Training_Vanilla : ITab_Pawn_Training
 	{
+		//
+		// Properties
+		//
 		public PreferenceTabBrowseButtons PreferenceTabBrowseButtons {
 			get;
 			set;
 		}
 
+		//
+		// Constructors
+		//
 		public ITab_Pawn_Training_Vanilla (PreferenceTabBrowseButtons preferenceTabBrowseButtons)
 		{
 			this.PreferenceTabBrowseButtons = preferenceTabBrowseButtons;
 		}
 
+		//
+		// Methods
+		//
 		protected override void FillTab ()
 		{
 			base.FillTab ();
 			if (this.PreferenceTabBrowseButtons != null && this.PreferenceTabBrowseButtons.Value) {
-				Pawn selPawn = base.SelPawn;
+				Pawn selPawn = base.get_SelPawn ();
 				if (selPawn != null) {
 					BrowseButtonDrawer.DrawBrowseButtons (this.size, selPawn);
 				}
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public abstract class ITab_Pawn_Visitor_Alternate : ITab_Pawn_Visitor
 	{
+		//
+		// Static Fields
+		//
 		private const float CheckboxInterval = 30;
 
 		private const float CheckboxMargin = 50;
 
+		//
+		// Properties
+		//
 		public PreferenceTabBrowseButtons PreferenceTabBrowseButtons {
 			get;
 			set;
 		}
 
+		//
+		// Constructors
+		//
 		public ITab_Pawn_Visitor_Alternate ()
 		{
 			this.size = new Vector2 (TabDrawer.TabPanelSize.x, TabDrawer.TabPanelSize.y);
 		}
 
+		//
+		// Methods
+		//
 		protected override void FillTab ()
 		{
-			ConceptDatabase.KnowledgeDemonstrated (ConceptDefOf.PrisonerTab, KnowledgeAmount.GuiFrame);
-			Text.Font = GameFont.Small;
+			ConceptDatabase.KnowledgeDemonstrated (ConceptDefOf.PrisonerTab, 1);
+			Text.set_Font (1);
 			Rect rect = GenUI.ContractedBy (new Rect (0, 0, this.size.x, this.size.y), 20);
-			bool isPrisonerOfColony = base.SelPawn.IsPrisonerOfColony;
+			bool isPrisonerOfColony = base.get_SelPawn ().get_IsPrisonerOfColony ();
 			try {
 				GUI.BeginGroup (rect);
 				float num = 10;
-				Rect rect2 = new Rect (10, num, rect.width - 20, 32);
-				MedicalCareUtility.MedicalCareSetter (rect2, ref base.SelPawn.playerSettings.medCare);
+				Rect rect2 = new Rect (10, num, rect.get_width () - 20, 32);
+				MedicalCareUtility.MedicalCareSetter (rect2, ref base.get_SelPawn ().playerSettings.medCare);
 				num += 32;
 				num += 18;
-				Rect rect3 = new Rect (10, num, rect.width - 28, rect.height - num);
-				bool getsFood = base.SelPawn.guest.GetsFood;
+				Rect rect3 = new Rect (10, num, rect.get_width () - 28, rect.get_height () - num);
+				bool getsFood = base.get_SelPawn ().guest.get_GetsFood ();
 				num += WidgetDrawer.DrawLabeledCheckbox (rect3, Translator.Translate ("GetsFood"), ref getsFood);
-				base.SelPawn.guest.GetsFood = getsFood;
+				base.get_SelPawn ().guest.set_GetsFood (getsFood);
 				if (isPrisonerOfColony) {
 					num += 6;
 					int length = Enum.GetValues (typeof(PrisonerInteractionMode)).Length;
 					float num2 = (float)(length * 28 + 20);
-					Rect rect4 = new Rect (0, num, rect.width, num2);
+					Rect rect4 = new Rect (0, num, rect.get_width (), num2);
 					TabDrawer.DrawBox (rect4);
 					Rect rect5 = GenUI.ContractedBy (rect4, 10);
-					rect5.height = 28;
+					rect5.set_height (28);
 					foreach (PrisonerInteractionMode prisonerInteractionMode in Enum.GetValues (typeof(PrisonerInteractionMode))) {
-						if (WidgetDrawer.DrawLabeledRadioButton (rect5, PrisonerInteractionModeUtility.GetLabel (prisonerInteractionMode), base.SelPawn.guest.interactionMode == prisonerInteractionMode, true)) {
-							base.SelPawn.guest.interactionMode = prisonerInteractionMode;
+						if (WidgetDrawer.DrawLabeledRadioButton (rect5, PrisonerInteractionModeUtility.GetLabel (prisonerInteractionMode), base.get_SelPawn ().guest.interactionMode == prisonerInteractionMode, true)) {
+							base.get_SelPawn ().guest.interactionMode = prisonerInteractionMode;
 						}
-						rect5.y = rect5.y + 28;
+						rect5.set_y (rect5.get_y () + 28);
 					}
-					Rect rect6 = new Rect (rect4.x, rect4.y + rect4.height + 5, rect4.width - 4, 28);
-					Text.Anchor = TextAnchor.UpperRight;
-					Widgets.Label (rect6, Translator.Translate ("RecruitmentDifficulty") + ": " + base.SelPawn.guest.RecruitDifficulty.ToString ("##0"));
-					Text.Anchor = TextAnchor.UpperLeft;
+					Rect rect6 = new Rect (rect4.get_x (), rect4.get_y () + rect4.get_height () + 5, rect4.get_width () - 4, 28);
+					Text.set_Anchor (2);
+					Widgets.Label (rect6, Translator.Translate ("RecruitmentDifficulty") + ": " + base.get_SelPawn ().guest.get_RecruitDifficulty ().ToString ("##0"));
+					Text.set_Anchor (0);
 				}
 			}
 			finally {
 				GUI.EndGroup ();
-				GUI.color = Color.white;
-				Text.Anchor = TextAnchor.UpperLeft;
+				GUI.set_color (Color.get_white ());
+				Text.set_Anchor (0);
 			}
 			if (this.PreferenceTabBrowseButtons != null && this.PreferenceTabBrowseButtons.Value) {
-				Pawn selPawn = base.SelPawn;
+				Pawn selPawn = base.get_SelPawn ();
 				if (selPawn != null) {
 					BrowseButtonDrawer.DrawBrowseButtons (this.size, selPawn);
 				}
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public interface IUpdatedComponent
 	{
+		//
+		// Methods
+		//
 		void Update ();
 	}
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class LessonsComponent : IRenderedComponent, INamedComponent
 	{
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "ActiveLessons";
@@ -8612,19 +10201,34 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI ()
 		{
 			ActiveTutorNoteManager.ActiveLessonManagerOnGUI ();
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ListWidget<T, D> where D : ListWidgetItemDrawer<T>
 	{
-		private Color borderColor = new Color (0.3593f, 0.3672f, 0.3789f);
+		//
+		// Fields
+		//
+		private Color borderColor = new Color (0.3593, 0.3672, 0.3789);
 
 		protected float scrollableContentHeight;
 
-		protected Vector2 scrollableContentViewPosition = Vector2.zero;
+		protected Vector2 scrollableContentViewPosition = Vector2.get_zero ();
 
 		private bool supportsMultiSelect;
 
@@ -8642,6 +10246,9 @@ namespace EdB.Interface
 
 		private List<Texture> rowTextures = new List<Texture> ();
 
+		//
+		// Properties
+		//
 		public Color BackgroundColor {
 			set {
 				this.backgroundColor = SolidColorMaterials.NewSolidColorTexture (value);
@@ -8690,6 +10297,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ListWidget (List<T> items, D itemDrawer) : this (itemDrawer)
 		{
 			this.items = new List<T> (items);
@@ -8698,12 +10308,15 @@ namespace EdB.Interface
 		public ListWidget (D itemDrawer)
 		{
 			this.itemDrawer = itemDrawer;
-			this.selectedTexture = SolidColorMaterials.NewSolidColorTexture (new Color (0.2656f, 0.2773f, 0.2891f));
-			this.rowTextures.Add (SolidColorMaterials.NewSolidColorTexture (new Color (0.1523f, 0.168f, 0.1836f)));
-			this.rowTextures.Add (SolidColorMaterials.NewSolidColorTexture (new Color (0.1094f, 0.125f, 0.1406f)));
-			this.backgroundColor = SolidColorMaterials.NewSolidColorTexture (new Color (0.0664f, 0.082f, 0.0938f));
+			this.selectedTexture = SolidColorMaterials.NewSolidColorTexture (new Color (0.2656, 0.2773, 0.2891));
+			this.rowTextures.Add (SolidColorMaterials.NewSolidColorTexture (new Color (0.1523, 0.168, 0.1836)));
+			this.rowTextures.Add (SolidColorMaterials.NewSolidColorTexture (new Color (0.1094, 0.125, 0.1406)));
+			this.backgroundColor = SolidColorMaterials.NewSolidColorTexture (new Color (0.0664, 0.082, 0.0938));
 		}
 
+		//
+		// Methods
+		//
 		public void Add (T item)
 		{
 			this.items.Add (item);
@@ -8730,23 +10343,23 @@ namespace EdB.Interface
 
 		public void DrawWidget (Rect bounds)
 		{
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 			GUI.DrawTexture (bounds, this.backgroundColor);
-			GUI.color = this.borderColor;
+			GUI.set_color (this.borderColor);
 			Widgets.DrawBox (bounds, 1);
 			Rect rect = GenUI.ContractedBy (bounds, 1);
 			try {
 				GUI.BeginGroup (rect);
-				Rect rect2 = new Rect (0, 0, rect.width, rect.height);
-				Rect rect3 = new Rect (rect2.x, rect2.y, rect2.width - 16, this.scrollableContentHeight);
+				Rect rect2 = new Rect (0, 0, rect.get_width (), rect.get_height ());
+				Rect rect3 = new Rect (rect2.get_x (), rect2.get_y (), rect2.get_width () - 16, this.scrollableContentHeight);
 				try {
 					Widgets.BeginScrollView (rect2, ref this.scrollableContentViewPosition, rect3);
 					Vector2 cursor = new Vector2 (0, 0);
 					for (int i = 0; i < this.items.Count; i++) {
 						bool flag = this.selectedIndices.Contains (i);
 						T item = this.items [i];
-						float height = this.itemDrawer.GetHeight (i, item, cursor, rect.width, flag, false);
-						Rect rect4 = new Rect (cursor.x, cursor.y, rect.width, height);
+						float height = this.itemDrawer.GetHeight (i, item, cursor, rect.get_width (), flag, false);
+						Rect rect4 = new Rect (cursor.x, cursor.y, rect.get_width (), height);
 						Texture texture = null;
 						if (flag) {
 							texture = this.selectedTexture;
@@ -8755,16 +10368,16 @@ namespace EdB.Interface
 							texture = this.rowTextures [i % this.rowTextures.Count];
 						}
 						if (this.backgroundColor != null) {
-							GUI.color = Color.white;
+							GUI.set_color (Color.get_white ());
 							GUI.DrawTexture (rect4, texture);
 						}
-						cursor = this.itemDrawer.Draw (i, item, cursor, rect.width, flag, false);
+						cursor = this.itemDrawer.Draw (i, item, cursor, rect.get_width (), flag, false);
 						if (Widgets.InvisibleButton (rect4)) {
 							if (this.SupportsMultiSelect) {
-								if (Event.current.control) {
+								if (Event.get_current ().get_control ()) {
 									this.ToggleSelection (i);
 								}
-								else if (Event.current.shift) {
+								else if (Event.get_current ().get_shift ()) {
 									this.SelectThrough (i);
 								}
 								else {
@@ -8776,7 +10389,7 @@ namespace EdB.Interface
 							}
 						}
 					}
-					if (Event.current.type == EventType.Layout) {
+					if (Event.get_current ().get_type () == 8) {
 						this.scrollableContentHeight = cursor.y;
 					}
 				}
@@ -8790,7 +10403,7 @@ namespace EdB.Interface
 			finally {
 				GUI.EndGroup ();
 			}
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 		}
 
 		public void Insert (T item, int index)
@@ -8944,25 +10557,84 @@ namespace EdB.Interface
 			this.SendSelectionEvent ();
 		}
 
-		public event ListWidgetMultiSelectionChangedHandler<T> MultiSelectionChangedEvent;
+		//
+		// Events
+		//
+		public event ListWidgetMultiSelectionChangedHandler<T> MultiSelectionChangedEvent {
+			add {
+				ListWidgetMultiSelectionChangedHandler<T> listWidgetMultiSelectionChangedHandler = this.MultiSelectionChangedEvent;
+				ListWidgetMultiSelectionChangedHandler<T> listWidgetMultiSelectionChangedHandler2;
+				do {
+					listWidgetMultiSelectionChangedHandler2 = listWidgetMultiSelectionChangedHandler;
+					listWidgetMultiSelectionChangedHandler = Interlocked.CompareExchange<ListWidgetMultiSelectionChangedHandler<T>> (ref this.MultiSelectionChangedEvent, (ListWidgetMultiSelectionChangedHandler<T>)Delegate.Combine (listWidgetMultiSelectionChangedHandler2, value), listWidgetMultiSelectionChangedHandler);
+				}
+				while (listWidgetMultiSelectionChangedHandler != listWidgetMultiSelectionChangedHandler2);
+			}
+			remove {
+				ListWidgetMultiSelectionChangedHandler<T> listWidgetMultiSelectionChangedHandler = this.MultiSelectionChangedEvent;
+				ListWidgetMultiSelectionChangedHandler<T> listWidgetMultiSelectionChangedHandler2;
+				do {
+					listWidgetMultiSelectionChangedHandler2 = listWidgetMultiSelectionChangedHandler;
+					listWidgetMultiSelectionChangedHandler = Interlocked.CompareExchange<ListWidgetMultiSelectionChangedHandler<T>> (ref this.MultiSelectionChangedEvent, (ListWidgetMultiSelectionChangedHandler<T>)Delegate.Remove (listWidgetMultiSelectionChangedHandler2, value), listWidgetMultiSelectionChangedHandler);
+				}
+				while (listWidgetMultiSelectionChangedHandler != listWidgetMultiSelectionChangedHandler2);
+			}
+		}
 
-		public event ListWidgetSingleSelectionChangedHandler<T> SingleSelectionChangedEvent;
+		public event ListWidgetSingleSelectionChangedHandler<T> SingleSelectionChangedEvent {
+			add {
+				ListWidgetSingleSelectionChangedHandler<T> listWidgetSingleSelectionChangedHandler = this.SingleSelectionChangedEvent;
+				ListWidgetSingleSelectionChangedHandler<T> listWidgetSingleSelectionChangedHandler2;
+				do {
+					listWidgetSingleSelectionChangedHandler2 = listWidgetSingleSelectionChangedHandler;
+					listWidgetSingleSelectionChangedHandler = Interlocked.CompareExchange<ListWidgetSingleSelectionChangedHandler<T>> (ref this.SingleSelectionChangedEvent, (ListWidgetSingleSelectionChangedHandler<T>)Delegate.Combine (listWidgetSingleSelectionChangedHandler2, value), listWidgetSingleSelectionChangedHandler);
+				}
+				while (listWidgetSingleSelectionChangedHandler != listWidgetSingleSelectionChangedHandler2);
+			}
+			remove {
+				ListWidgetSingleSelectionChangedHandler<T> listWidgetSingleSelectionChangedHandler = this.SingleSelectionChangedEvent;
+				ListWidgetSingleSelectionChangedHandler<T> listWidgetSingleSelectionChangedHandler2;
+				do {
+					listWidgetSingleSelectionChangedHandler2 = listWidgetSingleSelectionChangedHandler;
+					listWidgetSingleSelectionChangedHandler = Interlocked.CompareExchange<ListWidgetSingleSelectionChangedHandler<T>> (ref this.SingleSelectionChangedEvent, (ListWidgetSingleSelectionChangedHandler<T>)Delegate.Remove (listWidgetSingleSelectionChangedHandler2, value), listWidgetSingleSelectionChangedHandler);
+				}
+				while (listWidgetSingleSelectionChangedHandler != listWidgetSingleSelectionChangedHandler2);
+			}
+		}
 	}
+}
+using System;
+using UnityEngine;
 
+namespace EdB.Interface
+{
 	public interface ListWidgetItemDrawer<T>
 	{
+		//
+		// Methods
+		//
 		Vector2 Draw (int index, T item, Vector2 cursor, float width, bool selected, bool disabled);
 
 		float GetHeight (int index, T item, Vector2 cursor, float width, bool selected, bool disabled);
 	}
+}
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ListWidgetLabelDrawer<T> : ListWidgetItemDrawer<T>
 	{
+		//
+		// Fields
+		//
 		private Vector2 padding = new Vector2 (16, 5);
 
 		private Color selectedTextColor = new Color (1, 1, 1);
 
-		private Color textColor = new Color (0.85f, 0.85f, 0.85f);
+		private Color textColor = new Color (0.85, 0.85, 0.85);
 
 		private Func<T, string> labelDelegate;
 
@@ -8972,6 +10644,9 @@ namespace EdB.Interface
 
 		private Vector2 paddingTotal;
 
+		//
+		// Constructors
+		//
 		public ListWidgetLabelDrawer (Func<T, string> labelDelegate)
 		{
 			this.paddingTotal = new Vector2 (this.padding.x * 2, this.padding.y * 2);
@@ -8987,6 +10662,9 @@ namespace EdB.Interface
 			};
 		}
 
+		//
+		// Methods
+		//
 		public void AddRowColor (Color color)
 		{
 			this.rowTextures.Add (SolidColorMaterials.NewSolidColorTexture (color));
@@ -9000,7 +10678,7 @@ namespace EdB.Interface
 		public Vector2 Draw (int index, T item, Vector2 cursor, float width, bool selected, bool disabled)
 		{
 			string text = this.labelDelegate.Invoke (item);
-			Text.Anchor = TextAnchor.MiddleLeft;
+			Text.set_Anchor (3);
 			Vector2 result;
 			try {
 				Rect rect;
@@ -9016,16 +10694,16 @@ namespace EdB.Interface
 					rect2 = new Rect (cursor.x, cursor.y, width, this.paddingTotal.y + vector.y);
 				}
 				if (selected) {
-					GUI.color = this.selectedTextColor;
+					GUI.set_color (this.selectedTextColor);
 				}
 				else {
-					GUI.color = this.textColor;
+					GUI.set_color (this.textColor);
 				}
 				Widgets.Label (rect, text);
-				result = new Vector2 (cursor.x, cursor.y + rect2.height);
+				result = new Vector2 (cursor.x, cursor.y + rect2.get_height ());
 			}
 			finally {
-				Text.Anchor = TextAnchor.UpperLeft;
+				Text.set_Anchor (0);
 			}
 			return result;
 		}
@@ -9043,13 +10721,35 @@ namespace EdB.Interface
 			return num + this.paddingTotal.y;
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
 
+namespace EdB.Interface
+{
 	public delegate void ListWidgetMultiSelectionChangedHandler<T> (List<T> selected);
+}
+using System;
 
+namespace EdB.Interface
+{
 	public delegate void ListWidgetSingleSelectionChangedHandler<T> (T selected);
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public static class MainMenuDrawer
 	{
+		//
+		// Static Fields
+		//
 		private const float GameRectWidth = 200;
 
 		private static readonly Texture2D IconTwitter = ContentFinder<Texture2D>.Get ("UI/HeroArt/WebIcons/Twitter", true);
@@ -9080,85 +10780,88 @@ namespace EdB.Interface
 
 		private static readonly Texture2D TexTitle = ContentFinder<Texture2D>.Get ("UI/HeroArt/GameTitle", true);
 
+		//
+		// Static Methods
+		//
 		private static void CloseMainTab ()
 		{
-			if (Game.Mode == GameMode.MapPlaying) {
-				Find.MainTabsRoot.EscapeCurrentTab (false);
+			if (Game.get_Mode () == 2) {
+				Find.get_MainTabsRoot ().EscapeCurrentTab (false);
 			}
 		}
 
 		public static void DoMainMenuButtons (Rect rect, bool anyWorldFiles, bool anyMapFiles, Action backToGameButtonAction = null)
 		{
-			Rect rect2 = new Rect (0, 0, 200, rect.height);
-			Rect rect3 = new Rect (rect2.xMax + 17, 0, -1, rect.height);
-			rect3.xMax = rect.width;
-			Text.Font = GameFont.Small;
+			Rect rect2 = new Rect (0, 0, 200, rect.get_height ());
+			Rect rect3 = new Rect (rect2.get_xMax () + 17, 0, -1, rect.get_height ());
+			rect3.set_xMax (rect.get_width ());
+			Text.set_Font (1);
 			List<ListableOption> list = new List<ListableOption> ();
 			ListableOption item;
-			if (Game.Mode == null) {
+			if (Game.get_Mode () == null) {
 				item = new ListableOption (Translator.Translate ("CreateWorld"), delegate {
 					MapInitData.Reset ();
-					Find.WindowStack.Add (new Page_CreateWorldParams ());
+					Find.get_WindowStack ().Add (new Page_CreateWorldParams ());
 				});
 				list.Add (item);
 				if (anyWorldFiles) {
 					item = new ListableOption (Translator.Translate ("NewColony"), delegate {
 						MapInitData.Reset ();
-						Find.WindowStack.Add (new Page_SelectStoryteller ());
+						Find.get_WindowStack ().Add (new Page_SelectStoryteller ());
 					});
 					list.Add (item);
 				}
 			}
-			if (Game.Mode == GameMode.MapPlaying) {
+			if (Game.get_Mode () == 2) {
 				if (backToGameButtonAction != null) {
 					item = new ListableOption (Translator.Translate ("BackToGame"), backToGameButtonAction);
 					list.Add (item);
 				}
 				item = new ListableOption (Translator.Translate ("Save"), delegate {
 					MainMenuDrawer.CloseMainTab ();
-					Find.WindowStack.Add (new Dialog_MapList_Save ());
+					Find.get_WindowStack ().Add (new Dialog_MapList_Save ());
 				});
 				list.Add (item);
 			}
 			if (anyMapFiles) {
 				item = new ListableOption (Translator.Translate ("Load"), delegate {
 					MainMenuDrawer.CloseMainTab ();
-					Find.WindowStack.Add (new Dialog_MapList_Load ());
+					Find.get_WindowStack ().Add (new Dialog_MapList_Load ());
 				});
 				list.Add (item);
 			}
 			item = new ListableOption (Translator.Translate ("EdB.InterfaceOptions.Button.GameOptions"), delegate {
 				MainMenuDrawer.CloseMainTab ();
-				Find.WindowStack.Add (new Dialog_Options ());
+				Find.get_WindowStack ().Add (new Dialog_Options ());
 			});
 			list.Add (item);
 			if (Preferences.Instance.AtLeastOne) {
 				item = new ListableOption (Translator.Translate ("EdB.InterfaceOptions.Button.InterfaceOptions"), delegate {
 					MainMenuDrawer.CloseMainTab ();
-					Find.WindowStack.Add (new Dialog_InterfaceOptions ());
+					Find.get_WindowStack ().Add (new Dialog_InterfaceOptions ());
 				});
 				list.Add (item);
 			}
-			if (Game.Mode == null) {
+			if (Game.get_Mode () == null) {
 				item = new ListableOption (Translator.Translate ("Mods"), delegate {
-					Find.WindowStack.Add (new Page_ModsConfig ());
+					Find.get_WindowStack ().Add (new Page_ModsConfig ());
 				});
 				list.Add (item);
 				item = new ListableOption (Translator.Translate ("Credits"), delegate {
-					Find.WindowStack.Add (new Page_Credits ());
+					Find.get_WindowStack ().Add (new Page_Credits ());
 				});
 				list.Add (item);
 			}
-			if (Game.Mode == GameMode.MapPlaying) {
+			if (Game.get_Mode () == 2) {
 				Action action = delegate {
-					Find.WindowStack.Add (new Dialog_Confirm (Translator.Translate ("ConfirmQuit"), delegate {
+					Find.get_WindowStack ().Add (new Dialog_Confirm (Translator.Translate ("ConfirmQuit"), delegate {
 						Application.LoadLevel ("Entry");
 					}, true));
 				};
 				item = new ListableOption (Translator.Translate ("QuitToMainMenu"), action);
 				list.Add (item);
 				Action action2 = delegate {
-					Find.WindowStack.Add (new Dialog_Confirm (Translator.Translate ("ConfirmQuit"), delegate {
+					Find.get_WindowStack ().Add (new Dialog_Confirm (Translator.Translate ("ConfirmQuit"), delegate {
 						Root.Shutdown ();
 					}, true));
 				};
@@ -9173,7 +10876,7 @@ namespace EdB.Interface
 			}
 			Rect rect4 = GenUI.ContractedBy (rect2, 17);
 			OptionListingUtility.DrawOptionListing (rect4, list);
-			Text.Font = GameFont.Small;
+			Text.set_Font (1);
 			List<ListableOption> list2 = new List<ListableOption> ();
 			ListableOption item2 = new ListableOption_WebLink (Translator.Translate ("FictionPrimer"), "https://docs.google.com/document/d/1pIZyKif0bFbBWten4drrm7kfSSfvBoJPgG9-ywfN8j8/pub", MainMenuDrawer.IconBlog);
 			list2.Add (item2);
@@ -9187,21 +10890,21 @@ namespace EdB.Interface
 			list2.Add (item2);
 			item2 = new ListableOption_WebLink (Translator.Translate ("TynansDesignBook"), "http://tynansylvester.com/book", MainMenuDrawer.IconBook);
 			list2.Add (item2);
-			item2 = new ListableOption_WebLink (Translator.Translate ("HelpTranslate"), "http://ludeon.com/forums/index.php?topic=2933.0f", MainMenuDrawer.IconForums);
+			item2 = new ListableOption_WebLink (Translator.Translate ("HelpTranslate"), "http://ludeon.com/forums/index.php?topic=2933.0", MainMenuDrawer.IconForums);
 			list2.Add (item2);
 			Rect rect5 = GenUI.ContractedBy (rect3, 17);
 			float num = OptionListingUtility.DrawOptionListing (rect5, list2);
 			GUI.BeginGroup (rect5);
-			if (Game.Mode == null && Widgets.ImageButton (new Rect (0, num + 10, 64, 32), LanguageDatabase.activeLanguage.icon)) {
+			if (Game.get_Mode () == null && Widgets.ImageButton (new Rect (0, num + 10, 64, 32), LanguageDatabase.activeLanguage.icon)) {
 				List<FloatMenuOption> list3 = new List<FloatMenuOption> ();
-				foreach (LoadedLanguage current in LanguageDatabase.AllLoadedLanguages) {
+				foreach (LoadedLanguage current in LanguageDatabase.get_AllLoadedLanguages ()) {
 					LoadedLanguage localLang = current;
-					list3.Add (new FloatMenuOption (localLang.FriendlyNameNative, delegate {
+					list3.Add (new FloatMenuOption (localLang.get_FriendlyNameNative (), delegate {
 						LanguageDatabase.SelectLanguage (localLang);
 						Prefs.Save ();
-					}, MenuOptionPriority.Medium, null, null));
+					}, 1, null, null));
 				}
-				Find.WindowStack.Add (new FloatMenu (list3, false));
+				Find.get_WindowStack ().Add (new FloatMenu (list3, false));
 			}
 			GUI.EndGroup ();
 		}
@@ -9213,48 +10916,48 @@ namespace EdB.Interface
 			}
 			ConceptDatabase.Save ();
 			ShipCountdown.CancelCountdown ();
-			MainMenuDrawer.anyWorldFiles = SavedWorldsDatabase.AllWorldFiles.Any<FileInfo> ();
-			MainMenuDrawer.anyMapFiles = MapFilesUtility.AllMapFiles.Any<FileInfo> ();
+			MainMenuDrawer.anyWorldFiles = SavedWorldsDatabase.get_AllWorldFiles ().Any<FileInfo> ();
+			MainMenuDrawer.anyMapFiles = MapFilesUtility.get_AllMapFiles ().Any<FileInfo> ();
 		}
 
 		public static void MainMenuOnGUI ()
 		{
 			VersionControl.DrawInfoInCorner ();
-			Rect rect = new Rect ((float)(Screen.width / 2) - MainMenuDrawer.PaneSize.x / 2, (float)(Screen.height / 2) - MainMenuDrawer.PaneSize.y / 2, MainMenuDrawer.PaneSize.x, MainMenuDrawer.PaneSize.y);
-			rect.y = rect.y + 50;
-			rect.x = (float)Screen.width - rect.width - 30;
+			Rect rect = new Rect ((float)(Screen.get_width () / 2) - MainMenuDrawer.PaneSize.x / 2, (float)(Screen.get_height () / 2) - MainMenuDrawer.PaneSize.y / 2, MainMenuDrawer.PaneSize.x, MainMenuDrawer.PaneSize.y);
+			rect.set_y (rect.get_y () + 50);
+			rect.set_x ((float)Screen.get_width () - rect.get_width () - 30);
 			Vector2 vector = MainMenuDrawer.TitleSize;
-			if (vector.x > (float)Screen.width) {
-				vector *= (float)Screen.width / vector.x;
+			if (vector.x > (float)Screen.get_width ()) {
+				vector *= (float)Screen.get_width () / vector.x;
 			}
-			vector *= 0.7f;
-			Rect rect2 = new Rect ((float)(Screen.width / 2) - vector.x / 2, rect.y - vector.y - 10, vector.x, vector.y);
-			rect2.x = (float)Screen.width - vector.x - 50;
+			vector *= 0.7;
+			Rect rect2 = new Rect ((float)(Screen.get_width () / 2) - vector.x / 2, rect.get_y () - vector.y - 10, vector.x, vector.y);
+			rect2.set_x ((float)Screen.get_width () - vector.x - 50);
 			GUI.DrawTexture (rect2, MainMenuDrawer.TexTitle, 0, true);
 			Rect rect3 = rect2;
-			rect3.y = rect3.y + rect2.height;
-			rect3.xMax = rect3.xMax - 55;
-			rect3.height = 30;
-			rect3.y = rect3.y + 3;
+			rect3.set_y (rect3.get_y () + rect2.get_height ());
+			rect3.set_xMax (rect3.get_xMax () - 55);
+			rect3.set_height (30);
+			rect3.set_y (rect3.get_y () + 3);
 			string text = Translator.Translate ("MainPageCredit");
-			Text.Font = GameFont.Medium;
-			Text.Anchor = TextAnchor.UpperRight;
-			if (Screen.width < 990) {
+			Text.set_Font (2);
+			Text.set_Anchor (2);
+			if (Screen.get_width () < 990) {
 				Rect rect4 = rect3;
-				rect4.xMin = rect4.xMax - Text.CalcSize (text).x;
-				rect4.xMin = rect4.xMin - 4;
-				rect4.xMax = rect4.xMax + 4;
-				GUI.color = new Color (0.2f, 0.2f, 0.2f, 0.5f);
+				rect4.set_xMin (rect4.get_xMax () - Text.CalcSize (text).x);
+				rect4.set_xMin (rect4.get_xMin () - 4);
+				rect4.set_xMax (rect4.get_xMax () + 4);
+				GUI.set_color (new Color (0.2, 0.2, 0.2, 0.5));
 				GUI.DrawTexture (rect4, BaseContent.WhiteTex);
-				GUI.color = Color.white;
+				GUI.set_color (Color.get_white ());
 			}
 			Widgets.Label (rect3, text);
-			Text.Anchor = TextAnchor.UpperLeft;
-			Text.Font = GameFont.Small;
-			GUI.color = new Color (1, 1, 1, 0.5f);
-			Rect rect5 = new Rect ((float)(Screen.width - 8) - MainMenuDrawer.LudeonLogoSize.x, 8, MainMenuDrawer.LudeonLogoSize.x, MainMenuDrawer.LudeonLogoSize.y);
+			Text.set_Anchor (0);
+			Text.set_Font (1);
+			GUI.set_color (new Color (1, 1, 1, 0.5));
+			Rect rect5 = new Rect ((float)(Screen.get_width () - 8) - MainMenuDrawer.LudeonLogoSize.x, 8, MainMenuDrawer.LudeonLogoSize.x, MainMenuDrawer.LudeonLogoSize.y);
 			GUI.DrawTexture (rect5, MainMenuDrawer.TexLudeonLogo, 0, true);
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 			Rect rect6 = GenUI.ContractedBy (rect, 17);
 			GUI.BeginGroup (rect6);
 			MainMenuDrawer.DoMainMenuButtons (rect6, MainMenuDrawer.anyWorldFiles, MainMenuDrawer.anyMapFiles, null);
@@ -9263,16 +10966,29 @@ namespace EdB.Interface
 
 		public static void Notify_WorldFilesChanged ()
 		{
-			MainMenuDrawer.anyWorldFiles = SavedWorldsDatabase.AllWorldFiles.Any<FileInfo> ();
+			MainMenuDrawer.anyWorldFiles = SavedWorldsDatabase.get_AllWorldFiles ().Any<FileInfo> ();
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class MainTabsComponent : IRenderedComponent, INamedComponent
 	{
+		//
+		// Static Fields
+		//
 		public static readonly string ComponentName = "MainTabs";
 
+		//
+		// Fields
+		//
 		private MainTabsRoot mainTabsRoot;
 
+		//
+		// Properties
+		//
 		public MainTabsRoot MainTabsRoot {
 			get {
 				return this.mainTabsRoot;
@@ -9291,21 +11007,43 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public MainTabsComponent (MainTabsRoot mainTabsRoot)
 		{
 			this.mainTabsRoot = mainTabsRoot;
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI ()
 		{
 			this.mainTabsRoot.MainTabsOnGUI ();
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Verse;
+using Verse.Sound;
 
+namespace EdB.Interface
+{
 	public class MainTabsRoot
 	{
+		//
+		// Fields
+		//
 		private List<MainTabDef> allTabs;
 
+		//
+		// Properties
+		//
 		public List<MainTabDef> AllTabs {
 			get {
 				return this.allTabs;
@@ -9314,7 +11052,7 @@ namespace EdB.Interface
 
 		public MainTabDef OpenTab {
 			get {
-				MainTabWindow mainTabWindow = Find.WindowStack.WindowOfType<MainTabWindow> ();
+				MainTabWindow mainTabWindow = Find.get_WindowStack ().WindowOfType<MainTabWindow> ();
 				if (mainTabWindow == null) {
 					return null;
 				}
@@ -9334,19 +11072,25 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public MainTabsRoot ()
 		{
-			this.allTabs = (from x in DefDatabase<MainTabDef>.AllDefs
+			this.allTabs = (from x in DefDatabase<MainTabDef>.get_AllDefs ()
 			orderby x.order
 			select x).ToList<MainTabDef> ();
 		}
 
+		//
+		// Methods
+		//
 		private void DoTabButton (MainTabDef def, float posX, float width)
 		{
-			Text.Font = GameFont.Small;
-			Rect rect = new Rect (posX, (float)(Screen.height - 35), width, 35);
+			Text.set_Font (1);
+			Rect rect = new Rect (posX, (float)(Screen.get_height () - 35), width, 35);
 			SoundDef mouseoverButtonCategory = SoundDefOf.MouseoverButtonCategory;
-			if (WidgetsSubtle.ButtonSubtle (rect, def.LabelCap, def.Window.TabButtonBarPercent, -1, mouseoverButtonCategory)) {
+			if (WidgetsSubtle.ButtonSubtle (rect, def.get_LabelCap (), def.get_Window ().get_TabButtonBarPercent (), -1, mouseoverButtonCategory)) {
 				this.ToggleTab (def, true);
 			}
 			if (!GenText.NullOrEmpty (def.tutorHighlightTag)) {
@@ -9370,9 +11114,9 @@ namespace EdB.Interface
 		public T FindWindow<T> () where T : MainTabWindow
 		{
 			Type targetType = typeof(T);
-			MainTabDef mainTabDef = this.AllTabs.FirstOrDefault ((MainTabDef d) => d.Window != null && targetType.IsAssignableFrom (d.Window.GetType ()));
+			MainTabDef mainTabDef = this.AllTabs.FirstOrDefault ((MainTabDef d) => d.get_Window () != null && targetType.IsAssignableFrom (d.get_Window ().GetType ()));
 			if (mainTabDef != null) {
-				return (T)((object)mainTabDef.Window);
+				return (T)((object)mainTabDef.get_Window ());
 			}
 			return (T)((object)null);
 		}
@@ -9381,7 +11125,7 @@ namespace EdB.Interface
 		{
 			MainTabDef mainTabDef = this.AllTabs.FirstOrDefault ((MainTabDef d) => d.defName == defName);
 			if (mainTabDef != null) {
-				return mainTabDef.Window;
+				return mainTabDef.get_Window ();
 			}
 			return null;
 		}
@@ -9389,14 +11133,14 @@ namespace EdB.Interface
 		public IEnumerable<T> FindWindows<T> () where T : MainTabWindow
 		{
 			Type targetType = typeof(T);
-			return (from d in this.AllTabs.FindAll ((MainTabDef d) => d.Window != null && targetType.IsAssignableFrom (d.Window.GetType ()))
-			select d.Window).Cast<T> ();
+			return (from d in this.AllTabs.FindAll ((MainTabDef d) => d.get_Window () != null && targetType.IsAssignableFrom (d.get_Window ().GetType ()))
+			select d.get_Window ()).Cast<T> ();
 		}
 
 		private float GetTabButtonPosition (MainTabDef tab)
 		{
 			int tabButtonsCount = this.TabButtonsCount;
-			int num = (int)((float)Screen.width / (float)tabButtonsCount);
+			int num = (int)((float)Screen.get_width () / (float)tabButtonsCount);
 			int num2 = 0;
 			for (int i = 0; i < this.allTabs.Count; i++) {
 				if (this.allTabs [i].showTabButton) {
@@ -9418,13 +11162,13 @@ namespace EdB.Interface
 					num = i;
 				}
 			}
-			int num2 = (int)((float)Screen.width / (float)tabButtonsCount);
+			int num2 = (int)((float)Screen.get_width () / (float)tabButtonsCount);
 			int num3 = 0;
 			for (int j = 0; j < this.allTabs.Count; j++) {
 				if (this.allTabs [j].showTabButton) {
 					if (this.allTabs [j] == tab) {
 						if (j == num) {
-							return (float)(Screen.width - num3);
+							return (float)(Screen.get_width () - num3);
 						}
 						return (float)num2;
 					}
@@ -9438,32 +11182,32 @@ namespace EdB.Interface
 
 		public void HandleLowPriorityShortcuts ()
 		{
-			if (Find.Selector.NumSelected == 0 && Event.current.type == null && Event.current.button == 1) {
-				Event.current.Use ();
+			if (Find.get_Selector ().get_NumSelected () == 0 && Event.get_current ().get_type () == null && Event.get_current ().get_button () == 1) {
+				Event.get_current ().Use ();
 				this.ToggleTab (MainTabDefOf.Architect, true);
 			}
-			if (this.OpenTab != MainTabDefOf.Inspect && Event.current.type == null && Event.current.button != 2) {
+			if (this.OpenTab != MainTabDefOf.Inspect && Event.get_current ().get_type () == null && Event.get_current ().get_button () != 2) {
 				this.EscapeCurrentTab (true);
-				Find.Selector.ClearSelection ();
+				Find.get_Selector ().ClearSelection ();
 			}
 		}
 
 		public void MainTabsOnGUI ()
 		{
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 			for (int i = 0; i < this.allTabs.Count; i++) {
 				if (this.allTabs [i].showTabButton) {
 					this.DoTabButton (this.allTabs [i], this.GetTabButtonPosition (this.allTabs [i]), this.GetTabButtonWidth (this.allTabs [i]));
 				}
 			}
 			for (int j = 0; j < this.allTabs.Count; j++) {
-				if (this.allTabs [j].toggleHotKey != null && this.allTabs [j].toggleHotKey.KeyDownEvent) {
+				if (this.allTabs [j].toggleHotKey != null && this.allTabs [j].toggleHotKey.get_KeyDownEvent ()) {
 					this.ToggleTab (this.allTabs [j], true);
-					Event.current.Use ();
+					Event.get_current ().Use ();
 					break;
 				}
 			}
-			if (this.OpenTab == MainTabDefOf.Inspect && Find.Selector.NumSelected == 0) {
+			if (this.OpenTab == MainTabDefOf.Inspect && Find.get_Selector ().get_NumSelected () == 0) {
 				this.EscapeCurrentTab (false);
 			}
 		}
@@ -9483,17 +11227,17 @@ namespace EdB.Interface
 				return;
 			}
 			if (openTab == newTab) {
-				Find.WindowStack.TryRemove (openTab.Window, true);
+				Find.get_WindowStack ().TryRemove (openTab.get_Window (), true);
 				if (playSound) {
 					SoundStarter.PlayOneShotOnCamera (SoundDefOf.TabClose);
 				}
 			}
 			else {
 				if (openTab != null) {
-					Find.WindowStack.TryRemove (openTab.Window, true);
+					Find.get_WindowStack ().TryRemove (openTab.get_Window (), true);
 				}
 				if (newTab != null) {
-					Find.WindowStack.Add (newTab.Window);
+					Find.get_WindowStack ().Add (newTab.get_Window ());
 				}
 				if (playSound) {
 					if (newTab == null) {
@@ -9506,38 +11250,60 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Verse;
+using Verse.Sound;
 
-	public class MainTabWindow_Architect : RimWorld.MainTabWindow_Architect
+namespace EdB.Interface
+{
+	public class MainTabWindow_Architect : MainTabWindow_Architect
 	{
+		//
+		// Static Fields
+		//
 		private const float ButHeight = 32;
 
+		//
+		// Fields
+		//
 		private List<ArchitectCategoryTab> desPanelsCached;
 
 		public ArchitectCategoryTab selectedDesPanel;
 
+		//
+		// Constructors
+		//
 		public MainTabWindow_Architect ()
 		{
 			this.CacheDesPanels ();
 		}
 
+		//
+		// Methods
+		//
 		protected void BaseDoWindowContents (Rect inRect)
 		{
-			if (this.Anchor == null) {
-				this.currentWindowRect.x = 0;
+			if (this.get_Anchor () == null) {
+				this.currentWindowRect.set_x (0);
 			}
 			else {
-				this.currentWindowRect.x = (float)Screen.width - this.currentWindowRect.width;
+				this.currentWindowRect.set_x ((float)Screen.get_width () - this.currentWindowRect.get_width ());
 			}
-			this.currentWindowRect.y = (float)(Screen.height - 35) - this.currentWindowRect.height;
+			this.currentWindowRect.set_y ((float)(Screen.get_height () - 35) - this.currentWindowRect.get_height ());
 			if (this.def.concept != null) {
-				ConceptDatabase.KnowledgeDemonstrated (this.def.concept, KnowledgeAmount.GuiFrame);
+				ConceptDatabase.KnowledgeDemonstrated (this.def.concept, 1);
 			}
 		}
 
 		private void CacheDesPanels ()
 		{
 			this.desPanelsCached = new List<ArchitectCategoryTab> ();
-			foreach (DesignationCategoryDef current in from dc in DefDatabase<DesignationCategoryDef>.AllDefs
+			foreach (DesignationCategoryDef current in from dc in DefDatabase<DesignationCategoryDef>.get_AllDefs ()
 			orderby dc.order descending
 			select dc) {
 				this.desPanelsCached.Add (new ArchitectCategoryTab (current));
@@ -9558,17 +11324,17 @@ namespace EdB.Interface
 		public override void DoWindowContents (Rect inRect)
 		{
 			this.BaseDoWindowContents (inRect);
-			Text.Font = GameFont.Small;
-			float num = inRect.width / 2;
+			Text.set_Font (1);
+			float num = inRect.get_width () / 2;
 			float num2 = 0;
 			float num3 = 0;
 			for (int i = 0; i < this.desPanelsCached.Count; i++) {
 				Rect rect = new Rect (num2 * num, num3 * 32, num, 32);
-				rect.height = rect.height + 1;
+				rect.set_height (rect.get_height () + 1);
 				if (num2 == 0) {
-					rect.width = rect.width + 1;
+					rect.set_width (rect.get_width () + 1);
 				}
-				if (WidgetsSubtle.ButtonSubtle (rect, this.desPanelsCached [i].def.LabelCap, 0, 8, SoundDefOf.MouseoverButtonCategory)) {
+				if (WidgetsSubtle.ButtonSubtle (rect, this.desPanelsCached [i].def.get_LabelCap (), 0, 8, SoundDefOf.MouseoverButtonCategory)) {
 					this.ClickedCategory (this.desPanelsCached [i]);
 				}
 				num2 += 1;
@@ -9591,7 +11357,7 @@ namespace EdB.Interface
 		{
 			DesignationCategoryDef designationCategoryDef = null;
 			Designator designator = null;
-			foreach (DesignationCategoryDef current in from dc in DefDatabase<DesignationCategoryDef>.AllDefs
+			foreach (DesignationCategoryDef current in from dc in DefDatabase<DesignationCategoryDef>.get_AllDefs ()
 			orderby dc.order descending
 			select dc) {
 				foreach (Designator current2 in current.resolvedDesignators) {
@@ -9613,17 +11379,34 @@ namespace EdB.Interface
 			return designator;
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using UnityEngine;
+using Verse;
+using Verse.Sound;
 
-	public class MainTabWindow_Inspect : RimWorld.MainTabWindow_Inspect
+namespace EdB.Interface
+{
+	public class MainTabWindow_Inspect : MainTabWindow_Inspect
 	{
+		//
+		// Static Fields
+		//
 		private const float PaneWidth = 432;
 
 		private const float PaneInnerMargin = 12;
 
-		private static readonly Texture2D TabButtonFillTex = SolidColorMaterials.NewSolidColorTexture (0.07450981f, 0.08627451f, 0.1058824f, 1);
+		private static readonly Texture2D TabButtonFillTex = SolidColorMaterials.NewSolidColorTexture (0.07450981, 0.08627451, 0.1058824, 1);
 
 		private static IntVec3 lastSelectCell;
 
+		//
+		// Fields
+		//
 		private ReplacementTabs replacementTabs = new ReplacementTabs ();
 
 		private MethodInfo fillTabMethod;
@@ -9636,6 +11419,9 @@ namespace EdB.Interface
 
 		private FieldInfo openTabTypeField;
 
+		//
+		// Properties
+		//
 		public IEnumerable<ITab> CurTabs {
 			get {
 				if (this.NumSelected == 1) {
@@ -9662,7 +11448,7 @@ namespace EdB.Interface
 
 		private int NumSelected {
 			get {
-				return Find.Selector.NumSelected;
+				return Find.get_Selector ().get_NumSelected ();
 			}
 		}
 
@@ -9695,19 +11481,19 @@ namespace EdB.Interface
 
 		private IEnumerable<object> Selected {
 			get {
-				return Find.Selector.SelectedObjects;
+				return Find.get_Selector ().get_SelectedObjects ();
 			}
 		}
 
 		private Thing SelThing {
 			get {
-				return Find.Selector.SingleSelectedThing;
+				return Find.get_Selector ().get_SingleSelectedThing ();
 			}
 		}
 
 		private Zone SelZone {
 			get {
-				return Find.Selector.SelectedZone;
+				return Find.get_Selector ().get_SelectedZone ();
 			}
 		}
 
@@ -9717,6 +11503,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public MainTabWindow_Inspect ()
 		{
 			this.closeOnEscapeKey = false;
@@ -9727,16 +11516,19 @@ namespace EdB.Interface
 			this.fillTabMethod = typeof(ITab).GetMethod ("FillTab", BindingFlags.Instance | BindingFlags.NonPublic);
 		}
 
+		//
+		// Methods
+		//
 		public void DoTabGui (ITab tab)
 		{
-			MainTabWindow_Inspect inspectWorker = (MainTabWindow_Inspect)MainTabDefOf.Inspect.Window;
+			MainTabWindow_Inspect inspectWorker = (MainTabWindow_Inspect)MainTabDefOf.Inspect.get_Window ();
 			this.updateSizeMethod.Invoke (tab, null);
 			Vector2 vector = (Vector2)this.sizeField.GetValue (tab);
 			float y = vector.y;
-			float num = inspectWorker.PaneTopY - 30 - y;
+			float num = inspectWorker.get_PaneTopY () - 30 - y;
 			Rect outRect = new Rect (0, num, vector.x, y);
-			Find.WindowStack.ImmediateWindow (235086, outRect, 0, delegate {
-				if (Find.MainTabsRoot.OpenTab != MainTabDefOf.Inspect || !this.CurTabs.Contains (tab) || !tab.IsVisible) {
+			Find.get_WindowStack ().ImmediateWindow (235086, outRect, 0, delegate {
+				if (Find.get_MainTabsRoot ().get_OpenTab () != MainTabDefOf.Inspect || !this.CurTabs.Contains (tab) || !tab.get_IsVisible ()) {
 					return;
 				}
 				if (Widgets.CloseButtonFor (GenUI.AtZero (outRect))) {
@@ -9760,15 +11552,15 @@ namespace EdB.Interface
 		{
 			try {
 				Type openTabType = this.OpenTabType;
-				float num = base.PaneTopY - 30;
+				float num = base.get_PaneTopY () - 30;
 				float num2 = 360;
 				float num3 = 0;
 				bool flag = false;
 				foreach (ITab current in tabs) {
-					if (current.IsVisible) {
+					if (current.get_IsVisible ()) {
 						Rect rect = new Rect (num2, num, 72, 30);
 						num3 = num2;
-						Text.Font = GameFont.Small;
+						Text.set_Font (1);
 						if (Widgets.TextButton (rect, Translator.Translate (current.labelKey), true, false)) {
 							this.ToggleTab (current);
 						}
@@ -9794,22 +11586,22 @@ namespace EdB.Interface
 
 		public override void DoWindowContents (Rect inRect)
 		{
-			if (this.Anchor == null) {
-				this.currentWindowRect.x = 0;
+			if (this.get_Anchor () == null) {
+				this.currentWindowRect.set_x (0);
 			}
 			else {
-				this.currentWindowRect.x = (float)Screen.width - this.currentWindowRect.width;
+				this.currentWindowRect.set_x ((float)Screen.get_width () - this.currentWindowRect.get_width ());
 			}
-			this.currentWindowRect.y = (float)(Screen.height - 35) - this.currentWindowRect.height;
+			this.currentWindowRect.set_y ((float)(Screen.get_height () - 35) - this.currentWindowRect.get_height ());
 			if (this.def.concept != null) {
-				ConceptDatabase.KnowledgeDemonstrated (this.def.concept, KnowledgeAmount.GuiFrame);
+				ConceptDatabase.KnowledgeDemonstrated (this.def.concept, 1);
 			}
 			Vector2 paneSize = MainTabWindow_Inspect.PaneSize;
 			this.RecentHeight = paneSize.y;
 			if (this.NumSelected > 0) {
 				try {
 					Rect rect = GenUI.ContractedBy (inRect, 12);
-					rect.yMin = rect.yMin - 4;
+					rect.set_yMin (rect.get_yMin () - 4);
 					GUI.BeginGroup (rect);
 					bool flag = true;
 					if (this.NumSelected > 1) {
@@ -9818,29 +11610,29 @@ namespace EdB.Interface
 						select t).Any<object> ();
 					}
 					else {
-						Rect rect2 = new Rect (rect.width - 30, 0, 30, 30);
-						if (Find.Selector.SelectedZone == null || Find.Selector.SelectedZone.ContainsCell (MainTabWindow_Inspect.lastSelectCell)) {
+						Rect rect2 = new Rect (rect.get_width () - 30, 0, 30, 30);
+						if (Find.get_Selector ().get_SelectedZone () == null || Find.get_Selector ().get_SelectedZone ().ContainsCell (MainTabWindow_Inspect.lastSelectCell)) {
 							if (Widgets.ImageButton (rect2, TexButton.SelectOverlappingNext)) {
 								this.SelectNextInCell ();
 							}
 							TooltipHandler.TipRegion (rect2, Translator.Translate ("SelectNextInSquareTip", new object[] {
-								KeyBindingDefOf.SelectNextInCell.MainKeyLabel
+								KeyBindingDefOf.SelectNextInCell.get_MainKeyLabel ()
 							}));
 						}
-						if (Find.Selector.SingleSelectedThing != null) {
-							Widgets.InfoCardButton (rect.width - 60, 0, Find.Selector.SingleSelectedThing);
+						if (Find.get_Selector ().get_SingleSelectedThing () != null) {
+							Widgets.InfoCardButton (rect.get_width () - 60, 0, Find.get_Selector ().get_SingleSelectedThing ());
 						}
 					}
-					Rect rect3 = new Rect (0, 0, rect.width - 60, 50);
+					Rect rect3 = new Rect (0, 0, rect.get_width () - 60, 50);
 					string text = InspectPaneUtility.AdjustedLabelFor (this.Selected, rect3);
-					rect3.width = rect3.width + 300;
-					Text.Font = GameFont.Medium;
-					Text.Anchor = TextAnchor.UpperLeft;
+					rect3.set_width (rect3.get_width () + 300);
+					Text.set_Font (2);
+					Text.set_Anchor (0);
 					Widgets.Label (rect3, text);
 					if (flag && this.NumSelected == 1) {
 						Rect rect4 = GenUI.AtZero (rect);
-						rect4.yMin = rect4.yMin + 26;
-						InspectPaneFiller.DoPaneContentsFor ((ISelectable)Find.Selector.FirstSelectedObject, rect4);
+						rect4.set_yMin (rect4.get_yMin () + 26);
+						InspectPaneFiller.DoPaneContentsFor ((ISelectable)Find.get_Selector ().get_FirstSelectedObject (), rect4);
 					}
 				}
 				catch (Exception ex) {
@@ -9855,11 +11647,11 @@ namespace EdB.Interface
 		public override void ExtraOnGUI ()
 		{
 			if (this.NumSelected > 0) {
-				if (KeyBindingDefOf.SelectNextInCell.KeyDownEvent) {
+				if (KeyBindingDefOf.SelectNextInCell.get_KeyDownEvent ()) {
 					this.SelectNextInCell ();
 				}
-				if (DesignatorManager.SelectedDesignator != null) {
-					DesignatorManager.SelectedDesignator.DoExtraGuiControls (0, base.PaneTopY);
+				if (DesignatorManager.get_SelectedDesignator () != null) {
+					DesignatorManager.get_SelectedDesignator ().DoExtraGuiControls (0, base.get_PaneTopY ());
 				}
 				InspectGizmoGrid.DrawInspectGizmoGridFor (this.Selected);
 				this.DoTabs (this.CurTabs);
@@ -9871,11 +11663,11 @@ namespace EdB.Interface
 			if (this.NumSelected == 0) {
 				return;
 			}
-			if (Find.Selector.SelectedZone == null || Find.Selector.SelectedZone.ContainsCell (MainTabWindow_Inspect.lastSelectCell)) {
-				if (Find.Selector.SelectedZone == null) {
-					MainTabWindow_Inspect.lastSelectCell = Find.Selector.SingleSelectedThing.Position;
+			if (Find.get_Selector ().get_SelectedZone () == null || Find.get_Selector ().get_SelectedZone ().ContainsCell (MainTabWindow_Inspect.lastSelectCell)) {
+				if (Find.get_Selector ().get_SelectedZone () == null) {
+					MainTabWindow_Inspect.lastSelectCell = Find.get_Selector ().get_SingleSelectedThing ().get_Position ();
 				}
-				Find.Selector.SelectNextAt (MainTabWindow_Inspect.lastSelectCell);
+				Find.get_Selector ().SelectNextAt (MainTabWindow_Inspect.lastSelectCell);
 			}
 		}
 
@@ -9897,21 +11689,36 @@ namespace EdB.Interface
 		{
 			Type openTabType = this.OpenTabType;
 			foreach (ITab current in this.CurTabs) {
-				if (current.IsVisible && current.GetType () == openTabType) {
+				if (current.get_IsVisible () && current.GetType () == openTabType) {
 					current.TabUpdate ();
 				}
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class MainTabWindow_Inventory : MainTabWindow
 	{
+		//
+		// Fields
+		//
 		private InventoryTab curTab;
 
 		private List<InventoryTab> tabs = new List<InventoryTab> ();
 
 		protected InventoryManager inventoryManager;
 
+		//
+		// Properties
+		//
 		public InventoryManager InventoryManager {
 			get {
 				return this.inventoryManager;
@@ -9930,6 +11737,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public MainTabWindow_Inventory ()
 		{
 			this.doCloseX = true;
@@ -9941,18 +11751,21 @@ namespace EdB.Interface
 			this.curTab = this.tabs [0];
 		}
 
+		//
+		// Methods
+		//
 		public override void DoWindowContents (Rect inRect)
 		{
 			base.DoWindowContents (inRect);
-			Text.Font = GameFont.Small;
-			Rect rect = new Rect (0, -10, inRect.width, 40);
-			Text.Font = GameFont.Medium;
-			Text.Anchor = TextAnchor.MiddleCenter;
+			Text.set_Font (1);
+			Rect rect = new Rect (0, -10, inRect.get_width (), 40);
+			Text.set_Font (2);
+			Text.set_Anchor (4);
 			Widgets.Label (rect, Translator.Translate ("EdB.Inventory.Window.Header", new object[] {
-				Find.ColonyInfo.ColonyName
+				Find.get_ColonyInfo ().get_ColonyName ()
 			}));
 			float num = 70;
-			Rect rect2 = new Rect (0, num, inRect.width, inRect.height - num);
+			Rect rect2 = new Rect (0, num, inRect.get_width (), inRect.get_height () - num);
 			Widgets.DrawMenuSection (rect2, true);
 			this.curTab.InventoryTabOnGui (rect2);
 			List<TabRecord> list = (from panel in this.tabs
@@ -9997,16 +11810,31 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.IO;
+using System.Linq;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class MainTabWindow_Menu : MainTabWindow
 	{
+		//
+		// Fields
+		//
 		private bool anyWorldFiles;
 
 		private bool anyMapFiles;
 
+		//
+		// Properties
+		//
 		public override MainTabWindowAnchor Anchor {
 			get {
-				return MainTabWindowAnchor.Right;
+				return 1;
 			}
 		}
 
@@ -10016,11 +11844,17 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public MainTabWindow_Menu ()
 		{
 			this.forcePause = true;
 		}
 
+		//
+		// Methods
+		//
 		public override void DoWindowContents (Rect rect)
 		{
 			base.DoWindowContents (rect);
@@ -10038,19 +11872,37 @@ namespace EdB.Interface
 			base.PreOpen ();
 			ConceptDatabase.Save ();
 			ShipCountdown.CancelCountdown ();
-			this.anyWorldFiles = SavedWorldsDatabase.AllWorldFiles.Any<FileInfo> ();
-			this.anyMapFiles = MapFilesUtility.AllMapFiles.Any<FileInfo> ();
+			this.anyWorldFiles = SavedWorldsDatabase.get_AllWorldFiles ().Any<FileInfo> ();
+			this.anyMapFiles = MapFilesUtility.get_AllMapFiles ().Any<FileInfo> ();
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class MainTabWindow_Outfits : MainTabWindow_PawnListWithSquads
 	{
+		//
+		// Static Fields
+		//
 		private const float TopAreaHeight = 45;
 
+		//
+		// Fields
+		//
 		private Outfit outfit;
 
 		private bool anyForcedApparel;
 
+		//
+		// Properties
+		//
 		public override Vector2 RequestedTabSize {
 			get {
 				return new Vector2 (1010, this.WindowHeight);
@@ -10059,73 +11911,78 @@ namespace EdB.Interface
 
 		protected override float WindowHeight {
 			get {
-				return 45 + (float)base.PawnsCount * 30 + 65 + base.ExtraHeight;
+				return 45 + (float)base.get_PawnsCount () * 30 + 65 + base.ExtraHeight;
 			}
 		}
 
+		//
+		// Methods
+		//
 		public override void DoWindowContents (Rect fillRect)
 		{
 			base.DoWindowContents (fillRect);
-			Rect rect = new Rect (0, 0, fillRect.width, 45);
+			Rect rect = new Rect (0, 0, fillRect.get_width (), 45);
 			GUI.BeginGroup (rect);
-			Text.Font = GameFont.Small;
-			GUI.color = Color.white;
-			Text.Anchor = TextAnchor.UpperLeft;
+			Text.set_Font (1);
+			GUI.set_color (Color.get_white ());
+			Text.set_Anchor (0);
 			Rect rect2 = new Rect (5, 5, 160, 35);
 			if (Widgets.TextButton (rect2, Translator.Translate ("ManageOutfits"), true, false)) {
-				Find.WindowStack.Add (new Dialog_ManageOutfits (null));
+				Find.get_WindowStack ().Add (new Dialog_ManageOutfits (null));
 			}
-			Text.Anchor = TextAnchor.LowerCenter;
-			Rect rect3 = new Rect (175, 0, rect.width - 175, rect.height);
-			Rect rect4 = new Rect (rect3.x, rect3.y, rect3.width / 2, rect3.height);
+			Text.set_Anchor (7);
+			Rect rect3 = new Rect (175, 0, rect.get_width () - 175, rect.get_height ());
+			Rect rect4 = new Rect (rect3.get_x (), rect3.get_y (), rect3.get_width () / 2, rect3.get_height ());
 			Widgets.Label (rect4, Translator.Translate ("CurrentOutfit"));
-			Text.Anchor = TextAnchor.UpperLeft;
+			Text.set_Anchor (0);
 			GUI.EndGroup ();
-			Text.Font = GameFont.Small;
-			GUI.color = Color.white;
+			Text.set_Font (1);
+			GUI.set_color (Color.get_white ());
 			float squadRowHeight = base.SquadRowHeight;
-			Rect rect5 = new Rect (0, 45 + squadRowHeight, fillRect.width, fillRect.height - 45 - base.PawnListScrollHeightReduction);
+			Rect rect5 = new Rect (0, 45 + squadRowHeight, fillRect.get_width (), fillRect.get_height () - 45 - base.PawnListScrollHeightReduction);
 			this.anyForcedApparel = false;
 			base.DrawRows (rect5);
 			if (base.SquadRowEnabled) {
-				this.DrawSquadRow (new Rect (0, 45, fillRect.width - 16, squadRowHeight));
+				this.DrawSquadRow (new Rect (0, 45, fillRect.get_width () - 16, squadRowHeight));
 			}
 			if (base.SquadFilteringEnabled) {
-				Text.Font = GameFont.Small;
-				Text.Anchor = TextAnchor.UpperLeft;
-				GUI.color = Color.white;
-				this.DrawSquadSelectionDropdown (new Rect (fillRect.x, fillRect.y + fillRect.height - MainTabWindow_PawnListWithSquads.FooterButtonHeight, MainTabWindow_PawnListWithSquads.SquadFilterButtonWidth, MainTabWindow_PawnListWithSquads.FooterButtonHeight));
+				Text.set_Font (1);
+				Text.set_Anchor (0);
+				GUI.set_color (Color.get_white ());
+				this.DrawSquadSelectionDropdown (new Rect (fillRect.get_x (), fillRect.get_y () + fillRect.get_height () - MainTabWindow_PawnListWithSquads.FooterButtonHeight, MainTabWindow_PawnListWithSquads.SquadFilterButtonWidth, MainTabWindow_PawnListWithSquads.FooterButtonHeight));
 			}
 		}
 
 		protected override void DrawPawnRow (Rect rect, Pawn p)
 		{
-			Rect rect2 = new Rect (rect.x + 175, rect.y, rect.width - 175, rect.height);
-			Rect rect3 = new Rect (rect2.x, rect2.y + 2, rect2.width * 0.333f, rect2.height - 4);
-			if (Widgets.TextButton (rect3, p.outfits.CurrentOutfit.label, true, false)) {
+			Rect rect2 = new Rect (rect.get_x () + 175, rect.get_y (), rect.get_width () - 175, rect.get_height ());
+			Rect rect3 = new Rect (rect2.get_x (), rect2.get_y () + 2, rect2.get_width () * 0.333, rect2.get_height () - 4);
+			if (Widgets.TextButton (rect3, p.outfits.get_CurrentOutfit ().label, true, false)) {
 				List<FloatMenuOption> list = new List<FloatMenuOption> ();
-				foreach (Outfit current in Find.Map.outfitDatabase.AllOutfits) {
+				foreach (Outfit current in Find.get_Map ().outfitDatabase.get_AllOutfits ()) {
 					Outfit localOut = current;
 					list.Add (new FloatMenuOption (localOut.label, delegate {
-						p.outfits.CurrentOutfit = localOut;
-					}, MenuOptionPriority.Medium, null, null));
+						p.outfits.set_CurrentOutfit (localOut);
+					}, 1, null, null));
 				}
-				Find.WindowStack.Add (new FloatMenu (list, false));
+				Find.get_WindowStack ().Add (new FloatMenu (list, false));
 			}
-			Rect rect4 = new Rect (rect3.xMax + 4, rect.y + 2, 100, rect.height - 4);
+			Rect rect4 = new Rect (rect3.get_xMax () + 4, rect.get_y () + 2, 100, rect.get_height () - 4);
 			if (Widgets.TextButton (rect4, Translator.Translate ("OutfitEdit"), true, false)) {
-				Find.WindowStack.Add (new Dialog_ManageOutfits (p.outfits.CurrentOutfit));
+				Find.get_WindowStack ().Add (new Dialog_ManageOutfits (p.outfits.get_CurrentOutfit ()));
 			}
-			Rect rect5 = new Rect (rect4.xMax + 4, rect.y + 2, 100, rect.height - 4);
-			if (p.outfits.forcedHandler.SomethingIsForced) {
+			Rect rect5 = new Rect (rect4.get_xMax () + 4, rect.get_y () + 2, 100, rect.get_height () - 4);
+			if (p.outfits.forcedHandler.get_SomethingIsForced ()) {
 				this.anyForcedApparel = true;
 				if (Widgets.TextButton (rect5, Translator.Translate ("ClearForcedApparel"), true, false)) {
 					p.outfits.forcedHandler.Reset ();
 				}
 				TooltipHandler.TipRegion (rect5, new TipSignal (delegate {
-					string text = Translator.Translate ("ForcedApparel") + ":\n";
-					foreach (Apparel current2 in p.outfits.forcedHandler.ForcedApparel) {
-						text = text + "\n   " + current2.LabelCap;
+					string text = Translator.Translate ("ForcedApparel") + ":
+";
+					foreach (Apparel current2 in p.outfits.forcedHandler.get_ForcedApparel ()) {
+						text = text + "
+   " + current2.get_LabelCap ();
 					}
 					return text;
 				}, p.GetHashCode () * 612));
@@ -10136,66 +11993,77 @@ namespace EdB.Interface
 		{
 			float num = 3;
 			GUI.DrawTexture (rect, MainTabWindow_PawnListWithSquads.SquadRowBackground);
-			float num2 = rect.height - num - 4;
-			Rect rect2 = new Rect (rect.x + 175, rect.y, rect.width - 175, rect.height - num);
-			Rect rect3 = new Rect (rect2.x, rect2.y + 2, rect2.width * 0.333f, num2);
+			float num2 = rect.get_height () - num - 4;
+			Rect rect2 = new Rect (rect.get_x () + 175, rect.get_y (), rect.get_width () - 175, rect.get_height () - num);
+			Rect rect3 = new Rect (rect2.get_x (), rect2.get_y () + 2, rect2.get_width () * 0.333, num2);
 			if (Widgets.TextButton (rect3, this.outfit.label, true, false)) {
 				List<FloatMenuOption> list = new List<FloatMenuOption> ();
-				foreach (Outfit current in Find.Map.outfitDatabase.AllOutfits) {
+				foreach (Outfit current in Find.get_Map ().outfitDatabase.get_AllOutfits ()) {
 					Outfit localOut = current;
 					list.Add (new FloatMenuOption (localOut.label, delegate {
 						this.outfit = localOut;
 						foreach (Pawn current3 in this.pawns) {
-							current3.outfits.CurrentOutfit = localOut;
+							current3.outfits.set_CurrentOutfit (localOut);
 						}
-					}, MenuOptionPriority.Medium, null, null));
+					}, 1, null, null));
 				}
-				Find.WindowStack.Add (new FloatMenu (list, false));
+				Find.get_WindowStack ().Add (new FloatMenu (list, false));
 			}
-			Rect rect4 = new Rect (rect3.xMax + 4, rect.y + 2, 100, num2);
+			Rect rect4 = new Rect (rect3.get_xMax () + 4, rect.get_y () + 2, 100, num2);
 			if (Widgets.TextButton (rect4, Translator.Translate ("OutfitEdit"), true, false)) {
-				Find.WindowStack.Add (new Dialog_ManageOutfits (this.outfit));
+				Find.get_WindowStack ().Add (new Dialog_ManageOutfits (this.outfit));
 			}
-			Rect rect5 = new Rect (rect4.xMax + 4, rect.y + 2, 100, num2);
+			Rect rect5 = new Rect (rect4.get_xMax () + 4, rect.get_y () + 2, 100, num2);
 			if (this.anyForcedApparel && Widgets.TextButton (rect5, Translator.Translate ("ClearForcedApparel"), true, false)) {
 				foreach (Pawn current2 in this.pawns) {
 					current2.outfits.forcedHandler.Reset ();
 				}
 			}
 			GUI.BeginGroup (rect);
-			GUI.color = new Color (1, 1, 1, 0.2f);
-			Widgets.DrawLineHorizontal (0, 0, rect.width);
-			GUI.color = new Color (1, 1, 1, 0.35f);
-			Widgets.DrawLineHorizontal (0, base.SquadRowHeight - 3, rect.width);
-			Widgets.DrawLineHorizontal (0, base.SquadRowHeight - 2, rect.width);
-			Text.Font = GameFont.Small;
-			Text.Anchor = TextAnchor.MiddleLeft;
-			Text.WordWrap = false;
+			GUI.set_color (new Color (1, 1, 1, 0.2));
+			Widgets.DrawLineHorizontal (0, 0, rect.get_width ());
+			GUI.set_color (new Color (1, 1, 1, 0.35));
+			Widgets.DrawLineHorizontal (0, base.SquadRowHeight - 3, rect.get_width ());
+			Widgets.DrawLineHorizontal (0, base.SquadRowHeight - 2, rect.get_width ());
+			Text.set_Font (1);
+			Text.set_Anchor (3);
+			Text.set_WordWrap (false);
 			Rect rect6 = new Rect (0, 0, 175, 30);
-			rect6.xMin = rect6.xMin + 15;
-			GUI.color = new Color (1, 1, 1, 1);
+			rect6.set_xMin (rect6.get_xMin () + 15);
+			GUI.set_color (new Color (1, 1, 1, 1));
 			if (base.SquadFilteringEnabled && SquadManager.Instance.SquadFilter != null) {
 				Widgets.Label (rect6, SquadManager.Instance.SquadFilter.Name);
 			}
 			else {
 				Widgets.Label (rect6, Translator.Translate ("EdB.Squads.AllColonistsSquadName"));
 			}
-			Text.Anchor = TextAnchor.UpperLeft;
-			Text.WordWrap = true;
-			GUI.color = Color.white;
+			Text.set_Anchor (0);
+			Text.set_WordWrap (true);
+			GUI.set_color (Color.get_white ());
 			GUI.EndGroup ();
 		}
 
 		public override void PreOpen ()
 		{
 			base.PreOpen ();
-			this.outfit = Find.Map.outfitDatabase.AllOutfits.FirstOrDefault<Outfit> ();
+			this.outfit = Find.get_Map ().outfitDatabase.get_AllOutfits ().FirstOrDefault<Outfit> ();
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public abstract class MainTabWindow_PawnListWithSquads : MainTabWindow_PawnList
 	{
-		public static readonly Texture2D SquadRowBackground = SolidColorMaterials.NewSolidColorTexture (1, 1, 1, 0.05f);
+		//
+		// Static Fields
+		//
+		public static readonly Texture2D SquadRowBackground = SolidColorMaterials.NewSolidColorTexture (1, 1, 1, 0.05);
 
 		public static readonly float ScrollHeightReduction = 26;
 
@@ -10207,6 +12075,9 @@ namespace EdB.Interface
 
 		public static readonly float SquadFilterButtonWidth = 228;
 
+		//
+		// Fields
+		//
 		protected bool squadDirtyFlag;
 
 		protected PreferenceEnableSquadRow squadRowEnabled;
@@ -10215,6 +12086,9 @@ namespace EdB.Interface
 
 		protected PreferenceEnableSquads squadsEnabled;
 
+		//
+		// Properties
+		//
 		protected float ExtraHeight {
 			get {
 				float num = 0;
@@ -10240,12 +12114,12 @@ namespace EdB.Interface
 		protected IEnumerable<Pawn> Pawns {
 			get {
 				if (this.SquadFilteringEnabled) {
-					return SquadManager.Instance.SquadFilter.Pawns.FindAll ((Pawn p) => !p.Dead && !p.Destroyed && p.HostFaction == null && p.RaceProps.Humanlike);
+					return SquadManager.Instance.SquadFilter.Pawns.FindAll ((Pawn p) => !p.get_Dead () && !p.get_Destroyed () && p.get_HostFaction () == null && p.get_RaceProps ().get_Humanlike ());
 				}
 				if (this.SquadsEnabled) {
-					return SquadManager.Instance.AllColonistsSquad.Pawns.FindAll ((Pawn p) => !p.Dead && !p.Destroyed && p.HostFaction == null && p.RaceProps.Humanlike);
+					return SquadManager.Instance.AllColonistsSquad.Pawns.FindAll ((Pawn p) => !p.get_Dead () && !p.get_Destroyed () && p.get_HostFaction () == null && p.get_RaceProps ().get_Humanlike ());
 				}
-				return Find.ListerPawns.FreeColonists;
+				return Find.get_ListerPawns ().get_FreeColonists ();
 			}
 		}
 
@@ -10298,10 +12172,16 @@ namespace EdB.Interface
 			get;
 		}
 
+		//
+		// Constructors
+		//
 		public MainTabWindow_PawnListWithSquads ()
 		{
 		}
 
+		//
+		// Methods
+		//
 		protected override void BuildPawnList ()
 		{
 			this.squadDirtyFlag = true;
@@ -10315,7 +12195,7 @@ namespace EdB.Interface
 
 		protected virtual void DrawSquadSelectionDropdown (Rect rect)
 		{
-			Text.Font = GameFont.Small;
+			Text.set_Font (1);
 			Squad squadFilter = SquadManager.Instance.SquadFilter;
 			List<Squad> list = SquadManager.Instance.Squads.FindAll ((Squad s) => s.ShowInOverviewTabs && s.Pawns.Count > 0);
 			if (list.Count > 0 && Button.TextButton (rect, squadFilter.Name, true, false, true)) {
@@ -10325,8 +12205,8 @@ namespace EdB.Interface
 						SquadManager.Instance.SquadFilter = s;
 						this.squadDirtyFlag = true;
 					}
-				}, MenuOptionPriority.Medium, null, null)));
-				Find.WindowStack.Add (new FloatMenu (list2, false));
+				}, 1, null, null)));
+				Find.get_WindowStack ().Add (new FloatMenu (list2, false));
 			}
 		}
 
@@ -10341,15 +12221,28 @@ namespace EdB.Interface
 		{
 			if (this.squadDirtyFlag) {
 				this.DeferredBuildPawnList ();
-				this.currentWindowRect.height = this.WindowHeight;
-				this.scrollPosition = Vector2.zero;
+				this.currentWindowRect.set_height (this.WindowHeight);
+				this.scrollPosition = Vector2.get_zero ();
 				this.squadDirtyFlag = false;
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Verse;
+using Verse.Sound;
 
+namespace EdB.Interface
+{
 	public class MainTabWindow_Restrictions : MainTabWindow_PawnListWithSquads
 	{
+		//
+		// Static Fields
+		//
 		private const float TopAreaHeight = 65;
 
 		private const float AAGapWidth = 6;
@@ -10360,6 +12253,9 @@ namespace EdB.Interface
 
 		private const float CopyPasteColumnWidth = 52;
 
+		//
+		// Fields
+		//
 		private Area areaRestriction;
 
 		private Pawn_TimetableTracker timetable = new Pawn_TimetableTracker ();
@@ -10370,6 +12266,9 @@ namespace EdB.Interface
 
 		private TimeAssignmentDef selectedAssignment = TimeAssignmentDefOf.Work;
 
+		//
+		// Properties
+		//
 		public override Vector2 RequestedTabSize {
 			get {
 				return new Vector2 (1010, this.WindowHeight);
@@ -10378,10 +12277,13 @@ namespace EdB.Interface
 
 		protected override float WindowHeight {
 			get {
-				return 65 + (float)base.PawnsCount * 30 + 65 + base.ExtraHeight;
+				return 65 + (float)base.get_PawnsCount () * 30 + 65 + base.ExtraHeight;
 			}
 		}
 
+		//
+		// Methods
+		//
 		private void CopyFrom (Pawn p)
 		{
 			this.clipboard = p.timetable.times.ToList<TimeAssignmentDef> ();
@@ -10391,7 +12293,7 @@ namespace EdB.Interface
 		{
 			rect = GenUI.ContractedBy (rect, 1);
 			TimeAssignmentDef assignment = this.timetable.GetAssignment (hour);
-			GUI.DrawTexture (rect, assignment.ColorTexture);
+			GUI.DrawTexture (rect, assignment.get_ColorTexture ());
 			if (Mouse.IsOver (rect)) {
 				Widgets.DrawBox (rect, 2);
 				bool flag = false;
@@ -10416,7 +12318,7 @@ namespace EdB.Interface
 		{
 			rect = GenUI.ContractedBy (rect, 1);
 			TimeAssignmentDef assignment = p.timetable.GetAssignment (hour);
-			GUI.DrawTexture (rect, assignment.ColorTexture);
+			GUI.DrawTexture (rect, assignment.get_ColorTexture ());
 			if (Mouse.IsOver (rect)) {
 				Widgets.DrawBox (rect, 2);
 				if (assignment != this.selectedAssignment && Input.GetMouseButton (0)) {
@@ -10429,43 +12331,43 @@ namespace EdB.Interface
 		public override void DoWindowContents (Rect fillRect)
 		{
 			base.DoWindowContents (fillRect);
-			Rect rect = new Rect (0, 0, fillRect.width, 65);
+			Rect rect = new Rect (0, 0, fillRect.get_width (), 65);
 			GUI.BeginGroup (rect);
-			Rect rect2 = new Rect (0, 0, 217, rect.height);
+			Rect rect2 = new Rect (0, 0, 217, rect.get_height ());
 			this.DrawTimeAssignmentSelectorGrid (rect2);
 			float num = 227;
-			Text.Font = GameFont.Tiny;
-			Text.Anchor = TextAnchor.LowerLeft;
+			Text.set_Font (0);
+			Text.set_Anchor (6);
 			for (int i = 0; i < 24; i++) {
-				Rect rect3 = new Rect (num + 4, 0, this.hourWidth, rect.height + 3);
+				Rect rect3 = new Rect (num + 4, 0, this.hourWidth, rect.get_height () + 3);
 				Widgets.Label (rect3, i.ToString ());
 				num += this.hourWidth;
 			}
 			num += 6;
-			Rect rect4 = new Rect (num, 0, rect.width - num - 16, Mathf.Round (rect.height / 2));
-			Text.Font = GameFont.Small;
+			Rect rect4 = new Rect (num, 0, rect.get_width () - num - 16, Mathf.Round (rect.get_height () / 2));
+			Text.set_Font (1);
 			if (Widgets.TextButton (rect4, Translator.Translate ("ManageAreas"), true, false)) {
-				Find.WindowStack.Add (new Dialog_ManageAreas ());
+				Find.get_WindowStack ().Add (new Dialog_ManageAreas ());
 			}
-			Text.Font = GameFont.Tiny;
-			Text.Anchor = TextAnchor.LowerCenter;
-			Rect rect5 = new Rect (num, 0, rect.width - num, rect.height + 3);
+			Text.set_Font (0);
+			Text.set_Anchor (7);
+			Rect rect5 = new Rect (num, 0, rect.get_width () - num, rect.get_height () + 3);
 			Widgets.Label (rect5, Translator.Translate ("AllowedArea"));
 			GUI.EndGroup ();
 			if (base.SquadFilteringEnabled) {
-				Text.Font = GameFont.Small;
-				Text.Anchor = TextAnchor.UpperLeft;
-				GUI.color = Color.white;
-				this.DrawSquadSelectionDropdown (new Rect (fillRect.x, fillRect.y + fillRect.height - MainTabWindow_PawnListWithSquads.FooterButtonHeight, MainTabWindow_PawnListWithSquads.SquadFilterButtonWidth, MainTabWindow_PawnListWithSquads.FooterButtonHeight));
+				Text.set_Font (1);
+				Text.set_Anchor (0);
+				GUI.set_color (Color.get_white ());
+				this.DrawSquadSelectionDropdown (new Rect (fillRect.get_x (), fillRect.get_y () + fillRect.get_height () - MainTabWindow_PawnListWithSquads.FooterButtonHeight, MainTabWindow_PawnListWithSquads.SquadFilterButtonWidth, MainTabWindow_PawnListWithSquads.FooterButtonHeight));
 			}
-			Text.Font = GameFont.Small;
-			Text.Anchor = TextAnchor.UpperLeft;
-			GUI.color = Color.white;
+			Text.set_Font (1);
+			Text.set_Anchor (0);
+			GUI.set_color (Color.get_white ());
 			float squadRowHeight = base.SquadRowHeight;
-			Rect rect6 = new Rect (0, rect.height + squadRowHeight, fillRect.width, fillRect.height - rect.height - base.PawnListScrollHeightReduction);
+			Rect rect6 = new Rect (0, rect.get_height () + squadRowHeight, fillRect.get_width (), fillRect.get_height () - rect.get_height () - base.PawnListScrollHeightReduction);
 			base.DrawRows (rect6);
 			if (base.SquadRowEnabled) {
-				this.DrawSquadRow (new Rect (0, rect.height, fillRect.width - 16, squadRowHeight));
+				this.DrawSquadRow (new Rect (0, rect.get_height (), fillRect.get_width () - 16, squadRowHeight));
 			}
 		}
 
@@ -10480,7 +12382,7 @@ namespace EdB.Interface
 			TooltipHandler.TipRegion (rect2, Translator.Translate ("Copy"));
 			if (this.clipboard != null) {
 				Rect rect3 = rect2;
-				rect3.x = rect2.xMax + 2;
+				rect3.set_x (rect2.get_xMax () + 2);
 				if (Widgets.ImageButton (rect3, TexButton.Paste)) {
 					this.PasteTo (p);
 					SoundStarter.PlayOneShotOnCamera (SoundDefOf.TickLow);
@@ -10488,16 +12390,16 @@ namespace EdB.Interface
 				TooltipHandler.TipRegion (rect3, Translator.Translate ("Paste"));
 			}
 			float num = 227;
-			this.hourWidth = 20.83333f;
+			this.hourWidth = 20.83333;
 			for (int i = 0; i < 24; i++) {
-				Rect rect4 = new Rect (num, 0, this.hourWidth, rect.height);
+				Rect rect4 = new Rect (num, 0, this.hourWidth, rect.get_height ());
 				this.DoTimeAssignment (rect4, p, i);
 				num += this.hourWidth;
 			}
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 			num += 6;
-			Rect rect5 = new Rect (num, 0, rect.width - num, rect.height);
-			AreaAllowedGUI.DoAllowedAreaSelectors (rect5, p, AllowedAreaMode.Humanlike);
+			Rect rect5 = new Rect (num, 0, rect.get_width () - num, rect.get_height ());
+			AreaAllowedGUI.DoAllowedAreaSelectors (rect5, p, 1);
 			GUI.EndGroup ();
 		}
 
@@ -10509,7 +12411,7 @@ namespace EdB.Interface
 			Rect rect2 = new Rect (175, 4, 24, 24);
 			if (this.clipboard != null) {
 				Rect rect3 = rect2;
-				rect3.x = rect2.xMax + 2;
+				rect3.set_x (rect2.get_xMax () + 2);
 				if (Widgets.ImageButton (rect3, TexButton.Paste)) {
 					foreach (Pawn current in this.pawns) {
 						this.PasteTo (current);
@@ -10519,56 +12421,56 @@ namespace EdB.Interface
 				TooltipHandler.TipRegion (rect3, Translator.Translate ("Paste"));
 			}
 			float num2 = 227;
-			this.hourWidth = 20.83333f;
+			this.hourWidth = 20.83333;
 			for (int i = 0; i < 24; i++) {
-				Rect rect4 = new Rect (num2, 0, this.hourWidth, rect.height - num);
+				Rect rect4 = new Rect (num2, 0, this.hourWidth, rect.get_height () - num);
 				this.DoTimeAssignment (rect4, i);
 				num2 += this.hourWidth;
 			}
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 			num2 += 6;
-			Rect rect5 = new Rect (num2, 0, rect.width - num2, rect.height - num);
-			AreaAllowedGUI.DoAllowedAreaSelectors (rect5, ref this.areaRestriction, AllowedAreaMode.Humanlike, this.pawns);
-			GUI.color = new Color (1, 1, 1, 0.2f);
-			Widgets.DrawLineHorizontal (0, 0, rect.width);
-			GUI.color = new Color (1, 1, 1, 0.35f);
-			Widgets.DrawLineHorizontal (0, base.SquadRowHeight - 3, rect.width);
-			Widgets.DrawLineHorizontal (0, base.SquadRowHeight - 2, rect.width);
-			Text.Font = GameFont.Small;
-			Text.Anchor = TextAnchor.MiddleLeft;
-			Text.WordWrap = false;
+			Rect rect5 = new Rect (num2, 0, rect.get_width () - num2, rect.get_height () - num);
+			AreaAllowedGUI.DoAllowedAreaSelectors (rect5, ref this.areaRestriction, 1, this.pawns);
+			GUI.set_color (new Color (1, 1, 1, 0.2));
+			Widgets.DrawLineHorizontal (0, 0, rect.get_width ());
+			GUI.set_color (new Color (1, 1, 1, 0.35));
+			Widgets.DrawLineHorizontal (0, base.SquadRowHeight - 3, rect.get_width ());
+			Widgets.DrawLineHorizontal (0, base.SquadRowHeight - 2, rect.get_width ());
+			Text.set_Font (1);
+			Text.set_Anchor (3);
+			Text.set_WordWrap (false);
 			Rect rect6 = new Rect (0, 0, 175, 30);
-			rect6.xMin = rect6.xMin + 15;
-			GUI.color = new Color (1, 1, 1, 1);
+			rect6.set_xMin (rect6.get_xMin () + 15);
+			GUI.set_color (new Color (1, 1, 1, 1));
 			if (base.SquadFilteringEnabled && SquadManager.Instance.SquadFilter != null) {
 				Widgets.Label (rect6, SquadManager.Instance.SquadFilter.Name);
 			}
 			else {
 				Widgets.Label (rect6, Translator.Translate ("EdB.Squads.AllColonistsSquadName"));
 			}
-			Text.Anchor = TextAnchor.UpperLeft;
-			Text.WordWrap = true;
-			GUI.color = Color.white;
+			Text.set_Anchor (0);
+			Text.set_WordWrap (true);
+			GUI.set_color (Color.get_white ());
 			GUI.EndGroup ();
 		}
 
 		private void DrawTimeAssignmentSelectorFor (Rect rect, TimeAssignmentDef ta)
 		{
 			rect = GenUI.ContractedBy (rect, 2);
-			GUI.DrawTexture (rect, ta.ColorTexture);
+			GUI.DrawTexture (rect, ta.get_ColorTexture ());
 			if (Widgets.InvisibleButton (rect)) {
 				this.selectedAssignment = ta;
 				SoundStarter.PlayOneShotOnCamera (SoundDefOf.TickHigh);
 			}
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 			if (Mouse.IsOver (rect)) {
 				Widgets.DrawHighlight (rect);
 			}
-			Text.Font = GameFont.Small;
-			Text.Anchor = TextAnchor.MiddleCenter;
-			GUI.color = Color.white;
-			Widgets.Label (rect, ta.LabelCap);
-			Text.Anchor = TextAnchor.UpperLeft;
+			Text.set_Font (1);
+			Text.set_Anchor (4);
+			GUI.set_color (Color.get_white ());
+			Widgets.Label (rect, ta.get_LabelCap ());
+			Text.set_Anchor (0);
 			if (this.selectedAssignment == ta) {
 				Widgets.DrawBox (rect, 2);
 			}
@@ -10576,17 +12478,17 @@ namespace EdB.Interface
 
 		private void DrawTimeAssignmentSelectorGrid (Rect rect)
 		{
-			rect.yMax = rect.yMax - 2;
+			rect.set_yMax (rect.get_yMax () - 2);
 			Rect rect2 = rect;
-			rect2.xMax = rect2.center.x;
-			rect2.yMax = rect2.center.y;
+			rect2.set_xMax (rect2.get_center ().x);
+			rect2.set_yMax (rect2.get_center ().y);
 			this.DrawTimeAssignmentSelectorFor (rect2, TimeAssignmentDefOf.Anything);
-			rect2.x = rect2.x + rect2.width;
+			rect2.set_x (rect2.get_x () + rect2.get_width ());
 			this.DrawTimeAssignmentSelectorFor (rect2, TimeAssignmentDefOf.Work);
-			rect2.y = rect2.y + rect2.height;
-			rect2.x = rect2.x - rect2.width;
+			rect2.set_y (rect2.get_y () + rect2.get_height ());
+			rect2.set_x (rect2.get_x () - rect2.get_width ());
 			this.DrawTimeAssignmentSelectorFor (rect2, TimeAssignmentDefOf.Joy);
-			rect2.x = rect2.x + rect2.width;
+			rect2.set_x (rect2.get_x () + rect2.get_width ());
 			this.DrawTimeAssignmentSelectorFor (rect2, TimeAssignmentDefOf.Sleep);
 		}
 
@@ -10607,20 +12509,32 @@ namespace EdB.Interface
 			this.clipboard = null;
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class MainTabWindow_Squads : MainTabWindow
 	{
+		//
+		// Static Fields
+		//
 		public static Texture2D ButtonTexReorderUp;
 
-		public static readonly Rect SquadOrderMoveUpButtonRect = new Rect (MainTabWindow_Squads.SquadOrderMoveToTopButtonRect.x, MainTabWindow_Squads.SquadOrderMoveToTopButtonRect.y + MainTabWindow_Squads.SquadOrderMoveToTopButtonRect.height + MainTabWindow_Squads.OrderButtonMargin.y, MainTabWindow_Squads.OrderButtonSize.x, MainTabWindow_Squads.OrderButtonSize.y);
+		public static readonly Rect SquadOrderMoveUpButtonRect = new Rect (MainTabWindow_Squads.SquadOrderMoveToTopButtonRect.get_x (), MainTabWindow_Squads.SquadOrderMoveToTopButtonRect.get_y () + MainTabWindow_Squads.SquadOrderMoveToTopButtonRect.get_height () + MainTabWindow_Squads.OrderButtonMargin.y, MainTabWindow_Squads.OrderButtonSize.x, MainTabWindow_Squads.OrderButtonSize.y);
 
-		public static readonly Rect SquadOrderMoveToTopButtonRect = new Rect (MainTabWindow_Squads.SquadListRect.x + MainTabWindow_Squads.SquadListRect.width + MainTabWindow_Squads.OrderButtonMargin.x, MainTabWindow_Squads.SquadListRect.y, MainTabWindow_Squads.OrderButtonSize.x, MainTabWindow_Squads.OrderButtonSize.y);
+		public static readonly Rect SquadOrderMoveToTopButtonRect = new Rect (MainTabWindow_Squads.SquadListRect.get_x () + MainTabWindow_Squads.SquadListRect.get_width () + MainTabWindow_Squads.OrderButtonMargin.x, MainTabWindow_Squads.SquadListRect.get_y (), MainTabWindow_Squads.OrderButtonSize.x, MainTabWindow_Squads.OrderButtonSize.y);
 
-		public static readonly Rect DeleteSquadButtonRect = new Rect (MainTabWindow_Squads.NewSquadButtonRect.x + MainTabWindow_Squads.NewSquadButtonRect.width + MainTabWindow_Squads.SquadListMargin.x, MainTabWindow_Squads.NewSquadButtonRect.y, MainTabWindow_Squads.SquadListActionButtonSize.x, MainTabWindow_Squads.SquadListActionButtonSize.y);
+		public static readonly Rect DeleteSquadButtonRect = new Rect (MainTabWindow_Squads.NewSquadButtonRect.get_x () + MainTabWindow_Squads.NewSquadButtonRect.get_width () + MainTabWindow_Squads.SquadListMargin.x, MainTabWindow_Squads.NewSquadButtonRect.get_y (), MainTabWindow_Squads.SquadListActionButtonSize.x, MainTabWindow_Squads.SquadListActionButtonSize.y);
 
-		public static readonly Rect NewSquadButtonRect = new Rect (MainTabWindow_Squads.SquadListRect.x, MainTabWindow_Squads.SquadListRect.y + MainTabWindow_Squads.SquadListRect.height + MainTabWindow_Squads.SquadListMargin.y, MainTabWindow_Squads.SquadListActionButtonSize.x, MainTabWindow_Squads.SquadListActionButtonSize.y);
+		public static readonly Rect NewSquadButtonRect = new Rect (MainTabWindow_Squads.SquadListRect.get_x (), MainTabWindow_Squads.SquadListRect.get_y () + MainTabWindow_Squads.SquadListRect.get_height () + MainTabWindow_Squads.SquadListMargin.y, MainTabWindow_Squads.SquadListActionButtonSize.x, MainTabWindow_Squads.SquadListActionButtonSize.y);
 
-		public static readonly Vector2 SquadListActionButtonSize = new Vector2 ((MainTabWindow_Squads.SquadListRect.width - MainTabWindow_Squads.SquadListMargin.x) / 2, 40);
+		public static readonly Vector2 SquadListActionButtonSize = new Vector2 ((MainTabWindow_Squads.SquadListRect.get_width () - MainTabWindow_Squads.SquadListMargin.x) / 2, 40);
 
 		public static readonly Vector2 SquadListMargin = new Vector2 (16, 10);
 
@@ -10636,51 +12550,51 @@ namespace EdB.Interface
 
 		public static readonly Rect SquadListRect = new Rect (22, 70, 230, 514);
 
-		public static readonly Rect SquadOrderMoveToBottomButtonRect = new Rect (MainTabWindow_Squads.SquadOrderMoveToTopButtonRect.x, MainTabWindow_Squads.SquadListRect.y + MainTabWindow_Squads.SquadListRect.height - MainTabWindow_Squads.OrderButtonSize.y, MainTabWindow_Squads.OrderButtonSize.x, MainTabWindow_Squads.OrderButtonSize.y);
+		public static readonly Rect SquadOrderMoveToBottomButtonRect = new Rect (MainTabWindow_Squads.SquadOrderMoveToTopButtonRect.get_x (), MainTabWindow_Squads.SquadListRect.get_y () + MainTabWindow_Squads.SquadListRect.get_height () - MainTabWindow_Squads.OrderButtonSize.y, MainTabWindow_Squads.OrderButtonSize.x, MainTabWindow_Squads.OrderButtonSize.y);
 
-		public static readonly Rect MemberOrderMoveToTopButtonRect = new Rect (MainTabWindow_Squads.MemberListRect.x + MainTabWindow_Squads.MemberListRect.width + MainTabWindow_Squads.OrderButtonMargin.x, MainTabWindow_Squads.MemberListRect.y, MainTabWindow_Squads.OrderButtonSize.x, MainTabWindow_Squads.OrderButtonSize.y);
+		public static readonly Rect MemberOrderMoveToTopButtonRect = new Rect (MainTabWindow_Squads.MemberListRect.get_x () + MainTabWindow_Squads.MemberListRect.get_width () + MainTabWindow_Squads.OrderButtonMargin.x, MainTabWindow_Squads.MemberListRect.get_y (), MainTabWindow_Squads.OrderButtonSize.x, MainTabWindow_Squads.OrderButtonSize.y);
 
-		public static readonly Rect MemberOrderMoveUpButtonRect = new Rect (MainTabWindow_Squads.MemberOrderMoveToTopButtonRect.x, MainTabWindow_Squads.MemberOrderMoveToTopButtonRect.y + MainTabWindow_Squads.MemberOrderMoveToTopButtonRect.height + MainTabWindow_Squads.OrderButtonMargin.y, MainTabWindow_Squads.OrderButtonSize.x, MainTabWindow_Squads.OrderButtonSize.y);
+		public static readonly Rect MemberOrderMoveUpButtonRect = new Rect (MainTabWindow_Squads.MemberOrderMoveToTopButtonRect.get_x (), MainTabWindow_Squads.MemberOrderMoveToTopButtonRect.get_y () + MainTabWindow_Squads.MemberOrderMoveToTopButtonRect.get_height () + MainTabWindow_Squads.OrderButtonMargin.y, MainTabWindow_Squads.OrderButtonSize.x, MainTabWindow_Squads.OrderButtonSize.y);
 
-		public static readonly Rect MemberOrderMoveDownButtonRect = new Rect (MainTabWindow_Squads.MemberOrderMoveToTopButtonRect.x, MainTabWindow_Squads.MemberListRect.y + MainTabWindow_Squads.MemberListRect.height - MainTabWindow_Squads.OrderButtonSize.y, MainTabWindow_Squads.OrderButtonSize.x, MainTabWindow_Squads.OrderButtonSize.y);
+		public static readonly Rect MemberOrderMoveDownButtonRect = new Rect (MainTabWindow_Squads.MemberOrderMoveToTopButtonRect.get_x (), MainTabWindow_Squads.MemberListRect.get_y () + MainTabWindow_Squads.MemberListRect.get_height () - MainTabWindow_Squads.OrderButtonSize.y, MainTabWindow_Squads.OrderButtonSize.x, MainTabWindow_Squads.OrderButtonSize.y);
 
-		public static readonly Rect MemberOrderMoveToBottomButtonRect = new Rect (MainTabWindow_Squads.MemberOrderMoveToTopButtonRect.x, MainTabWindow_Squads.MemberOrderMoveDownButtonRect.y - MainTabWindow_Squads.OrderButtonMargin.y - MainTabWindow_Squads.OrderButtonSize.y, MainTabWindow_Squads.OrderButtonSize.x, MainTabWindow_Squads.OrderButtonSize.y);
+		public static readonly Rect MemberOrderMoveToBottomButtonRect = new Rect (MainTabWindow_Squads.MemberOrderMoveToTopButtonRect.get_x (), MainTabWindow_Squads.MemberOrderMoveDownButtonRect.get_y () - MainTabWindow_Squads.OrderButtonMargin.y - MainTabWindow_Squads.OrderButtonSize.y, MainTabWindow_Squads.OrderButtonSize.x, MainTabWindow_Squads.OrderButtonSize.y);
 
 		public static readonly Rect SquadHeaderRect = new Rect (MainTabWindow_Squads.SquadContentMargin.x, MainTabWindow_Squads.SquadContentMargin.y, 240, 30);
 
-		public static readonly Rect MemberCountRect = new Rect (MainTabWindow_Squads.SquadHeaderRect.x, MainTabWindow_Squads.SquadHeaderRect.y + 23, 200, 28);
+		public static readonly Rect MemberCountRect = new Rect (MainTabWindow_Squads.SquadHeaderRect.get_x (), MainTabWindow_Squads.SquadHeaderRect.get_y () + 23, 200, 28);
 
-		public static readonly Rect DeleteMemberButtonRect = new Rect (MainTabWindow_Squads.AddMemberButtonRect.x, MainTabWindow_Squads.AvailableListRect.y + MainTabWindow_Squads.AvailableListRect.height - MainTabWindow_Squads.MemberActionButtonSize.y, MainTabWindow_Squads.MemberActionButtonSize.x, MainTabWindow_Squads.MemberActionButtonSize.y);
+		public static readonly Rect DeleteMemberButtonRect = new Rect (MainTabWindow_Squads.AddMemberButtonRect.get_x (), MainTabWindow_Squads.AvailableListRect.get_y () + MainTabWindow_Squads.AvailableListRect.get_height () - MainTabWindow_Squads.MemberActionButtonSize.y, MainTabWindow_Squads.MemberActionButtonSize.x, MainTabWindow_Squads.MemberActionButtonSize.y);
 
-		public static readonly Rect SquadOrderMoveDownButtonRect = new Rect (MainTabWindow_Squads.SquadOrderMoveToTopButtonRect.x, MainTabWindow_Squads.SquadOrderMoveToBottomButtonRect.y - MainTabWindow_Squads.OrderButtonMargin.y - MainTabWindow_Squads.OrderButtonSize.y, MainTabWindow_Squads.OrderButtonSize.x, MainTabWindow_Squads.OrderButtonSize.y);
+		public static readonly Rect SquadOrderMoveDownButtonRect = new Rect (MainTabWindow_Squads.SquadOrderMoveToTopButtonRect.get_x (), MainTabWindow_Squads.SquadOrderMoveToBottomButtonRect.get_y () - MainTabWindow_Squads.OrderButtonMargin.y - MainTabWindow_Squads.OrderButtonSize.y, MainTabWindow_Squads.OrderButtonSize.x, MainTabWindow_Squads.OrderButtonSize.y);
 
 		public static readonly Rect SquadContentRect = new Rect (306, 56, 680, 582);
 
 		public static readonly Rect AvailableListRect = new Rect (MainTabWindow_Squads.SquadContentMargin.x, 118, 232, 442);
 
-		public static readonly Rect MemberListRect = new Rect (MainTabWindow_Squads.AvailableListRect.x + MainTabWindow_Squads.MemberActionButtonMargin.x * 2 + MainTabWindow_Squads.MemberActionButtonSize.x + MainTabWindow_Squads.AvailableListRect.width, MainTabWindow_Squads.AvailableListRect.y, MainTabWindow_Squads.AvailableListRect.width, MainTabWindow_Squads.AvailableListRect.height);
+		public static readonly Rect MemberListRect = new Rect (MainTabWindow_Squads.AvailableListRect.get_x () + MainTabWindow_Squads.MemberActionButtonMargin.x * 2 + MainTabWindow_Squads.MemberActionButtonSize.x + MainTabWindow_Squads.AvailableListRect.get_width (), MainTabWindow_Squads.AvailableListRect.get_y (), MainTabWindow_Squads.AvailableListRect.get_width (), MainTabWindow_Squads.AvailableListRect.get_height ());
 
-		public static readonly Rect AddMemberButtonRect = new Rect (MainTabWindow_Squads.AvailableListRect.x + MainTabWindow_Squads.AvailableListRect.width + MainTabWindow_Squads.MemberActionButtonMargin.x, MainTabWindow_Squads.AvailableListRect.y + MainTabWindow_Squads.AvailableListRect.height / 2 - (MainTabWindow_Squads.MemberActionButtonSize.y + MainTabWindow_Squads.MemberActionButtonMargin.y / 2), MainTabWindow_Squads.MemberActionButtonSize.x, MainTabWindow_Squads.MemberActionButtonSize.y);
+		public static readonly Rect AddMemberButtonRect = new Rect (MainTabWindow_Squads.AvailableListRect.get_x () + MainTabWindow_Squads.AvailableListRect.get_width () + MainTabWindow_Squads.MemberActionButtonMargin.x, MainTabWindow_Squads.AvailableListRect.get_y () + MainTabWindow_Squads.AvailableListRect.get_height () / 2 - (MainTabWindow_Squads.MemberActionButtonSize.y + MainTabWindow_Squads.MemberActionButtonMargin.y / 2), MainTabWindow_Squads.MemberActionButtonSize.x, MainTabWindow_Squads.MemberActionButtonSize.y);
 
-		public static readonly Rect RemoveMemberButtonRect = new Rect (MainTabWindow_Squads.AddMemberButtonRect.x, MainTabWindow_Squads.AddMemberButtonRect.y + MainTabWindow_Squads.AddMemberButtonRect.height + MainTabWindow_Squads.MemberActionButtonMargin.y, MainTabWindow_Squads.MemberActionButtonSize.x, MainTabWindow_Squads.MemberActionButtonSize.y);
+		public static readonly Rect RemoveMemberButtonRect = new Rect (MainTabWindow_Squads.AddMemberButtonRect.get_x (), MainTabWindow_Squads.AddMemberButtonRect.get_y () + MainTabWindow_Squads.AddMemberButtonRect.get_height () + MainTabWindow_Squads.MemberActionButtonMargin.y, MainTabWindow_Squads.MemberActionButtonSize.x, MainTabWindow_Squads.MemberActionButtonSize.y);
 
 		public static Texture2D ButtonTexReorderDown;
 
-		protected static Color ListHeaderColor = new Color (0.8f, 0.8f, 0.8f);
+		protected static Color ListHeaderColor = new Color (0.8, 0.8, 0.8);
 
-		protected static Color ListTextColor = new Color (0.7216f, 0.7647f, 0.902f);
+		protected static Color ListTextColor = new Color (0.7216, 0.7647, 0.902);
 
-		protected static Color SelectedRowColor = new Color (0.2588f, 0.2588f, 0.2588f);
+		protected static Color SelectedRowColor = new Color (0.2588, 0.2588, 0.2588);
 
-		protected static Color SelectedTextColor = new Color (0.902f, 0.8314f, 0);
+		protected static Color SelectedTextColor = new Color (0.902, 0.8314, 0);
 
-		protected static Color AlternateRowColor = new Color (0.1095f, 0.125f, 0.1406f);
+		protected static Color AlternateRowColor = new Color (0.1095, 0.125, 0.1406);
 
-		protected static Color ArrowButtonColor = new Color (0.9137f, 0.9137f, 0.9137f);
+		protected static Color ArrowButtonColor = new Color (0.9137, 0.9137, 0.9137);
 
-		protected static Color ArrowButtonHighlightColor = Color.white;
+		protected static Color ArrowButtonHighlightColor = Color.get_white ();
 
-		protected static Color InactiveButtonColor = new Color (1, 1, 1, 0.5f);
+		protected static Color InactiveButtonColor = new Color (1, 1, 1, 0.5);
 
 		public static Texture2D BackgroundColorTexture;
 
@@ -10690,6 +12604,9 @@ namespace EdB.Interface
 
 		public static Texture2D ButtonTexReorderTop;
 
+		//
+		// Fields
+		//
 		private ListWidget<Squad, ListWidgetLabelDrawer<Squad>> squadListWidget;
 
 		private HashSet<TrackedColonist> tempSelectedMembers = new HashSet<TrackedColonist> ();
@@ -10742,6 +12659,9 @@ namespace EdB.Interface
 
 		private bool addMembersButtonEnabled;
 
+		//
+		// Properties
+		//
 		public override Vector2 RequestedTabSize {
 			get {
 				return new Vector2 (1010, 684);
@@ -10760,6 +12680,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public MainTabWindow_Squads ()
 		{
 			this.squadListWidget = new ListWidget<Squad, ListWidgetLabelDrawer<Squad>> (new ListWidgetLabelDrawer<Squad> ((Squad s) => s.Name));
@@ -10767,13 +12690,16 @@ namespace EdB.Interface
 			this.availableColonistsWidget = new ListWidget<TrackedColonist, ColonistRowDrawer> (new ColonistRowDrawer ());
 			this.availableColonistsWidget.SupportsMultiSelect = true;
 			this.availableColonistsWidget.MultiSelectionChangedEvent += new ListWidgetMultiSelectionChangedHandler<TrackedColonist> (this.SelectAvailableColonists);
-			this.availableColonistsWidget.BackgroundColor = new Color (0.0664f, 0.082f, 0.0938f);
+			this.availableColonistsWidget.BackgroundColor = new Color (0.0664, 0.082, 0.0938);
 			this.squadMembersWidget = new ListWidget<TrackedColonist, ColonistRowDrawer> (new ColonistRowDrawer ());
 			this.squadMembersWidget.SupportsMultiSelect = true;
 			this.squadMembersWidget.MultiSelectionChangedEvent += new ListWidgetMultiSelectionChangedHandler<TrackedColonist> (this.SelectSquadMembers);
-			this.squadMembersWidget.BackgroundColor = new Color (0.0664f, 0.082f, 0.0938f);
+			this.squadMembersWidget.BackgroundColor = new Color (0.0664, 0.082, 0.0938);
 		}
 
+		//
+		// Static Methods
+		//
 		public static void ResetTextures ()
 		{
 			MainTabWindow_Squads.ButtonTexReorderUp = ContentFinder<Texture2D>.Get ("EdB/Interface/Squads/ArrowUp", true);
@@ -10781,9 +12707,12 @@ namespace EdB.Interface
 			MainTabWindow_Squads.ButtonTexReorderTop = ContentFinder<Texture2D>.Get ("EdB/Interface/Squads/ArrowTop", true);
 			MainTabWindow_Squads.ButtonTexReorderBottom = ContentFinder<Texture2D>.Get ("EdB/Interface/Squads/ArrowBottom", true);
 			MainTabWindow_Squads.RenameSquadButton = ContentFinder<Texture2D>.Get ("UI/Buttons/Rename", true);
-			MainTabWindow_Squads.BackgroundColorTexture = SolidColorMaterials.NewSolidColorTexture (new Color (0.0508f, 0.0664f, 0.0742f));
+			MainTabWindow_Squads.BackgroundColorTexture = SolidColorMaterials.NewSolidColorTexture (new Color (0.0508, 0.0664, 0.0742));
 		}
 
+		//
+		// Methods
+		//
 		protected void AddSelectedMembers ()
 		{
 			this.tempColonists.Clear ();
@@ -10848,7 +12777,7 @@ namespace EdB.Interface
 
 		protected void DeleteSquad ()
 		{
-			Find.WindowStack.Add (new Dialog_Confirm (Translator.Translate ("EdB.Squads.Window.DeleteSquad.Confirm"), delegate {
+			Find.get_WindowStack ().Add (new Dialog_Confirm (Translator.Translate ("EdB.Squads.Window.DeleteSquad.Confirm"), delegate {
 				int num = this.squadListWidget.SelectedIndices [0];
 				this.squadManager.RemoveSquad (this.selectedSquad);
 				if (num >= this.squadManager.Squads.Count) {
@@ -10863,20 +12792,20 @@ namespace EdB.Interface
 		public override void DoWindowContents (Rect inRect)
 		{
 			base.DoWindowContents (inRect);
-			Text.Font = GameFont.Small;
-			Rect rect = new Rect (0, 0, inRect.width, 40);
-			Text.Font = GameFont.Medium;
-			Text.Anchor = TextAnchor.MiddleCenter;
+			Text.set_Font (1);
+			Rect rect = new Rect (0, 0, inRect.get_width (), 40);
+			Text.set_Font (2);
+			Text.set_Anchor (4);
 			Widgets.Label (rect, Translator.Translate ("EdB.Squads.Window.Header"));
-			Text.Anchor = TextAnchor.UpperLeft;
-			Text.Font = GameFont.Small;
-			Text.Font = GameFont.Tiny;
-			Text.Anchor = TextAnchor.LowerLeft;
-			GUI.color = MainTabWindow_Squads.ListHeaderColor;
-			Widgets.Label (new Rect (MainTabWindow_Squads.SquadListRect.x, MainTabWindow_Squads.SquadListRect.y - 23, 225, 30), Translator.Translate ("EdB.Squads.Window.SquadList.Header"));
-			Text.Anchor = TextAnchor.UpperLeft;
-			GUI.color = Color.white;
-			Text.Font = GameFont.Small;
+			Text.set_Anchor (0);
+			Text.set_Font (1);
+			Text.set_Font (0);
+			Text.set_Anchor (6);
+			GUI.set_color (MainTabWindow_Squads.ListHeaderColor);
+			Widgets.Label (new Rect (MainTabWindow_Squads.SquadListRect.get_x (), MainTabWindow_Squads.SquadListRect.get_y () - 23, 225, 30), Translator.Translate ("EdB.Squads.Window.SquadList.Header"));
+			Text.set_Anchor (0);
+			GUI.set_color (Color.get_white ());
+			Text.set_Font (1);
 			this.squadListWidget.DrawWidget (MainTabWindow_Squads.SquadListRect);
 			this.EnableSquadReorderButtons ();
 			if (Button.IconButton (MainTabWindow_Squads.SquadOrderMoveToTopButtonRect, MainTabWindow_Squads.ButtonTexReorderTop, MainTabWindow_Squads.ArrowButtonColor, MainTabWindow_Squads.ArrowButtonHighlightColor, this.moveSquadToTopButtonEnabled)) {
@@ -10891,7 +12820,7 @@ namespace EdB.Interface
 			if (Button.IconButton (MainTabWindow_Squads.SquadOrderMoveToBottomButtonRect, MainTabWindow_Squads.ButtonTexReorderBottom, MainTabWindow_Squads.ArrowButtonColor, MainTabWindow_Squads.ArrowButtonHighlightColor, this.moveSquadToBottomButtonEnabled)) {
 				this.MoveSelectedSquadToBottom ();
 			}
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 			if (Widgets.TextButton (MainTabWindow_Squads.NewSquadButtonRect, Translator.Translate ("EdB.Squads.Window.NewSquad.Button"), true, false)) {
 				this.NewSquad ();
 			}
@@ -10902,10 +12831,10 @@ namespace EdB.Interface
 			GUI.DrawTexture (MainTabWindow_Squads.SquadContentRect, MainTabWindow_Squads.BackgroundColorTexture);
 			try {
 				GUI.BeginGroup (MainTabWindow_Squads.SquadContentRect);
-				Text.Font = GameFont.Medium;
+				Text.set_Font (2);
 				Widgets.Label (MainTabWindow_Squads.SquadHeaderRect, this.selectedSquad.Name);
 				Vector2 vector = Text.CalcSize (this.selectedSquad.Name);
-				Text.Font = GameFont.Small;
+				Text.set_Font (1);
 				int count = this.selectedSquad.Pawns.Count;
 				string text;
 				if (count == 0) {
@@ -10919,21 +12848,21 @@ namespace EdB.Interface
 						count
 					});
 				}
-				GUI.color = MainTabWindow_Squads.ListHeaderColor;
+				GUI.set_color (MainTabWindow_Squads.ListHeaderColor);
 				Widgets.Label (MainTabWindow_Squads.MemberCountRect, text);
-				GUI.color = Color.white;
-				Rect rect2 = new Rect (MainTabWindow_Squads.SquadHeaderRect.x + vector.x + 8, MainTabWindow_Squads.SquadHeaderRect.y - 3, 30, 30);
+				GUI.set_color (Color.get_white ());
+				Rect rect2 = new Rect (MainTabWindow_Squads.SquadHeaderRect.get_x () + vector.x + 8, MainTabWindow_Squads.SquadHeaderRect.get_y () - 3, 30, 30);
 				if (this.selectedSquad != this.squadManager.AllColonistsSquad) {
 					TooltipHandler.TipRegion (rect2, new TipSignal (Translator.Translate ("EdB.Squads.Window.RenameSquad.Button.Tip")));
 					if (Widgets.ImageButton (rect2, MainTabWindow_Squads.RenameSquadButton)) {
-						Find.WindowStack.Add (new Dialog_NameSquad (this.selectedSquad, false));
+						Find.get_WindowStack ().Add (new Dialog_NameSquad (this.selectedSquad, false));
 					}
 				}
 				else {
 					TooltipHandler.TipRegion (rect2, new TipSignal (Translator.Translate ("EdB.Squads.Window.RenameSquad.Disabled.Tip")));
-					GUI.color = new Color (1, 1, 1, 0.5f);
+					GUI.set_color (new Color (1, 1, 1, 0.5));
 					GUI.DrawTexture (rect2, MainTabWindow_Squads.RenameSquadButton);
-					GUI.color = Color.white;
+					GUI.set_color (Color.get_white ());
 				}
 				string text2 = Translator.Translate ("EdB.Squads.Window.SquadOption.ShowInBar");
 				string text3 = Translator.Translate ("EdB.Squads.Window.SquadOption.ShowInFilters");
@@ -10942,26 +12871,26 @@ namespace EdB.Interface
 				Vector2 vector4 = new Vector2 (Math.Max (vector2.x, vector3.x), 28);
 				vector4.x += 48;
 				float num = 0;
-				Rect rect3 = new Rect (MainTabWindow_Squads.SquadContentRect.width - MainTabWindow_Squads.SquadContentMargin.x - vector4.x, MainTabWindow_Squads.SquadContentMargin.y, vector4.x, vector4.y);
+				Rect rect3 = new Rect (MainTabWindow_Squads.SquadContentRect.get_width () - MainTabWindow_Squads.SquadContentMargin.x - vector4.x, MainTabWindow_Squads.SquadContentMargin.y, vector4.x, vector4.y);
 				bool showInColonistBar = this.selectedSquad.ShowInColonistBar;
 				bool flag = false;
 				Widgets.LabelCheckbox (rect3, text2, ref showInColonistBar, flag);
 				this.squadManager.ShowSquadInColonistBar (this.selectedSquad, showInColonistBar);
-				Rect rect4 = new Rect (MainTabWindow_Squads.SquadContentRect.width - MainTabWindow_Squads.SquadContentMargin.x - vector4.x, rect3.y + vector4.y + num, vector4.x, vector4.y);
+				Rect rect4 = new Rect (MainTabWindow_Squads.SquadContentRect.get_width () - MainTabWindow_Squads.SquadContentMargin.x - vector4.x, rect3.get_y () + vector4.y + num, vector4.x, vector4.y);
 				bool showInOverviewTabs = this.selectedSquad.ShowInOverviewTabs;
 				flag = false;
 				Widgets.LabelCheckbox (rect4, text3, ref showInOverviewTabs, flag);
 				if (!flag) {
 					this.selectedSquad.ShowInOverviewTabs = showInOverviewTabs;
 				}
-				Text.Font = GameFont.Tiny;
-				Text.Anchor = TextAnchor.LowerLeft;
-				GUI.color = MainTabWindow_Squads.ListHeaderColor;
-				Widgets.Label (new Rect (MainTabWindow_Squads.AvailableListRect.x, MainTabWindow_Squads.AvailableListRect.y - 23, 210, 30), Translator.Translate ("EdB.Squads.Window.AvailableList.Header"));
-				Widgets.Label (new Rect (MainTabWindow_Squads.MemberListRect.x, MainTabWindow_Squads.MemberListRect.y - 23, 210, 30), Translator.Translate ("EdB.Squads.Window.MemberList.Header"));
-				GUI.color = Color.white;
-				Text.Anchor = TextAnchor.UpperLeft;
-				Text.Font = GameFont.Small;
+				Text.set_Font (0);
+				Text.set_Anchor (6);
+				GUI.set_color (MainTabWindow_Squads.ListHeaderColor);
+				Widgets.Label (new Rect (MainTabWindow_Squads.AvailableListRect.get_x (), MainTabWindow_Squads.AvailableListRect.get_y () - 23, 210, 30), Translator.Translate ("EdB.Squads.Window.AvailableList.Header"));
+				Widgets.Label (new Rect (MainTabWindow_Squads.MemberListRect.get_x (), MainTabWindow_Squads.MemberListRect.get_y () - 23, 210, 30), Translator.Translate ("EdB.Squads.Window.MemberList.Header"));
+				GUI.set_color (Color.get_white ());
+				Text.set_Anchor (0);
+				Text.set_Font (1);
 				this.availableColonistsWidget.DrawWidget (MainTabWindow_Squads.AvailableListRect);
 				this.squadMembersWidget.DrawWidget (MainTabWindow_Squads.MemberListRect);
 				if (Button.TextButton (MainTabWindow_Squads.AddMemberButtonRect, Translator.Translate ("EdB.Squads.Window.AddSquadMember.Button"), true, false, this.addMembersButtonEnabled)) {
@@ -10999,7 +12928,7 @@ namespace EdB.Interface
 			}
 			finally {
 				GUI.EndGroup ();
-				GUI.color = Color.white;
+				GUI.set_color (Color.get_white ());
 			}
 		}
 
@@ -11254,7 +13183,7 @@ namespace EdB.Interface
 			this.squadListWidget.ResetItems (this.squadManager.Squads);
 			this.squadListWidget.Select (squad);
 			this.SelectSquad (squad);
-			Find.WindowStack.Add (new Dialog_NameSquad (squad, true));
+			Find.get_WindowStack ().Add (new Dialog_NameSquad (squad, true));
 			this.ResetVisibleSquadCount ();
 		}
 
@@ -11431,19 +13360,36 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class MainTabWindow_Work : MainTabWindow_PawnListWithSquads
 	{
+		//
+		// Static Fields
+		//
 		private const float TopAreaHeight = 40;
 
 		protected const float LabelRowHeight = 50;
 
 		private static List<WorkTypeDef> VisibleWorkTypeDefsInPriorityOrder;
 
+		//
+		// Fields
+		//
 		private float workColumnSpacing = -1;
 
 		protected SquadPriorities squadPriorities = new SquadPriorities ();
 
+		//
+		// Properties
+		//
 		public override Vector2 RequestedTabSize {
 			get {
 				return new Vector2 (1010, this.WindowHeight);
@@ -11452,52 +13398,58 @@ namespace EdB.Interface
 
 		protected override float WindowHeight {
 			get {
-				return 90 + (float)base.PawnsCount * 30 + 65 + base.ExtraHeight;
+				return 90 + (float)base.get_PawnsCount () * 30 + 65 + base.ExtraHeight;
 			}
 		}
 
+		//
+		// Static Methods
+		//
 		public static void Reinit ()
 		{
-			MainTabWindow_Work.VisibleWorkTypeDefsInPriorityOrder = (from def in WorkTypeDefsUtility.WorkTypeDefsInPriorityOrder
+			MainTabWindow_Work.VisibleWorkTypeDefsInPriorityOrder = (from def in WorkTypeDefsUtility.get_WorkTypeDefsInPriorityOrder ()
 			where def.visible
 			select def).ToList<WorkTypeDef> ();
 		}
 
+		//
+		// Methods
+		//
 		public override void DoWindowContents (Rect rect)
 		{
 			base.DoWindowContents (rect);
-			Rect rect2 = new Rect (0, 0, rect.width, 40);
+			Rect rect2 = new Rect (0, 0, rect.get_width (), 40);
 			GUI.BeginGroup (rect2);
-			Text.Font = GameFont.Small;
-			GUI.color = Color.white;
-			Text.Anchor = TextAnchor.UpperLeft;
+			Text.set_Font (1);
+			GUI.set_color (Color.get_white ());
+			Text.set_Anchor (0);
 			Rect rect3 = new Rect (5, 5, 140, 30);
-			bool useWorkPriorities = Find.Map.playSettings.useWorkPriorities;
-			Widgets.LabelCheckbox (rect3, Translator.Translate ("ManualPriorities"), ref Find.Map.playSettings.useWorkPriorities, false);
-			if (useWorkPriorities != Find.Map.playSettings.useWorkPriorities) {
-				foreach (Pawn current in Find.ListerPawns.FreeColonists) {
+			bool useWorkPriorities = Find.get_Map ().playSettings.useWorkPriorities;
+			Widgets.LabelCheckbox (rect3, Translator.Translate ("ManualPriorities"), ref Find.get_Map ().playSettings.useWorkPriorities, false);
+			if (useWorkPriorities != Find.get_Map ().playSettings.useWorkPriorities) {
+				foreach (Pawn current in Find.get_ListerPawns ().get_FreeColonists ()) {
 					current.workSettings.Notify_UseWorkPrioritiesChanged ();
 				}
 			}
-			float num = rect2.width / 3;
-			float num2 = rect2.width * 2 / 3;
+			float num = rect2.get_width () / 3;
+			float num2 = rect2.get_width () * 2 / 3;
 			Rect rect4 = new Rect (num - 50, 5, 160, 30);
 			Rect rect5 = new Rect (num2 - 50, 5, 160, 30);
-			GUI.color = new Color (1, 1, 1, 0.5f);
-			Text.Anchor = TextAnchor.UpperCenter;
-			Text.Font = GameFont.Tiny;
+			GUI.set_color (new Color (1, 1, 1, 0.5));
+			Text.set_Anchor (1);
+			Text.set_Font (0);
 			Widgets.Label (rect4, "<= " + Translator.Translate ("HigherPriority"));
 			Widgets.Label (rect5, Translator.Translate ("LowerPriority") + " =>");
-			Text.Font = GameFont.Small;
-			Text.Anchor = TextAnchor.UpperLeft;
+			Text.set_Font (1);
+			Text.set_Anchor (0);
 			GUI.EndGroup ();
-			Rect rect6 = new Rect (0, 40, rect.width, rect.height - 40);
+			Rect rect6 = new Rect (0, 40, rect.get_width (), rect.get_height () - 40);
 			GUI.BeginGroup (rect6);
-			Text.Font = GameFont.Small;
-			GUI.color = Color.white;
+			Text.set_Font (1);
+			GUI.set_color (Color.get_white ());
 			float squadRowHeight = base.SquadRowHeight;
-			Rect rect7 = new Rect (0, 50 + squadRowHeight, rect6.width, rect6.height - 50 - base.PawnListScrollHeightReduction);
-			this.workColumnSpacing = (rect6.width - 16 - 175) / (float)MainTabWindow_Work.VisibleWorkTypeDefsInPriorityOrder.Count;
+			Rect rect7 = new Rect (0, 50 + squadRowHeight, rect6.get_width (), rect6.get_height () - 50 - base.PawnListScrollHeightReduction);
+			this.workColumnSpacing = (rect6.get_width () - 16 - 175) / (float)MainTabWindow_Work.VisibleWorkTypeDefsInPriorityOrder.Count;
 			float num3 = 175;
 			int num4 = 0;
 			foreach (WorkTypeDef current2 in MainTabWindow_Work.VisibleWorkTypeDefsInPriorityOrder) {
@@ -11505,42 +13457,44 @@ namespace EdB.Interface
 				float num5 = num3 + 15;
 				Rect rect8 = new Rect (num5 - vector.x / 2, 0, vector.x, vector.y);
 				if (num4 % 2 == 1) {
-					rect8.y = rect8.y + 20;
+					rect8.set_y (rect8.get_y () + 20);
 				}
 				if (Mouse.IsOver (rect8)) {
 					Widgets.DrawHighlight (rect8);
 				}
-				Text.Anchor = TextAnchor.MiddleCenter;
+				Text.set_Anchor (4);
 				Widgets.Label (rect8, current2.labelShort);
 				WorkTypeDef localDef = current2;
-				TooltipHandler.TipRegion (rect8, new TipSignal (() => localDef.gerundLabel + "\n\n" + localDef.description, localDef.GetHashCode ()));
-				GUI.color = new Color (1, 1, 1, 0.3f);
-				Widgets.DrawLineVertical (num5, rect8.yMax - 3, 50 - rect8.yMax + 3);
-				Widgets.DrawLineVertical (num5 + 1, rect8.yMax - 3, 50 - rect8.yMax + 3);
-				GUI.color = Color.white;
+				TooltipHandler.TipRegion (rect8, new TipSignal (() => localDef.gerundLabel + "
+
+" + localDef.description, localDef.GetHashCode ()));
+				GUI.set_color (new Color (1, 1, 1, 0.3));
+				Widgets.DrawLineVertical (num5, rect8.get_yMax () - 3, 50 - rect8.get_yMax () + 3);
+				Widgets.DrawLineVertical (num5 + 1, rect8.get_yMax () - 3, 50 - rect8.get_yMax () + 3);
+				GUI.set_color (Color.get_white ());
 				num3 += this.workColumnSpacing;
 				num4++;
 			}
 			base.DrawRows (rect7);
 			if (base.SquadRowEnabled) {
-				this.DrawSquadRow (new Rect (0, 50, rect6.width - 16, squadRowHeight));
+				this.DrawSquadRow (new Rect (0, 50, rect6.get_width () - 16, squadRowHeight));
 			}
 			GUI.EndGroup ();
 			if (base.SquadFilteringEnabled) {
-				Text.Font = GameFont.Small;
-				Text.Anchor = TextAnchor.UpperLeft;
-				GUI.color = Color.white;
-				this.DrawSquadSelectionDropdown (new Rect (rect.x, rect.y + rect.height - MainTabWindow_PawnListWithSquads.FooterButtonHeight, MainTabWindow_PawnListWithSquads.SquadFilterButtonWidth, MainTabWindow_PawnListWithSquads.FooterButtonHeight));
+				Text.set_Font (1);
+				Text.set_Anchor (0);
+				GUI.set_color (Color.get_white ());
+				this.DrawSquadSelectionDropdown (new Rect (rect.get_x (), rect.get_y () + rect.get_height () - MainTabWindow_PawnListWithSquads.FooterButtonHeight, MainTabWindow_PawnListWithSquads.SquadFilterButtonWidth, MainTabWindow_PawnListWithSquads.FooterButtonHeight));
 			}
 		}
 
 		protected override void DrawPawnRow (Rect rect, Pawn p)
 		{
 			float num = 175;
-			Text.Font = GameFont.Medium;
+			Text.set_Font (2);
 			for (int i = 0; i < MainTabWindow_Work.VisibleWorkTypeDefsInPriorityOrder.Count; i++) {
 				WorkTypeDef workTypeDef = MainTabWindow_Work.VisibleWorkTypeDefsInPriorityOrder [i];
-				Vector2 topLeft = new Vector2 (num, rect.y + 2.5f);
+				Vector2 topLeft = new Vector2 (num, rect.get_y () + 2.5);
 				WidgetsWork.DrawWorkBoxFor (topLeft, p, workTypeDef);
 				Rect rect2 = new Rect (topLeft.x, topLeft.y, 25, 25);
 				TooltipHandler.TipRegion (rect2, WidgetsWork.TipForPawnWorker (p, workTypeDef));
@@ -11552,34 +13506,34 @@ namespace EdB.Interface
 		{
 			GUI.DrawTexture (rect, MainTabWindow_PawnListWithSquads.SquadRowBackground);
 			float num = 175;
-			Text.Font = GameFont.Medium;
+			Text.set_Font (2);
 			for (int i = 0; i < MainTabWindow_Work.VisibleWorkTypeDefsInPriorityOrder.Count; i++) {
 				WorkTypeDef wType = MainTabWindow_Work.VisibleWorkTypeDefsInPriorityOrder [i];
-				Vector2 topLeft = new Vector2 (num, rect.y + 2.5f);
+				Vector2 topLeft = new Vector2 (num, rect.get_y () + 2.5);
 				WidgetsWork.DrawWorkBoxForSquad (topLeft, wType, this.squadPriorities, this.pawns);
 				num += this.workColumnSpacing;
 			}
 			GUI.BeginGroup (rect);
-			GUI.color = new Color (1, 1, 1, 0.2f);
-			Widgets.DrawLineHorizontal (0, 0, rect.width);
-			GUI.color = new Color (1, 1, 1, 0.35f);
-			Widgets.DrawLineHorizontal (0, base.SquadRowHeight - 3, rect.width);
-			Widgets.DrawLineHorizontal (0, base.SquadRowHeight - 2, rect.width);
-			Text.Font = GameFont.Small;
-			Text.Anchor = TextAnchor.MiddleLeft;
-			Text.WordWrap = false;
+			GUI.set_color (new Color (1, 1, 1, 0.2));
+			Widgets.DrawLineHorizontal (0, 0, rect.get_width ());
+			GUI.set_color (new Color (1, 1, 1, 0.35));
+			Widgets.DrawLineHorizontal (0, base.SquadRowHeight - 3, rect.get_width ());
+			Widgets.DrawLineHorizontal (0, base.SquadRowHeight - 2, rect.get_width ());
+			Text.set_Font (1);
+			Text.set_Anchor (3);
+			Text.set_WordWrap (false);
 			Rect rect2 = new Rect (0, 0, 175, 30);
-			rect2.xMin = rect2.xMin + 15;
-			GUI.color = new Color (1, 1, 1, 1);
+			rect2.set_xMin (rect2.get_xMin () + 15);
+			GUI.set_color (new Color (1, 1, 1, 1));
 			if (base.SquadFilteringEnabled && SquadManager.Instance.SquadFilter != null) {
 				Widgets.Label (rect2, SquadManager.Instance.SquadFilter.Name);
 			}
 			else {
 				Widgets.Label (rect2, Translator.Translate ("EdB.Squads.AllColonistsSquadName"));
 			}
-			Text.Anchor = TextAnchor.UpperLeft;
-			Text.WordWrap = true;
-			GUI.color = Color.white;
+			Text.set_Anchor (0);
+			Text.set_WordWrap (true);
+			GUI.set_color (Color.get_white ());
 			GUI.EndGroup ();
 		}
 
@@ -11590,9 +13544,17 @@ namespace EdB.Interface
 			this.squadPriorities.Reset ();
 		}
 	}
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class MapComponentsComponent : IRenderedComponent, INamedComponent
 	{
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "MapComponents";
@@ -11605,32 +13567,55 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI ()
 		{
-			for (int i = 0; i < Find.Map.components.Count; i++) {
-				Find.Map.components [i].MapComponentOnGUI ();
+			for (int i = 0; i < Find.get_Map ().components.Count; i++) {
+				Find.get_Map ().components [i].MapComponentOnGUI ();
 			}
 		}
 	}
+}
+using System;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class MaterialResolver
 	{
+		//
+		// Static Methods
+		//
 		public static TextureColorPair Resolve (Thing thing)
 		{
 			if (thing.def.apparel != null) {
-				return new TextureColorPair (thing.def.uiIcon, thing.DrawColor);
+				return new TextureColorPair (thing.def.uiIcon, thing.get_DrawColor ());
 			}
-			return new TextureColorPair (thing.def.uiIcon, thing.DrawColor);
+			return new TextureColorPair (thing.def.uiIcon, thing.get_DrawColor ());
 		}
 
 		public static TextureColorPair Resolve (ThingDef def)
 		{
-			return new TextureColorPair (def.uiIcon, Color.white);
+			return new TextureColorPair (def.uiIcon, Color.get_white ());
 		}
 	}
+}
+using RimWorld;
+using System;
+using UnityEngine;
+using Verse;
+using Verse.Sound;
 
+namespace EdB.Interface
+{
 	public static class MedicalCareUtility
 	{
+		//
+		// Static Fields
+		//
 		public const float CareSetterHeight = 28;
 
 		public static float ButtonPadding = 8;
@@ -11645,18 +13630,21 @@ namespace EdB.Interface
 
 		public static Texture2D HealthOptionActive = null;
 
+		//
+		// Static Methods
+		//
 		public static bool AllowsMedicine (this MedicalCareCategory cat, ThingDef meds)
 		{
 			switch (cat) {
-			case MedicalCareCategory.NoCare:
+			case 0:
 				return false;
-			case MedicalCareCategory.NoMeds:
+			case 1:
 				return false;
-			case MedicalCareCategory.HerbalOrWorse:
-				return (double)StatExtension.GetStatValueAbstract (meds, StatDefOf.MedicalPotency, null) <= 0.99f;
-			case MedicalCareCategory.NormalOrWorse:
-				return (double)StatExtension.GetStatValueAbstract (meds, StatDefOf.MedicalPotency, null) <= 1.01f;
-			case MedicalCareCategory.Best:
+			case 2:
+				return (double)StatExtension.GetStatValueAbstract (meds, StatDefOf.MedicalPotency, null) <= 0.99;
+			case 3:
+				return (double)StatExtension.GetStatValueAbstract (meds, StatDefOf.MedicalPotency, null) <= 1.01;
+			case 4:
 				return true;
 			default:
 				throw new InvalidOperationException ();
@@ -11670,9 +13658,9 @@ namespace EdB.Interface
 
 		public static void MedicalCareSetter (Rect rect, ref MedicalCareCategory medCare)
 		{
-			Rect rect2 = new Rect (rect.x, rect.y, MedicalCareUtility.ButtonSize.x, MedicalCareUtility.ButtonSize.y);
+			Rect rect2 = new Rect (rect.get_x (), rect.get_y (), MedicalCareUtility.ButtonSize.x, MedicalCareUtility.ButtonSize.y);
 			for (int i = 0; i < 5; i++) {
-				MedicalCareCategory mc = (MedicalCareCategory)i;
+				MedicalCareCategory mc = (byte)i;
 				if (medCare == mc) {
 					GUI.DrawTexture (rect2, MedicalCareUtility.HealthOptionActive);
 				}
@@ -11688,7 +13676,7 @@ namespace EdB.Interface
 					SoundStarter.PlayOneShotOnCamera (SoundDefOf.TickHigh);
 				}
 				TooltipHandler.TipRegion (rect2, () => mc.GetLabel (), 632165 + i * 17);
-				rect2.x = rect2.x + (MedicalCareUtility.ButtonSize.x + MedicalCareUtility.ButtonPadding);
+				rect2.set_x (rect2.get_x () + (MedicalCareUtility.ButtonSize.x + MedicalCareUtility.ButtonPadding));
 			}
 		}
 
@@ -11704,39 +13692,66 @@ namespace EdB.Interface
 			MedicalCareUtility.HealthOptionInactive = ContentFinder<Texture2D>.Get ("EdB/Interface/TabReplacement/HealthOptionInactive", true);
 		}
 	}
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class MessagesComponent : IUpdatedComponent, INamedComponent
 	{
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "Messages";
 			}
 		}
 
+		//
+		// Methods
+		//
 		public void Update ()
 		{
 			Messages.Update ();
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class MouseoverReadout
 	{
+		//
+		// Static Fields
+		//
 		private const float YInterval = 19;
 
 		private static readonly Vector2 BotLeft = new Vector2 (15, 65);
 
+		//
+		// Fields
+		//
 		private TerrainDef cachedTerrain;
 
 		private string cachedTerrainString;
 
+		//
+		// Methods
+		//
 		public void MouseoverReadoutOnGUI ()
 		{
-			if (Find.MainTabsRoot.OpenTab != null) {
+			if (Find.get_MainTabsRoot ().get_OpenTab () != null) {
 				return;
 			}
-			GenUI.DrawTextWinterShadow (new Rect (256, (float)(Screen.height - 256), -256, 256));
-			Text.Font = GameFont.Small;
-			GUI.color = new Color (1, 1, 1, 0.8f);
+			GenUI.DrawTextWinterShadow (new Rect (256, (float)(Screen.get_height () - 256), -256, 256));
+			Text.set_Font (1);
+			GUI.set_color (new Color (1, 1, 1, 0.8));
 			IntVec3 intVec = Gen.MouseCell ();
 			if (!GenGrid.InBounds (intVec)) {
 				return;
@@ -11744,18 +13759,18 @@ namespace EdB.Interface
 			float num = 0;
 			Rect rect;
 			if (GridsUtility.Fogged (intVec)) {
-				rect = new Rect (MouseoverReadout.BotLeft.x, (float)Screen.height - MouseoverReadout.BotLeft.y - num, 999, 999);
+				rect = new Rect (MouseoverReadout.BotLeft.x, (float)Screen.get_height () - MouseoverReadout.BotLeft.y - num, 999, 999);
 				Widgets.Label (rect, Translator.Translate ("Undiscovered"));
-				GUI.color = Color.white;
+				GUI.set_color (Color.get_white ());
 				return;
 			}
-			rect = new Rect (MouseoverReadout.BotLeft.x, (float)Screen.height - MouseoverReadout.BotLeft.y - num, 999, 999);
-			Widgets.Label (rect, PsychGlowUtility.GetLabel (Find.GlowGrid.PsychGlowAt (intVec)) + " (" + GenText.ToStringPercent (Find.GlowGrid.GameGlowAt (intVec)) + ")");
+			rect = new Rect (MouseoverReadout.BotLeft.x, (float)Screen.get_height () - MouseoverReadout.BotLeft.y - num, 999, 999);
+			Widgets.Label (rect, PsychGlowUtility.GetLabel (Find.get_GlowGrid ().PsychGlowAt (intVec)) + " (" + GenText.ToStringPercent (Find.get_GlowGrid ().GameGlowAt (intVec)) + ")");
 			num += 19;
-			rect = new Rect (MouseoverReadout.BotLeft.x, (float)Screen.height - MouseoverReadout.BotLeft.y - num, 999, 999);
+			rect = new Rect (MouseoverReadout.BotLeft.x, (float)Screen.get_height () - MouseoverReadout.BotLeft.y - num, 999, 999);
 			TerrainDef terrain = GridsUtility.GetTerrain (intVec);
 			if (terrain != this.cachedTerrain) {
-				this.cachedTerrainString = terrain.LabelCap + ((terrain.passability != Traversability.Impassable) ? (" (" + Translator.Translate ("WalkSpeed", new object[] {
+				this.cachedTerrainString = terrain.get_LabelCap () + ((terrain.passability != 2) ? (" (" + Translator.Translate ("WalkSpeed", new object[] {
 					this.SpeedPercentString ((float)terrain.pathCost)
 				}) + ")") : null);
 				this.cachedTerrain = terrain;
@@ -11764,14 +13779,14 @@ namespace EdB.Interface
 			num += 19;
 			Zone zone = GridsUtility.GetZone (intVec);
 			if (zone != null) {
-				rect = new Rect (MouseoverReadout.BotLeft.x, (float)Screen.height - MouseoverReadout.BotLeft.y - num, 999, 999);
+				rect = new Rect (MouseoverReadout.BotLeft.x, (float)Screen.get_height () - MouseoverReadout.BotLeft.y - num, 999, 999);
 				string label = zone.label;
 				Widgets.Label (rect, label);
 				num += 19;
 			}
-			float depth = Find.SnowGrid.GetDepth (intVec);
-			if ((double)depth > 0.03f) {
-				rect = new Rect (MouseoverReadout.BotLeft.x, (float)Screen.height - MouseoverReadout.BotLeft.y - num, 999, 999);
+			float depth = Find.get_SnowGrid ().GetDepth (intVec);
+			if ((double)depth > 0.03) {
+				rect = new Rect (MouseoverReadout.BotLeft.x, (float)Screen.get_height () - MouseoverReadout.BotLeft.y - num, 999, 999);
 				SnowCategory snowCategory = SnowUtility.GetSnowCategory (depth);
 				string text = SnowUtility.GetDescription (snowCategory) + " (" + Translator.Translate ("WalkSpeed", new object[] {
 					this.SpeedPercentString ((float)SnowUtility.MovementTicksAddOn (snowCategory))
@@ -11779,23 +13794,23 @@ namespace EdB.Interface
 				Widgets.Label (rect, text);
 				num += 19;
 			}
-			List<Thing> list = Find.ThingGrid.ThingsListAt (intVec);
+			List<Thing> list = Find.get_ThingGrid ().ThingsListAt (intVec);
 			for (int i = 0; i < list.Count; i++) {
 				Thing thing = list [i];
-				if (thing.def.category != ThingCategory.Mote) {
-					rect = new Rect (MouseoverReadout.BotLeft.x, (float)Screen.height - MouseoverReadout.BotLeft.y - num, 999, 999);
-					string labelMouseover = thing.LabelMouseover;
+				if (thing.def.category != 7) {
+					rect = new Rect (MouseoverReadout.BotLeft.x, (float)Screen.get_height () - MouseoverReadout.BotLeft.y - num, 999, 999);
+					string labelMouseover = thing.get_LabelMouseover ();
 					Widgets.Label (rect, labelMouseover);
 					num += 19;
 				}
 			}
 			RoofDef roof = GridsUtility.GetRoof (intVec);
 			if (roof != null) {
-				rect = new Rect (MouseoverReadout.BotLeft.x, (float)Screen.height - MouseoverReadout.BotLeft.y - num, 999, 999);
-				Widgets.Label (rect, roof.LabelCap);
+				rect = new Rect (MouseoverReadout.BotLeft.x, (float)Screen.get_height () - MouseoverReadout.BotLeft.y - num, 999, 999);
+				Widgets.Label (rect, roof.get_LabelCap ());
 				num += 19;
 			}
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 		}
 
 		private string SpeedPercentString (float extraPathTicks)
@@ -11804,11 +13819,21 @@ namespace EdB.Interface
 			return GenText.ToStringPercent (num);
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class MouseoverReadoutComponent : IRenderedComponent, INamedComponent
 	{
+		//
+		// Fields
+		//
 		private MouseoverReadout mouseoverReadout;
 
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "MouseoverReadout";
@@ -11821,27 +13846,48 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public MouseoverReadoutComponent (MouseoverReadout mouseoverReadout)
 		{
 			this.mouseoverReadout = mouseoverReadout;
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI ()
 		{
 			this.mouseoverReadout.MouseoverReadoutOnGUI ();
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public abstract class MultipleSelectionStringOptionsPreference : IPreference
 	{
 		public delegate void ValueChangedHandler (IEnumerable<string> selectedOptions);
 
+		//
+		// Static Fields
+		//
 		public static float LabelMargin = MultipleSelectionStringOptionsPreference.RadioButtonWidth + MultipleSelectionStringOptionsPreference.RadioButtonMargin;
 
 		public static float RadioButtonMargin = 18;
 
 		public static float RadioButtonWidth = 24;
 
+		//
+		// Fields
+		//
 		public HashSet<string> selectedOptions = new HashSet<string> ();
 
 		public int tooltipId;
@@ -11850,6 +13896,9 @@ namespace EdB.Interface
 
 		private string stringValue;
 
+		//
+		// Properties
+		//
 		public abstract string DefaultValue {
 			get;
 		}
@@ -11945,10 +13994,16 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public MultipleSelectionStringOptionsPreference ()
 		{
 		}
 
+		//
+		// Methods
+		//
 		public bool IsOptionSelected (string option)
 		{
 			return this.selectedOptions.Contains (option);
@@ -11958,7 +14013,7 @@ namespace EdB.Interface
 		{
 			bool disabled = this.Disabled;
 			if (disabled) {
-				GUI.color = Dialog_InterfaceOptions.DisabledControlColor;
+				GUI.set_color (Dialog_InterfaceOptions.DisabledControlColor);
 			}
 			if (!string.IsNullOrEmpty (this.Name)) {
 				string text = Translator.Translate (this.Name);
@@ -11991,7 +14046,7 @@ namespace EdB.Interface
 				}
 			}
 			positionY -= Dialog_InterfaceOptions.PreferencePadding.y;
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 		}
 
 		public virtual string OptionTranslated (string optionValue)
@@ -12024,13 +14079,45 @@ namespace EdB.Interface
 			this.stringValue = string.Join (",", this.selectedOptions.ToArray<string> ());
 		}
 
-		public event MultipleSelectionStringOptionsPreference.ValueChangedHandler ValueChanged;
+		//
+		// Events
+		//
+		public event MultipleSelectionStringOptionsPreference.ValueChangedHandler ValueChanged {
+			add {
+				MultipleSelectionStringOptionsPreference.ValueChangedHandler valueChangedHandler = this.ValueChanged;
+				MultipleSelectionStringOptionsPreference.ValueChangedHandler valueChangedHandler2;
+				do {
+					valueChangedHandler2 = valueChangedHandler;
+					valueChangedHandler = Interlocked.CompareExchange<MultipleSelectionStringOptionsPreference.ValueChangedHandler> (ref this.ValueChanged, (MultipleSelectionStringOptionsPreference.ValueChangedHandler)Delegate.Combine (valueChangedHandler2, value), valueChangedHandler);
+				}
+				while (valueChangedHandler != valueChangedHandler2);
+			}
+			remove {
+				MultipleSelectionStringOptionsPreference.ValueChangedHandler valueChangedHandler = this.ValueChanged;
+				MultipleSelectionStringOptionsPreference.ValueChangedHandler valueChangedHandler2;
+				do {
+					valueChangedHandler2 = valueChangedHandler;
+					valueChangedHandler = Interlocked.CompareExchange<MultipleSelectionStringOptionsPreference.ValueChangedHandler> (ref this.ValueChanged, (MultipleSelectionStringOptionsPreference.ValueChangedHandler)Delegate.Remove (valueChangedHandler2, value), valueChangedHandler);
+				}
+				while (valueChangedHandler != valueChangedHandler2);
+			}
+		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceAlwaysShowSquadName : BooleanPreference
 	{
+		//
+		// Fields
+		//
 		protected PreferenceEnableSquads preferenceEnableSquads;
 
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return false;
@@ -12073,9 +14160,16 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceAmPm : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return false;
@@ -12111,9 +14205,16 @@ namespace EdB.Interface
 			set;
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceColorCodedWorkPassions : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return false;
@@ -12138,9 +14239,16 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceCompressedStorage : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return false;
@@ -12165,9 +14273,16 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceEmptyStockpile : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return false;
@@ -12192,9 +14307,16 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceEnableAlternateTimeDisplay : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return false;
@@ -12213,9 +14335,16 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceEnabled : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return true;
@@ -12234,9 +14363,16 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceEnableInventory : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return true;
@@ -12261,11 +14397,21 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceEnableSquadFiltering : BooleanPreference
 	{
+		//
+		// Fields
+		//
 		protected PreferenceEnableSquads preferenceEnableSquads;
 
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return true;
@@ -12314,11 +14460,21 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceEnableSquadRow : BooleanPreference
 	{
+		//
+		// Fields
+		//
 		protected PreferenceEnableSquads preferenceEnableSquads;
 
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return true;
@@ -12355,9 +14511,16 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceEnableSquads : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return true;
@@ -12382,12 +14545,20 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
+using UnityEngine;
 
+namespace EdB.Interface
+{
 	public class PreferenceEnableTabReplacement : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
-				return Screen.height >= 900;
+				return Screen.get_height () >= 900;
 			}
 		}
 
@@ -12409,13 +14580,24 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
 
+namespace EdB.Interface
+{
 	public class PreferenceGroup
 	{
+		//
+		// Fields
+		//
 		private string name;
 
 		private List<IPreference> preferences = new List<IPreference> ();
 
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return this.name;
@@ -12437,25 +14619,45 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public PreferenceGroup (string name)
 		{
 			this.name = name;
 		}
 
+		//
+		// Methods
+		//
 		public void Add (IPreference preference)
 		{
 			this.preferences.Add (preference);
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class PreferenceHideMainTabs : MultipleSelectionStringOptionsPreference
 	{
+		//
+		// Fields
+		//
 		protected List<string> options = new List<string> ();
 
 		protected HashSet<string> exclusions = new HashSet<string> ();
 
 		protected Dictionary<string, string> labels = new Dictionary<string, string> ();
 
+		//
+		// Properties
+		//
 		public override string DefaultValue {
 			get {
 				return string.Empty;
@@ -12498,6 +14700,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public PreferenceHideMainTabs ()
 		{
 			this.exclusions.Add ("Inspect");
@@ -12505,17 +14710,20 @@ namespace EdB.Interface
 			this.exclusions.Add ("Work");
 			this.exclusions.Add ("EdB_Interface_Squads");
 			this.exclusions.Add ("Menu");
-			IEnumerable<MainTabDef> allDefs = DefDatabase<MainTabDef>.AllDefs;
+			IEnumerable<MainTabDef> allDefs = DefDatabase<MainTabDef>.get_AllDefs ();
 			foreach (MainTabDef current in from def in allDefs
 			orderby def.order
 			select def) {
 				if (!this.exclusions.Contains (current.defName)) {
 					this.options.Add (current.defName);
-					this.labels.Add (current.defName, current.LabelCap);
+					this.labels.Add (current.defName, current.get_LabelCap ());
 				}
 			}
 		}
 
+		//
+		// Methods
+		//
 		public bool IsTabExcluded (string name)
 		{
 			return this.exclusions.Contains (name);
@@ -12532,9 +14740,16 @@ namespace EdB.Interface
 			return null;
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceIncludeUnfinished : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return false;
@@ -12559,15 +14774,29 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
 
+namespace EdB.Interface
+{
 	public class PreferenceMinuteInterval : IntegerOptionsPreference
 	{
+		//
+		// Static Fields
+		//
 		protected static readonly int DefaultSelectedOption = 2;
 
+		//
+		// Fields
+		//
 		protected List<int> optionValues = new List<int> ();
 
 		protected string optionLabelPrefix = "EdB.AlternateTimeDisplay.Prefs.Interval";
 
+		//
+		// Properties
+		//
 		public override int DefaultValue {
 			get {
 				return this.optionValues [PreferenceMinuteInterval.DefaultSelectedOption];
@@ -12615,6 +14844,9 @@ namespace EdB.Interface
 			set;
 		}
 
+		//
+		// Constructors
+		//
 		public PreferenceMinuteInterval ()
 		{
 			this.optionValues.Add (1);
@@ -12622,9 +14854,16 @@ namespace EdB.Interface
 			this.optionValues.Add (15);
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferencePauseOnStart : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return false;
@@ -12649,9 +14888,16 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceRightClickOnly : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return false;
@@ -12676,11 +14922,28 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml;
+using System.Xml.Linq;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class Preferences
 	{
+		//
+		// Static Fields
+		//
 		private static Preferences instance;
 
+		//
+		// Fields
+		//
 		protected bool atLeastOne;
 
 		protected List<PreferenceGroup> miscellaneousGroup = new List<PreferenceGroup> ();
@@ -12691,6 +14954,9 @@ namespace EdB.Interface
 
 		protected List<PreferenceGroup> groups = new List<PreferenceGroup> ();
 
+		//
+		// Static Properties
+		//
 		public static Preferences Instance {
 			get {
 				if (Preferences.instance == null) {
@@ -12700,6 +14966,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Properties
+		//
 		public bool AtLeastOne {
 			get {
 				return this.atLeastOne;
@@ -12708,7 +14977,7 @@ namespace EdB.Interface
 
 		protected string FilePath {
 			get {
-				return Path.Combine (GenFilePaths.ConfigFolderPath, "EdBInterface.xml");
+				return Path.Combine (GenFilePaths.get_ConfigFolderPath (), "EdBInterface.xml");
 			}
 		}
 
@@ -12721,11 +14990,17 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public Preferences ()
 		{
 			this.Reset ();
 		}
 
+		//
+		// Methods
+		//
 		public void Add (IPreference preference)
 		{
 			if (this.preferenceDictionary.ContainsKey (preference.Name)) {
@@ -12837,9 +15112,16 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceShowCloseButton : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return false;
@@ -12864,9 +15146,16 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceSmallIcons : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return false;
@@ -12897,9 +15186,16 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceTabArt : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return true;
@@ -12941,9 +15237,16 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceTabBills : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return true;
@@ -12985,9 +15288,16 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceTabBrowseButtons : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return true;
@@ -13012,12 +15322,20 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
+using UnityEngine;
 
+namespace EdB.Interface
+{
 	public class PreferenceTabCharacter : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
-				return Screen.height >= 900;
+				return Screen.get_height () >= 900;
 			}
 		}
 
@@ -13056,9 +15374,16 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceTabGear : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return true;
@@ -13100,9 +15425,16 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceTabGrowing : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return true;
@@ -13144,9 +15476,16 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceTabGuestAndPrisoner : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return true;
@@ -13188,12 +15527,20 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
+using UnityEngine;
 
+namespace EdB.Interface
+{
 	public class PreferenceTabHealth : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
-				return Screen.height >= 900;
+				return Screen.get_height () >= 900;
 			}
 		}
 
@@ -13232,12 +15579,20 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
+using UnityEngine;
 
+namespace EdB.Interface
+{
 	public class PreferenceTabNeeds : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
-				return Screen.height >= 900;
+				return Screen.get_height () >= 900;
 			}
 		}
 
@@ -13276,9 +15631,16 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class PreferenceTabTraining : BooleanPreference
 	{
+		//
+		// Properties
+		//
 		public override bool DefaultValue {
 			get {
 				return true;
@@ -13320,19 +15682,35 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ReplacementTabs
 	{
+		//
+		// Fields
+		//
 		protected Dictionary<ThingDef, List<ITab>> thingDefDictionary = new Dictionary<ThingDef, List<ITab>> ();
 
 		protected Dictionary<Type, ITab> zoneTypeDictionary = new Dictionary<Type, ITab> ();
 
+		//
+		// Properties
+		//
 		public bool Empty {
 			get {
 				return this.thingDefDictionary.Count == 0 && this.zoneTypeDictionary.Count == 0;
 			}
 		}
 
+		//
+		// Methods
+		//
 		public void AddThingDef (ThingDef def, List<ITab> tabs)
 		{
 			this.thingDefDictionary.Add (def, tabs);
@@ -13375,11 +15753,22 @@ namespace EdB.Interface
 			});
 		}
 	}
+}
+using RimWorld;
+using System;
 
+namespace EdB.Interface
+{
 	public class ResourceReadoutComponent : IRenderedComponent, INamedComponent
 	{
+		//
+		// Fields
+		//
 		private ResourceReadout resourceReadout;
 
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "ResourceReadout";
@@ -13392,33 +15781,56 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ResourceReadoutComponent (ResourceReadout resourceReadout)
 		{
 			this.resourceReadout = resourceReadout;
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI ()
 		{
 			this.resourceReadout.ResourceReadoutOnGUI ();
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class RoomOverlaysComponent : IUpdatedComponent, INamedComponent
 	{
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "RoomOverlays";
 			}
 		}
 
+		//
+		// Methods
+		//
 		public void Update ()
 		{
 			RoomStatsDrawer.DrawRoomOverlays ();
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public class RoomStatsComponent : IRenderedComponent, INamedComponent
 	{
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "RoomStats";
@@ -13431,17 +15843,31 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI ()
 		{
 			RoomStatsDrawer.RoomStatsOnGUI ();
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	internal static class RoomStatsDrawer
 	{
+		//
+		// Static Fields
+		//
 		private static float scoreStageLabelColumnWidth = 0;
 
-		private static readonly Color RelatedStatColor = new Color (0.85f, 0.85f, 0.85f);
+		private static readonly Color RelatedStatColor = new Color (0.85, 0.85, 0.85);
 
 		private static float scoreColumnWidth = 0;
 
@@ -13455,10 +15881,13 @@ namespace EdB.Interface
 
 		private const int SpaceBetweenLines = 2;
 
+		//
+		// Static Properties
+		//
 		private static int DisplayedRoomStatsCount {
 			get {
 				int num = 0;
-				List<RoomStatDef> allDefsListForReading = DefDatabase<RoomStatDef>.AllDefsListForReading;
+				List<RoomStatDef> allDefsListForReading = DefDatabase<RoomStatDef>.get_AllDefsListForReading ();
 				for (int i = 0; i < allDefsListForReading.Count; i++) {
 					if (!allDefsListForReading [i].isHidden) {
 						num++;
@@ -13470,29 +15899,32 @@ namespace EdB.Interface
 
 		private static bool ShouldShowRoomStats {
 			get {
-				if (!Find.PlaySettings.showRoomStats) {
+				if (!Find.get_PlaySettings ().showRoomStats) {
 					return false;
 				}
-				if (Mouse.IsInputBlockedNow) {
+				if (Mouse.get_IsInputBlockedNow ()) {
 					return false;
 				}
 				if (!GenGrid.InBounds (Gen.MouseCell ()) || GridsUtility.Fogged (Gen.MouseCell ())) {
 					return false;
 				}
 				Room room = GridsUtility.GetRoom (Gen.MouseCell ());
-				return room != null && room.Role != RoomRoleDefOf.None;
+				return room != null && room.get_Role () != RoomRoleDefOf.None;
 			}
 		}
 
+		//
+		// Static Methods
+		//
 		private static void CalculateColumnsSizes (Room room)
 		{
 			RoomStatsDrawer.statLabelColumnWidth = 0;
 			RoomStatsDrawer.scoreColumnWidth = 0;
 			RoomStatsDrawer.scoreStageLabelColumnWidth = 0;
-			for (int i = 0; i < DefDatabase<RoomStatDef>.AllDefsListForReading.Count; i++) {
-				RoomStatDef roomStatDef = DefDatabase<RoomStatDef>.AllDefsListForReading [i];
+			for (int i = 0; i < DefDatabase<RoomStatDef>.get_AllDefsListForReading ().Count; i++) {
+				RoomStatDef roomStatDef = DefDatabase<RoomStatDef>.get_AllDefsListForReading () [i];
 				if (!roomStatDef.isHidden) {
-					RoomStatsDrawer.statLabelColumnWidth = Mathf.Max (RoomStatsDrawer.statLabelColumnWidth, Text.CalcSize (roomStatDef.LabelCap).x);
+					RoomStatsDrawer.statLabelColumnWidth = Mathf.Max (RoomStatsDrawer.statLabelColumnWidth, Text.CalcSize (roomStatDef.get_LabelCap ()).x);
 					float stat = room.GetStat (roomStatDef);
 					string label = roomStatDef.GetScoreStage (stat).label;
 					RoomStatsDrawer.scoreStageLabelColumnWidth = Mathf.Max (RoomStatsDrawer.scoreStageLabelColumnWidth, Text.CalcSize (label).x);
@@ -13520,16 +15952,16 @@ namespace EdB.Interface
 
 		private static string GetRoomRoleLabel (Room room)
 		{
-			Pawn owner = room.Owner;
+			Pawn owner = room.get_Owner ();
 			string result;
 			if (owner != null) {
 				result = Translator.Translate ("SomeonesSomething", new object[] {
-					owner.NameStringShort,
-					room.Role.label
+					owner.get_NameStringShort (),
+					room.get_Role ().label
 				});
 			}
 			else {
-				result = room.Role.LabelCap;
+				result = room.get_Role ().get_LabelCap ();
 			}
 			return result;
 		}
@@ -13541,43 +15973,43 @@ namespace EdB.Interface
 				return;
 			}
 			temp.room = GridsUtility.GetRoom (Gen.MouseCell ());
-			Text.Font = GameFont.Small;
+			Text.set_Font (1);
 			RoomStatsDrawer.CalculateColumnsSizes (temp.room);
-			temp.windowRect = new Rect (Event.current.mousePosition.x, Event.current.mousePosition.y, 108 + RoomStatsDrawer.statLabelColumnWidth + RoomStatsDrawer.scoreColumnWidth + RoomStatsDrawer.scoreStageLabelColumnWidth, (float)(65 + RoomStatsDrawer.DisplayedRoomStatsCount * 25));
+			temp.windowRect = new Rect (Event.get_current ().get_mousePosition ().x, Event.get_current ().get_mousePosition ().y, 108 + RoomStatsDrawer.statLabelColumnWidth + RoomStatsDrawer.scoreColumnWidth + RoomStatsDrawer.scoreStageLabelColumnWidth, (float)(65 + RoomStatsDrawer.DisplayedRoomStatsCount * 25));
 			RoomStatsDrawer.Anonymous temp5 = temp;
-			temp5.windowRect.x = temp5.windowRect.x + 5;
+			temp5.windowRect.set_x (temp5.windowRect.get_x () + 5);
 			RoomStatsDrawer.Anonymous temp2 = temp;
-			temp2.windowRect.y = temp2.windowRect.y + 5;
-			if (temp.windowRect.xMax > (float)Screen.width) {
+			temp2.windowRect.set_y (temp2.windowRect.get_y () + 5);
+			if (temp.windowRect.get_xMax () > (float)Screen.get_width ()) {
 				RoomStatsDrawer.Anonymous temp3 = temp;
-				temp3.windowRect.x = temp3.windowRect.x - (temp.windowRect.width + 10);
+				temp3.windowRect.set_x (temp3.windowRect.get_x () - (temp.windowRect.get_width () + 10));
 			}
-			if (temp.windowRect.yMax > (float)Screen.height) {
+			if (temp.windowRect.get_yMax () > (float)Screen.get_height ()) {
 				RoomStatsDrawer.Anonymous temp4 = temp;
-				temp4.windowRect.y = temp4.windowRect.y - (temp.windowRect.height + 10);
+				temp4.windowRect.set_y (temp4.windowRect.get_y () - (temp.windowRect.get_height () + 10));
 			}
-			Find.WindowStack.ImmediateWindow (74975, temp.windowRect, WindowLayer.Super, delegate {
-				ConceptDatabase.KnowledgeDemonstrated (ConceptDefOf.InspectRoomStats, KnowledgeAmount.GuiFrame);
-				Text.Font = GameFont.Small;
+			Find.get_WindowStack ().ImmediateWindow (74975, temp.windowRect, 2, delegate {
+				ConceptDatabase.KnowledgeDemonstrated (ConceptDefOf.InspectRoomStats, 1);
+				Text.set_Font (1);
 				float num = 19;
-				Rect rect = new Rect (19, num, temp.windowRect.width - 38, 100);
-				GUI.color = Color.white;
+				Rect rect = new Rect (19, num, temp.windowRect.get_width () - 38, 100);
+				GUI.set_color (Color.get_white ());
 				Widgets.Label (rect, RoomStatsDrawer.GetRoomRoleLabel (temp.room));
 				num += 25;
-				for (int i = 0; i < DefDatabase<RoomStatDef>.AllDefsListForReading.Count; i++) {
-					RoomStatDef roomStatDef = DefDatabase<RoomStatDef>.AllDefsListForReading [i];
+				for (int i = 0; i < DefDatabase<RoomStatDef>.get_AllDefsListForReading ().Count; i++) {
+					RoomStatDef roomStatDef = DefDatabase<RoomStatDef>.get_AllDefsListForReading () [i];
 					if (!roomStatDef.isHidden) {
 						float stat = temp.room.GetStat (roomStatDef);
 						RoomStatScoreStage scoreStage = roomStatDef.GetScoreStage (stat);
-						if (temp.room.Role.IsStatRelated (roomStatDef)) {
-							GUI.color = RoomStatsDrawer.RelatedStatColor;
+						if (temp.room.get_Role ().IsStatRelated (roomStatDef)) {
+							GUI.set_color (RoomStatsDrawer.RelatedStatColor);
 						}
 						else {
-							GUI.color = Color.gray;
+							GUI.set_color (Color.get_gray ());
 						}
-						Rect rect2 = new Rect (rect.x, num, RoomStatsDrawer.statLabelColumnWidth, 23);
-						Widgets.Label (rect2, roomStatDef.LabelCap);
-						Rect rect3 = new Rect (rect2.xMax + 35, num, RoomStatsDrawer.scoreColumnWidth, 23);
+						Rect rect2 = new Rect (rect.get_x (), num, RoomStatsDrawer.statLabelColumnWidth, 23);
+						Widgets.Label (rect2, roomStatDef.get_LabelCap ());
+						Rect rect3 = new Rect (rect2.get_xMax () + 35, num, RoomStatsDrawer.scoreColumnWidth, 23);
 						string text;
 						if (roomStatDef.displayRounded) {
 							text = Mathf.RoundToInt (stat).ToString ();
@@ -13586,15 +16018,18 @@ namespace EdB.Interface
 							text = stat.ToString ("0.##");
 						}
 						Widgets.Label (rect3, text);
-						Rect rect4 = new Rect (rect3.xMax + 35, num, RoomStatsDrawer.scoreStageLabelColumnWidth, 23);
+						Rect rect4 = new Rect (rect3.get_xMax () + 35, num, RoomStatsDrawer.scoreStageLabelColumnWidth, 23);
 						Widgets.Label (rect4, scoreStage.label);
 						num += 25;
 					}
 				}
-				GUI.color = Color.white;
+				GUI.set_color (Color.get_white ());
 			}, true, false, 1);
 		}
 
+		//
+		// Nested Types
+		//
 		private sealed class Anonymous
 		{
 			internal Rect windowRect;
@@ -13603,27 +16038,27 @@ namespace EdB.Interface
 
 			internal void Iterate ()
 			{
-				ConceptDatabase.KnowledgeDemonstrated (ConceptDefOf.InspectRoomStats, KnowledgeAmount.GuiFrame);
-				Text.Font = GameFont.Small;
+				ConceptDatabase.KnowledgeDemonstrated (ConceptDefOf.InspectRoomStats, 1);
+				Text.set_Font (1);
 				float num = 19;
-				Rect rect = new Rect (19, num, this.windowRect.width - 38, 100);
-				GUI.color = Color.white;
+				Rect rect = new Rect (19, num, this.windowRect.get_width () - 38, 100);
+				GUI.set_color (Color.get_white ());
 				Widgets.Label (rect, RoomStatsDrawer.GetRoomRoleLabel (this.room));
 				num += 25;
-				for (int i = 0; i < DefDatabase<RoomStatDef>.AllDefsListForReading.Count; i++) {
-					RoomStatDef roomStatDef = DefDatabase<RoomStatDef>.AllDefsListForReading [i];
+				for (int i = 0; i < DefDatabase<RoomStatDef>.get_AllDefsListForReading ().Count; i++) {
+					RoomStatDef roomStatDef = DefDatabase<RoomStatDef>.get_AllDefsListForReading () [i];
 					if (!roomStatDef.isHidden) {
 						float stat = this.room.GetStat (roomStatDef);
 						RoomStatScoreStage scoreStage = roomStatDef.GetScoreStage (stat);
-						if (this.room.Role.IsStatRelated (roomStatDef)) {
-							GUI.color = RoomStatsDrawer.RelatedStatColor;
+						if (this.room.get_Role ().IsStatRelated (roomStatDef)) {
+							GUI.set_color (RoomStatsDrawer.RelatedStatColor);
 						}
 						else {
-							GUI.color = Color.gray;
+							GUI.set_color (Color.get_gray ());
 						}
-						Rect rect2 = new Rect (rect.x, num, RoomStatsDrawer.statLabelColumnWidth, 23);
-						Widgets.Label (rect2, roomStatDef.LabelCap);
-						Rect rect3 = new Rect (rect2.xMax + 35, num, RoomStatsDrawer.scoreColumnWidth, 23);
+						Rect rect2 = new Rect (rect.get_x (), num, RoomStatsDrawer.statLabelColumnWidth, 23);
+						Widgets.Label (rect2, roomStatDef.get_LabelCap ());
+						Rect rect3 = new Rect (rect2.get_xMax () + 35, num, RoomStatsDrawer.scoreColumnWidth, 23);
 						string text;
 						if (roomStatDef.displayRounded) {
 							text = Mathf.RoundToInt (stat).ToString ();
@@ -13632,24 +16067,36 @@ namespace EdB.Interface
 							text = stat.ToString ("0.##");
 						}
 						Widgets.Label (rect3, text);
-						Rect rect4 = new Rect (rect3.xMax + 35, num, RoomStatsDrawer.scoreStageLabelColumnWidth, 23);
+						Rect rect4 = new Rect (rect3.get_xMax () + 35, num, RoomStatsDrawer.scoreStageLabelColumnWidth, 23);
 						Widgets.Label (rect4, scoreStage.label);
 						num += 25;
 					}
 				}
-				GUI.color = Color.white;
+				GUI.set_color (Color.get_white ());
 			}
 		}
 	}
+}
+using System;
+using System.Threading;
+using UnityEngine;
 
+namespace EdB.Interface
+{
 	public class ScreenSizeMonitor
 	{
 		public delegate void ScreenSizeChangeHandler (int width, int height);
 
+		//
+		// Fields
+		//
 		protected int width;
 
 		protected int height;
 
+		//
+		// Properties
+		//
 		public int Height {
 			get {
 				return this.height;
@@ -13662,16 +16109,22 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ScreenSizeMonitor ()
 		{
-			this.width = Screen.width;
-			this.height = Screen.height;
+			this.width = Screen.get_width ();
+			this.height = Screen.get_height ();
 		}
 
+		//
+		// Methods
+		//
 		public void Update ()
 		{
-			int num = Screen.width;
-			int num2 = Screen.height;
+			int num = Screen.get_width ();
+			int num2 = Screen.get_height ();
 			if (num != this.width || num2 != this.height) {
 				this.width = num;
 				this.height = num2;
@@ -13681,14 +16134,45 @@ namespace EdB.Interface
 			}
 		}
 
-		public event ScreenSizeMonitor.ScreenSizeChangeHandler Changed;
+		//
+		// Events
+		//
+		public event ScreenSizeMonitor.ScreenSizeChangeHandler Changed {
+			add {
+				ScreenSizeMonitor.ScreenSizeChangeHandler screenSizeChangeHandler = this.Changed;
+				ScreenSizeMonitor.ScreenSizeChangeHandler screenSizeChangeHandler2;
+				do {
+					screenSizeChangeHandler2 = screenSizeChangeHandler;
+					screenSizeChangeHandler = Interlocked.CompareExchange<ScreenSizeMonitor.ScreenSizeChangeHandler> (ref this.Changed, (ScreenSizeMonitor.ScreenSizeChangeHandler)Delegate.Combine (screenSizeChangeHandler2, value), screenSizeChangeHandler);
+				}
+				while (screenSizeChangeHandler != screenSizeChangeHandler2);
+			}
+			remove {
+				ScreenSizeMonitor.ScreenSizeChangeHandler screenSizeChangeHandler = this.Changed;
+				ScreenSizeMonitor.ScreenSizeChangeHandler screenSizeChangeHandler2;
+				do {
+					screenSizeChangeHandler2 = screenSizeChangeHandler;
+					screenSizeChangeHandler = Interlocked.CompareExchange<ScreenSizeMonitor.ScreenSizeChangeHandler> (ref this.Changed, (ScreenSizeMonitor.ScreenSizeChangeHandler)Delegate.Remove (screenSizeChangeHandler2, value), screenSizeChangeHandler);
+				}
+				while (screenSizeChangeHandler != screenSizeChangeHandler2);
+			}
+		}
 	}
+}
+using System;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ScrollView
 	{
+		//
+		// Fields
+		//
 		private float contentHeight;
 
-		private Vector2 position = Vector2.zero;
+		private Vector2 position = Vector2.get_zero ();
 
 		private Rect viewRect;
 
@@ -13696,6 +16180,9 @@ namespace EdB.Interface
 
 		private bool consumeScrollEvents = true;
 
+		//
+		// Properties
+		//
 		public float ContentHeight {
 			get {
 				return this.contentHeight;
@@ -13704,7 +16191,7 @@ namespace EdB.Interface
 
 		public float ContentWidth {
 			get {
-				return this.contentRect.width;
+				return this.contentRect.get_width ();
 			}
 		}
 
@@ -13716,16 +16203,19 @@ namespace EdB.Interface
 
 		public float ViewHeight {
 			get {
-				return this.viewRect.height;
+				return this.viewRect.get_height ();
 			}
 		}
 
 		public float ViewWidth {
 			get {
-				return this.viewRect.width;
+				return this.viewRect.get_width ();
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ScrollView (bool consumeScrollEvents)
 		{
 			this.consumeScrollEvents = consumeScrollEvents;
@@ -13735,27 +16225,33 @@ namespace EdB.Interface
 		{
 		}
 
+		//
+		// Static Methods
+		//
 		protected static void BeginScrollView (Rect outRect, ref Vector2 scrollPosition, Rect viewRect)
 		{
 			Vector2 vector = scrollPosition;
 			Vector2 vector2 = GUI.BeginScrollView (outRect, scrollPosition, viewRect);
 			Vector2 vector3;
-			if (Event.current.type == null) {
+			if (Event.get_current ().get_type () == null) {
 				vector3 = vector;
 			}
 			else {
 				vector3 = vector2;
 			}
-			if (Event.current.type == EventType.ScrollWheel && Mouse.IsOver (outRect)) {
-				vector3 += Event.current.delta * 40;
+			if (Event.get_current ().get_type () == 6 && Mouse.IsOver (outRect)) {
+				vector3 += Event.get_current ().get_delta () * 40;
 			}
 			scrollPosition = vector3;
 		}
 
+		//
+		// Methods
+		//
 		public void Begin (Rect viewRect)
 		{
 			this.viewRect = viewRect;
-			this.contentRect = new Rect (0, 0, viewRect.width - 16, this.contentHeight);
+			this.contentRect = new Rect (0, 0, viewRect.get_width () - 16, this.contentHeight);
 			if (this.consumeScrollEvents) {
 				Widgets.BeginScrollView (viewRect, ref this.position, this.contentRect);
 			}
@@ -13766,29 +16262,52 @@ namespace EdB.Interface
 
 		public void End (float yPosition)
 		{
-			if (Event.current.type == EventType.Layout) {
+			if (Event.get_current ().get_type () == 8) {
 				this.contentHeight = yPosition;
 			}
 			Widgets.EndScrollView ();
 		}
 	}
+}
+using RimWorld;
+using System;
 
+namespace EdB.Interface
+{
 	public class SelectionOverlaysComponent : IUpdatedComponent, INamedComponent
 	{
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "SelectionOverlays";
 			}
 		}
 
+		//
+		// Methods
+		//
 		public void Update ()
 		{
 			SelectionDrawer.DrawSelectionOverlays ();
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class SelectorUtility
 	{
+		//
+		// Fields
+		//
 		protected FieldInfo hostilePawnsField;
 
 		protected FieldInfo allPawnsField;
@@ -13797,32 +16316,35 @@ namespace EdB.Interface
 
 		protected List<Pawn> visitorPawns = new List<Pawn> (20);
 
+		//
+		// Properties
+		//
 		public IEnumerable<Pawn> ColonyAnimals {
 			get {
-				return from pawn in Find.ListerPawns.PawnsInFaction (Faction.OfColony)
-				where !pawn.IsColonist
+				return from pawn in Find.get_ListerPawns ().PawnsInFaction (Faction.get_OfColony ())
+				where !pawn.get_IsColonist ()
 				select pawn;
 			}
 		}
 
 		public int HostilePawnCount {
 			get {
-				Dictionary<Faction, List<Pawn>> dictionary = (Dictionary<Faction, List<Pawn>>)this.hostilePawnsField.GetValue (Find.ListerPawns);
+				Dictionary<Faction, List<Pawn>> dictionary = (Dictionary<Faction, List<Pawn>>)this.hostilePawnsField.GetValue (Find.get_ListerPawns ());
 				if (dictionary == null) {
 					return 0;
 				}
-				return dictionary [Faction.OfColony].Count;
+				return dictionary [Faction.get_OfColony ()].Count;
 			}
 		}
 
 		public IEnumerable<Pawn> HostilePawns {
 			get {
-				Dictionary<Faction, List<Pawn>> dictionary = (Dictionary<Faction, List<Pawn>>)this.hostilePawnsField.GetValue (Find.ListerPawns);
+				Dictionary<Faction, List<Pawn>> dictionary = (Dictionary<Faction, List<Pawn>>)this.hostilePawnsField.GetValue (Find.get_ListerPawns ());
 				if (dictionary == null) {
 					return this.emptyList;
 				}
-				return from p in dictionary [Faction.OfColony]
-				where !p.InContainer
+				return from p in dictionary [Faction.get_OfColony ()]
+				where !p.get_InContainer ()
 				select p;
 			}
 		}
@@ -13830,8 +16352,8 @@ namespace EdB.Interface
 		public bool MoreThanOneColonyAnimal {
 			get {
 				int num = 0;
-				foreach (Pawn current in from pawn in Find.ListerPawns.PawnsInFaction (Faction.OfColony)
-				where !pawn.IsColonist
+				foreach (Pawn current in from pawn in Find.get_ListerPawns ().PawnsInFaction (Faction.get_OfColony ())
+				where !pawn.get_IsColonist ()
 				select pawn) {
 					if (++num > 1) {
 						return true;
@@ -13843,13 +16365,13 @@ namespace EdB.Interface
 
 		public bool MoreThanOneHostilePawn {
 			get {
-				Dictionary<Faction, List<Pawn>> dictionary = (Dictionary<Faction, List<Pawn>>)this.hostilePawnsField.GetValue (Find.ListerPawns);
+				Dictionary<Faction, List<Pawn>> dictionary = (Dictionary<Faction, List<Pawn>>)this.hostilePawnsField.GetValue (Find.get_ListerPawns ());
 				if (dictionary == null) {
 					return false;
 				}
 				int num = 0;
-				foreach (Pawn current in from p in dictionary [Faction.OfColony]
-				where !p.InContainer
+				foreach (Pawn current in from p in dictionary [Faction.get_OfColony ()]
+				where !p.get_InContainer ()
 				select p) {
 					if (++num > 1) {
 						return true;
@@ -13861,13 +16383,13 @@ namespace EdB.Interface
 
 		public bool MoreThanOneVisitorPawn {
 			get {
-				List<Pawn> list = (List<Pawn>)this.allPawnsField.GetValue (Find.ListerPawns);
+				List<Pawn> list = (List<Pawn>)this.allPawnsField.GetValue (Find.get_ListerPawns ());
 				if (list == null || list.Count < 2) {
 					return false;
 				}
 				int num = 0;
 				foreach (Pawn current in from p in list
-				where p.Faction != null && p.Faction != Faction.OfColony && !p.IsPrisonerOfColony && !p.Faction.RelationWith (Faction.OfColony).hostile && !p.InContainer
+				where p.get_Faction () != null && p.get_Faction () != Faction.get_OfColony () && !p.get_IsPrisonerOfColony () && !p.get_Faction ().RelationWith (Faction.get_OfColony ()).hostile && !p.get_InContainer ()
 				select p) {
 					if (++num > 1) {
 						return true;
@@ -13879,67 +16401,73 @@ namespace EdB.Interface
 
 		public IEnumerable<Pawn> VisitorPawns {
 			get {
-				List<Pawn> list = (List<Pawn>)this.allPawnsField.GetValue (Find.ListerPawns);
+				List<Pawn> list = (List<Pawn>)this.allPawnsField.GetValue (Find.get_ListerPawns ());
 				if (list == null) {
 					return this.emptyList;
 				}
 				return from p in list
-				where p.Faction != null && p.Faction != Faction.OfColony && !p.IsPrisonerOfColony && !p.Faction.RelationWith (Faction.OfColony).hostile && !p.InContainer
+				where p.get_Faction () != null && p.get_Faction () != Faction.get_OfColony () && !p.get_IsPrisonerOfColony () && !p.get_Faction ().RelationWith (Faction.get_OfColony ()).hostile && !p.get_InContainer ()
 				select p;
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public SelectorUtility ()
 		{
 			this.hostilePawnsField = typeof(ListerPawns).GetField ("pawnsHostileToFaction", BindingFlags.Instance | BindingFlags.NonPublic);
 			this.allPawnsField = typeof(ListerPawns).GetField ("allPawns", BindingFlags.Instance | BindingFlags.NonPublic);
 		}
 
+		//
+		// Methods
+		//
 		public void AddToSelection (object o)
 		{
-			Find.Selector.Select (o, false, true);
+			Find.get_Selector ().Select (o, false, true);
 		}
 
 		public void ClearSelection ()
 		{
-			Find.Selector.ClearSelection ();
+			Find.get_Selector ().ClearSelection ();
 		}
 
 		public void SelectAllColonists ()
 		{
-			Selector selector = Find.Selector;
+			Selector selector = Find.get_Selector ();
 			selector.ClearSelection ();
-			foreach (Pawn current in Find.ListerPawns.FreeColonists) {
-				Find.Selector.Select (current, false, true);
+			foreach (Pawn current in Find.get_ListerPawns ().get_FreeColonists ()) {
+				Find.get_Selector ().Select (current, false, true);
 			}
-			Find.MainTabsRoot.SetCurrentTab (MainTabDefOf.Inspect, true);
+			Find.get_MainTabsRoot ().SetCurrentTab (MainTabDefOf.Inspect, true);
 		}
 
 		public void SelectNextColonist ()
 		{
-			Selector selector = Find.Selector;
-			if (selector.SingleSelectedThing == null || !(selector.SingleSelectedThing is Pawn) || selector.SingleSelectedThing.Faction != Faction.OfColony) {
-				this.SelectThing (Find.ListerPawns.FreeColonists.FirstOrDefault<Pawn> (), false);
+			Selector selector = Find.get_Selector ();
+			if (selector.get_SingleSelectedThing () == null || !(selector.get_SingleSelectedThing () is Pawn) || selector.get_SingleSelectedThing ().get_Faction () != Faction.get_OfColony ()) {
+				this.SelectThing (Find.get_ListerPawns ().get_FreeColonists ().FirstOrDefault<Pawn> (), false);
 			}
 			else {
 				bool flag = false;
-				foreach (Pawn current in Find.ListerPawns.FreeColonists) {
+				foreach (Pawn current in Find.get_ListerPawns ().get_FreeColonists ()) {
 					if (flag) {
 						this.SelectThing (current, false);
 						return;
 					}
-					if (current == selector.SingleSelectedThing) {
+					if (current == selector.get_SingleSelectedThing ()) {
 						flag = true;
 					}
 				}
-				this.SelectThing (Find.ListerPawns.FreeColonists.FirstOrDefault<Pawn> (), false);
+				this.SelectThing (Find.get_ListerPawns ().get_FreeColonists ().FirstOrDefault<Pawn> (), false);
 			}
 		}
 
 		public void SelectNextColonyAnimal ()
 		{
-			Selector selector = Find.Selector;
-			if (selector.SingleSelectedThing == null || !(selector.SingleSelectedThing is Pawn) || selector.SingleSelectedThing.Faction != Faction.OfColony || (selector.SingleSelectedThing as Pawn).IsColonist) {
+			Selector selector = Find.get_Selector ();
+			if (selector.get_SingleSelectedThing () == null || !(selector.get_SingleSelectedThing () is Pawn) || selector.get_SingleSelectedThing ().get_Faction () != Faction.get_OfColony () || (selector.get_SingleSelectedThing () as Pawn).get_IsColonist ()) {
 				this.SelectThing (this.ColonyAnimals.FirstOrDefault<Pawn> (), false);
 			}
 			else {
@@ -13949,7 +16477,7 @@ namespace EdB.Interface
 						this.SelectThing (current, false);
 						return;
 					}
-					if (current == selector.SingleSelectedThing) {
+					if (current == selector.get_SingleSelectedThing ()) {
 						flag = true;
 					}
 				}
@@ -13959,8 +16487,8 @@ namespace EdB.Interface
 
 		public void SelectNextEnemy ()
 		{
-			Selector selector = Find.Selector;
-			if (selector.SingleSelectedThing == null || !(selector.SingleSelectedThing is Pawn) || selector.SingleSelectedThing.Faction == Faction.OfColony) {
+			Selector selector = Find.get_Selector ();
+			if (selector.get_SingleSelectedThing () == null || !(selector.get_SingleSelectedThing () is Pawn) || selector.get_SingleSelectedThing ().get_Faction () == Faction.get_OfColony ()) {
 				Pawn thing = this.HostilePawns.FirstOrDefault<Pawn> ();
 				this.SelectThing (thing, false);
 			}
@@ -13971,7 +16499,7 @@ namespace EdB.Interface
 						this.SelectThing (current, false);
 						return;
 					}
-					if (current == selector.SingleSelectedThing) {
+					if (current == selector.get_SingleSelectedThing ()) {
 						flag = true;
 					}
 				}
@@ -13982,29 +16510,29 @@ namespace EdB.Interface
 
 		public void SelectNextPrisoner ()
 		{
-			Selector selector = Find.Selector;
-			if (selector.SingleSelectedThing == null || !(selector.SingleSelectedThing is Pawn)) {
-				this.SelectThing (Find.ListerPawns.PrisonersOfColony.FirstOrDefault<Pawn> (), false);
+			Selector selector = Find.get_Selector ();
+			if (selector.get_SingleSelectedThing () == null || !(selector.get_SingleSelectedThing () is Pawn)) {
+				this.SelectThing (Find.get_ListerPawns ().get_PrisonersOfColony ().FirstOrDefault<Pawn> (), false);
 			}
 			else {
 				bool flag = false;
-				foreach (Pawn current in Find.ListerPawns.PrisonersOfColony) {
+				foreach (Pawn current in Find.get_ListerPawns ().get_PrisonersOfColony ()) {
 					if (flag) {
 						this.SelectThing (current, false);
 						return;
 					}
-					if (current == selector.SingleSelectedThing) {
+					if (current == selector.get_SingleSelectedThing ()) {
 						flag = true;
 					}
 				}
-				this.SelectThing (Find.ListerPawns.PrisonersOfColony.FirstOrDefault<Pawn> (), false);
+				this.SelectThing (Find.get_ListerPawns ().get_PrisonersOfColony ().FirstOrDefault<Pawn> (), false);
 			}
 		}
 
 		public void SelectNextVisitor ()
 		{
-			Selector selector = Find.Selector;
-			if (selector.SingleSelectedThing == null || !(selector.SingleSelectedThing is Pawn) || selector.SingleSelectedThing.Faction == Faction.OfColony) {
+			Selector selector = Find.get_Selector ();
+			if (selector.get_SingleSelectedThing () == null || !(selector.get_SingleSelectedThing () is Pawn) || selector.get_SingleSelectedThing ().get_Faction () == Faction.get_OfColony ()) {
 				this.SelectThing (this.VisitorPawns.FirstOrDefault<Pawn> (), false);
 			}
 			else {
@@ -14014,7 +16542,7 @@ namespace EdB.Interface
 						this.SelectThing (current, false);
 						return;
 					}
-					if (current == selector.SingleSelectedThing) {
+					if (current == selector.get_SingleSelectedThing ()) {
 						flag = true;
 					}
 				}
@@ -14024,19 +16552,19 @@ namespace EdB.Interface
 
 		public void SelectPreviousColonist ()
 		{
-			Selector selector = Find.Selector;
-			if (selector.SingleSelectedThing == null || !(selector.SingleSelectedThing is Pawn) || selector.SingleSelectedThing.Faction != Faction.OfColony) {
-				this.SelectThing (Find.ListerPawns.FreeColonists.LastOrDefault<Pawn> (), false);
+			Selector selector = Find.get_Selector ();
+			if (selector.get_SingleSelectedThing () == null || !(selector.get_SingleSelectedThing () is Pawn) || selector.get_SingleSelectedThing ().get_Faction () != Faction.get_OfColony ()) {
+				this.SelectThing (Find.get_ListerPawns ().get_FreeColonists ().LastOrDefault<Pawn> (), false);
 			}
 			else {
 				Pawn pawn = null;
-				foreach (Pawn current in Find.ListerPawns.FreeColonists) {
-					if (selector.SingleSelectedThing == current) {
+				foreach (Pawn current in Find.get_ListerPawns ().get_FreeColonists ()) {
+					if (selector.get_SingleSelectedThing () == current) {
 						if (pawn != null) {
 							this.SelectThing (pawn, false);
 							break;
 						}
-						this.SelectThing (Find.ListerPawns.FreeColonists.LastOrDefault<Pawn> (), false);
+						this.SelectThing (Find.get_ListerPawns ().get_FreeColonists ().LastOrDefault<Pawn> (), false);
 						break;
 					}
 					else {
@@ -14048,14 +16576,14 @@ namespace EdB.Interface
 
 		public void SelectPreviousColonyAnimal ()
 		{
-			Selector selector = Find.Selector;
-			if (selector.SingleSelectedThing == null || !(selector.SingleSelectedThing is Pawn) || selector.SingleSelectedThing.Faction != Faction.OfColony || (selector.SingleSelectedThing as Pawn).IsColonist) {
+			Selector selector = Find.get_Selector ();
+			if (selector.get_SingleSelectedThing () == null || !(selector.get_SingleSelectedThing () is Pawn) || selector.get_SingleSelectedThing ().get_Faction () != Faction.get_OfColony () || (selector.get_SingleSelectedThing () as Pawn).get_IsColonist ()) {
 				this.SelectThing (this.ColonyAnimals.LastOrDefault<Pawn> (), false);
 			}
 			else {
 				Pawn pawn = null;
 				foreach (Pawn current in this.ColonyAnimals) {
-					if (selector.SingleSelectedThing == current) {
+					if (selector.get_SingleSelectedThing () == current) {
 						if (pawn != null) {
 							this.SelectThing (pawn, false);
 							break;
@@ -14072,14 +16600,14 @@ namespace EdB.Interface
 
 		public void SelectPreviousEnemy ()
 		{
-			Selector selector = Find.Selector;
-			if (selector.SingleSelectedThing == null || !(selector.SingleSelectedThing is Pawn) || selector.SingleSelectedThing.Faction == Faction.OfColony) {
+			Selector selector = Find.get_Selector ();
+			if (selector.get_SingleSelectedThing () == null || !(selector.get_SingleSelectedThing () is Pawn) || selector.get_SingleSelectedThing ().get_Faction () == Faction.get_OfColony ()) {
 				this.SelectThing (this.HostilePawns.LastOrDefault<Pawn> (), false);
 			}
 			else {
 				Pawn pawn = null;
 				foreach (Pawn current in this.HostilePawns) {
-					if (selector.SingleSelectedThing == current) {
+					if (selector.get_SingleSelectedThing () == current) {
 						if (pawn != null) {
 							this.SelectThing (pawn, false);
 							break;
@@ -14096,19 +16624,19 @@ namespace EdB.Interface
 
 		public void SelectPreviousPrisoner ()
 		{
-			Selector selector = Find.Selector;
-			if (selector.SingleSelectedThing == null || !(selector.SingleSelectedThing is Pawn)) {
-				this.SelectThing (Find.ListerPawns.PrisonersOfColony.LastOrDefault<Pawn> (), false);
+			Selector selector = Find.get_Selector ();
+			if (selector.get_SingleSelectedThing () == null || !(selector.get_SingleSelectedThing () is Pawn)) {
+				this.SelectThing (Find.get_ListerPawns ().get_PrisonersOfColony ().LastOrDefault<Pawn> (), false);
 			}
 			else {
 				Pawn pawn = null;
-				foreach (Pawn current in Find.ListerPawns.PrisonersOfColony) {
-					if (selector.SingleSelectedThing == current) {
+				foreach (Pawn current in Find.get_ListerPawns ().get_PrisonersOfColony ()) {
+					if (selector.get_SingleSelectedThing () == current) {
 						if (pawn != null) {
 							this.SelectThing (pawn, false);
 							break;
 						}
-						this.SelectThing (Find.ListerPawns.PrisonersOfColony.LastOrDefault<Pawn> (), false);
+						this.SelectThing (Find.get_ListerPawns ().get_PrisonersOfColony ().LastOrDefault<Pawn> (), false);
 						break;
 					}
 					else {
@@ -14120,14 +16648,14 @@ namespace EdB.Interface
 
 		public void SelectPreviousVisitor ()
 		{
-			Selector selector = Find.Selector;
-			if (selector.SingleSelectedThing == null || !(selector.SingleSelectedThing is Pawn) || selector.SingleSelectedThing.Faction == Faction.OfColony) {
+			Selector selector = Find.get_Selector ();
+			if (selector.get_SingleSelectedThing () == null || !(selector.get_SingleSelectedThing () is Pawn) || selector.get_SingleSelectedThing ().get_Faction () == Faction.get_OfColony ()) {
 				this.SelectThing (this.VisitorPawns.LastOrDefault<Pawn> (), false);
 			}
 			else {
 				Pawn pawn = null;
 				foreach (Pawn current in this.VisitorPawns) {
-					if (selector.SingleSelectedThing == current) {
+					if (selector.get_SingleSelectedThing () == current) {
 						if (pawn != null) {
 							this.SelectThing (pawn, false);
 							break;
@@ -14148,15 +16676,26 @@ namespace EdB.Interface
 				return;
 			}
 			if (!addToSelection) {
-				Find.Selector.ClearSelection ();
+				Find.get_Selector ().ClearSelection ();
 			}
-			Find.Selector.Select (thing, true, true);
-			Find.MainTabsRoot.SetCurrentTab (MainTabDefOf.Inspect, true);
+			Find.get_Selector ().Select (thing, true, true);
+			Find.get_MainTabsRoot ().SetCurrentTab (MainTabDefOf.Inspect, true);
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Text;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class SkillDrawer
 	{
+		//
+		// Static Fields
+		//
 		private const float IncButSpacing = 10;
 
 		private const float SkillWidth = 380;
@@ -14165,9 +16704,9 @@ namespace EdB.Interface
 
 		private static Texture2D PassionMinorIcon = ContentFinder<Texture2D>.Get ("UI/Icons/PassionMinor", true);
 
-		private static Texture2D SkillBarFillTex = SolidColorMaterials.NewSolidColorTexture (new Color (1, 1, 1, 0.1f));
+		private static Texture2D SkillBarFillTex = SolidColorMaterials.NewSolidColorTexture (new Color (1, 1, 1, 0.1));
 
-		private static Color DisabledSkillColor = new Color (1, 1, 1, 0.5f);
+		private static Color DisabledSkillColor = new Color (1, 1, 1, 0.5);
 
 		private static float levelLabelWidth = -1;
 
@@ -14187,10 +16726,13 @@ namespace EdB.Interface
 
 		public const float LevelNumberX = 140;
 
+		//
+		// Static Methods
+		//
 		private static string GetSkillDescription (SkillRecord sk)
 		{
 			StringBuilder stringBuilder = new StringBuilder ();
-			if (sk.TotallyDisabled) {
+			if (sk.get_TotallyDisabled ()) {
 				stringBuilder.Append (GenText.CapitalizeFirst (Translator.Translate ("DisabledLower")));
 			}
 			else {
@@ -14199,33 +16741,33 @@ namespace EdB.Interface
 					" ",
 					sk.level,
 					": ",
-					sk.LevelDescriptor
+					sk.get_LevelDescriptor ()
 				}));
-				if (Game.Mode == GameMode.MapPlaying) {
+				if (Game.get_Mode () == 2) {
 					string text = (sk.level == 20) ? Translator.Translate ("Experience") : Translator.Translate ("ProgressToNextLevel");
 					stringBuilder.AppendLine (string.Concat (new object[] {
 						text,
 						": ",
 						sk.xpSinceLastLevel.ToString ("########0"),
 						" / ",
-						sk.XpRequiredForLevelUp
+						sk.get_XpRequiredForLevelUp ()
 					}));
 				}
 				stringBuilder.Append (Translator.Translate ("Passion") + ": ");
 				switch (sk.passion) {
-				case Passion.None:
+				case 0:
 					stringBuilder.Append (Translator.Translate ("PassionNone", new object[] {
-						"0.3f"
+						"0.3"
 					}));
 					break;
-				case Passion.Minor:
+				case 1:
 					stringBuilder.Append (Translator.Translate ("PassionMinor", new object[] {
-						"1.0f"
+						"1.0"
 					}));
 					break;
-				case Passion.Major:
+				case 2:
 					stringBuilder.Append (Translator.Translate ("PassionMajor", new object[] {
-						"1.5f"
+						"1.5"
 					}));
 					break;
 				}
@@ -14236,53 +16778,56 @@ namespace EdB.Interface
 			return stringBuilder.ToString ();
 		}
 
+		//
+		// Methods
+		//
 		private void DrawSkill (SkillRecord skill, Vector2 topLeft)
 		{
 			Rect rect = new Rect (topLeft.x, topLeft.y, 380, 20);
-			if (rect.Contains (Event.current.mousePosition)) {
+			if (rect.Contains (Event.get_current ().get_mousePosition ())) {
 				GUI.DrawTexture (rect, TexUI.HighlightTex);
 			}
 			try {
 				GUI.BeginGroup (rect);
-				Text.Anchor = TextAnchor.UpperLeft;
-				Rect rect2 = new Rect (6, -3, SkillDrawer.levelLabelWidth + 6, rect.height + 5);
-				rect2.yMin = rect2.yMin + 3;
-				GUI.color = TabDrawer.TextColor;
+				Text.set_Anchor (0);
+				Rect rect2 = new Rect (6, -3, SkillDrawer.levelLabelWidth + 6, rect.get_height () + 5);
+				rect2.set_yMin (rect2.get_yMin () + 3);
+				GUI.set_color (TabDrawer.TextColor);
 				Widgets.Label (rect2, skill.def.skillLabel);
-				Rect rect3 = new Rect (rect2.xMax, 0, 24, 24);
+				Rect rect3 = new Rect (rect2.get_xMax (), 0, 24, 24);
 				if (skill.passion > 0) {
-					Texture2D texture2D = (skill.passion == Passion.Major) ? SkillDrawer.PassionMajorIcon : SkillDrawer.PassionMinorIcon;
+					Texture2D texture2D = (skill.passion == 2) ? SkillDrawer.PassionMajorIcon : SkillDrawer.PassionMinorIcon;
 					GUI.DrawTexture (rect3, texture2D);
 				}
-				if (!skill.TotallyDisabled) {
-					Rect rect4 = new Rect (rect3.xMax, 0, rect.width - rect3.xMax, rect.height);
+				if (!skill.get_TotallyDisabled ()) {
+					Rect rect4 = new Rect (rect3.get_xMax (), 0, rect.get_width () - rect3.get_xMax (), rect.get_height ());
 					Widgets.FillableBar (rect4, (float)skill.level / 20, SkillDrawer.SkillBarFillTex, null, false);
 				}
-				Rect rect5 = new Rect (rect3.xMax + 4, -2, 999, rect2.height);
-				rect5.yMin = rect5.yMin + 3;
+				Rect rect5 = new Rect (rect3.get_xMax () + 4, -2, 999, rect2.get_height ());
+				rect5.set_yMin (rect5.get_yMin () + 3);
 				string text;
-				if (skill.TotallyDisabled) {
-					GUI.color = SkillDrawer.DisabledSkillColor;
+				if (skill.get_TotallyDisabled ()) {
+					GUI.set_color (SkillDrawer.DisabledSkillColor);
 					text = "-";
 				}
 				else {
 					text = GenString.ToStringCached (skill.level);
 				}
-				Text.Anchor = TextAnchor.MiddleLeft;
+				Text.set_Anchor (3);
 				Widgets.Label (rect5, text);
 			}
 			finally {
 				GUI.EndGroup ();
-				Text.Anchor = TextAnchor.UpperLeft;
-				GUI.color = Color.white;
+				Text.set_Anchor (0);
+				GUI.set_color (Color.get_white ());
 			}
 			TooltipHandler.TipRegion (rect, new TipSignal (SkillDrawer.GetSkillDescription (skill), skill.def.GetHashCode () * 397945));
 		}
 
 		public void DrawSkillsOf (Pawn p, Vector2 Offset)
 		{
-			Text.Font = GameFont.Small;
-			foreach (SkillDef current in DefDatabase<SkillDef>.AllDefs) {
+			Text.set_Font (1);
+			foreach (SkillDef current in DefDatabase<SkillDef>.get_AllDefs ()) {
 				float x = Text.CalcSize (current.skillLabel).x;
 				if (x > SkillDrawer.levelLabelWidth) {
 					SkillDrawer.levelLabelWidth = x;
@@ -14296,11 +16841,23 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class Squad : IExposable
 	{
+		//
+		// Static Fields
+		//
 		private static int Count;
 
+		//
+		// Fields
+		//
 		protected string id = Squad.GenerateId ();
 
 		protected bool showInOverviewTabs = true;
@@ -14311,6 +16868,9 @@ namespace EdB.Interface
 
 		protected List<Pawn> pawns = new List<Pawn> ();
 
+		//
+		// Properties
+		//
 		public string Id {
 			get {
 				return this.id;
@@ -14367,11 +16927,17 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Static Methods
+		//
 		public static string GenerateId ()
 		{
 			return "Squad" + DateTime.Now.Ticks + ++Squad.Count;
 		}
 
+		//
+		// Methods
+		//
 		public virtual void Add (Pawn pawn)
 		{
 			if (!this.pawns.Contains (pawn)) {
@@ -14390,7 +16956,7 @@ namespace EdB.Interface
 			Scribe_Values.LookValue<string> (ref this.name, "name", string.Empty, true);
 			Scribe_Values.LookValue<bool> (ref this.showInColonistBar, "showInColonistBar", true, true);
 			Scribe_Values.LookValue<bool> (ref this.showInOverviewTabs, "showInOverviewTabs", true, true);
-			Scribe_Collections.LookList<Pawn> (ref this.pawns, "pawns", LookMode.MapReference, null);
+			Scribe_Collections.LookList<Pawn> (ref this.pawns, "pawns", 3, null);
 		}
 
 		public virtual bool Remove (Pawn pawn)
@@ -14406,19 +16972,41 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public delegate void SquadAddedHandler (Squad squad);
+}
+using System;
 
+namespace EdB.Interface
+{
 	public delegate void SquadChangedHandler (Squad squad);
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class SquadManager
 	{
+		//
+		// Static Fields
+		//
 		public static bool LoggingEnabled;
 
 		public static readonly int MaxFavorites = 10;
 
 		protected static SquadManager instance;
 
+		//
+		// Fields
+		//
 		protected AllColonistsSquad allColonistsSquad;
 
 		protected Squad squadFilter;
@@ -14429,6 +17017,9 @@ namespace EdB.Interface
 
 		protected List<Squad> squads = new List<Squad> ();
 
+		//
+		// Static Properties
+		//
 		public static SquadManager Instance {
 			get {
 				if (SquadManager.instance == null) {
@@ -14438,10 +17029,13 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Properties
+		//
 		public bool AllColonistsOrderMatches {
 			get {
 				int orderHash = this.GetOrderHash (this.AllColonistsSquad.Pawns);
-				int orderHash2 = this.GetOrderHash (Find.ListerPawns.FreeColonists);
+				int orderHash2 = this.GetOrderHash (Find.get_ListerPawns ().get_FreeColonists ());
 				return orderHash == orderHash2;
 			}
 		}
@@ -14496,12 +17090,18 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		protected SquadManager ()
 		{
 			this.Message ("SquadManager()");
 			this.Reset ();
 		}
 
+		//
+		// Methods
+		//
 		public void AddSquad (Squad squad)
 		{
 			this.Message ("SquadManager.AddSquad()");
@@ -14732,23 +17332,134 @@ namespace EdB.Interface
 			}
 		}
 
-		public event SquadNotificationHandler SquadAdded;
+		//
+		// Events
+		//
+		public event SquadNotificationHandler SquadAdded {
+			add {
+				SquadNotificationHandler squadNotificationHandler = this.SquadAdded;
+				SquadNotificationHandler squadNotificationHandler2;
+				do {
+					squadNotificationHandler2 = squadNotificationHandler;
+					squadNotificationHandler = Interlocked.CompareExchange<SquadNotificationHandler> (ref this.SquadAdded, (SquadNotificationHandler)Delegate.Combine (squadNotificationHandler2, value), squadNotificationHandler);
+				}
+				while (squadNotificationHandler != squadNotificationHandler2);
+			}
+			remove {
+				SquadNotificationHandler squadNotificationHandler = this.SquadAdded;
+				SquadNotificationHandler squadNotificationHandler2;
+				do {
+					squadNotificationHandler2 = squadNotificationHandler;
+					squadNotificationHandler = Interlocked.CompareExchange<SquadNotificationHandler> (ref this.SquadAdded, (SquadNotificationHandler)Delegate.Remove (squadNotificationHandler2, value), squadNotificationHandler);
+				}
+				while (squadNotificationHandler != squadNotificationHandler2);
+			}
+		}
 
-		public event SquadNotificationHandler SquadChanged;
+		public event SquadNotificationHandler SquadChanged {
+			add {
+				SquadNotificationHandler squadNotificationHandler = this.SquadChanged;
+				SquadNotificationHandler squadNotificationHandler2;
+				do {
+					squadNotificationHandler2 = squadNotificationHandler;
+					squadNotificationHandler = Interlocked.CompareExchange<SquadNotificationHandler> (ref this.SquadChanged, (SquadNotificationHandler)Delegate.Combine (squadNotificationHandler2, value), squadNotificationHandler);
+				}
+				while (squadNotificationHandler != squadNotificationHandler2);
+			}
+			remove {
+				SquadNotificationHandler squadNotificationHandler = this.SquadChanged;
+				SquadNotificationHandler squadNotificationHandler2;
+				do {
+					squadNotificationHandler2 = squadNotificationHandler;
+					squadNotificationHandler = Interlocked.CompareExchange<SquadNotificationHandler> (ref this.SquadChanged, (SquadNotificationHandler)Delegate.Remove (squadNotificationHandler2, value), squadNotificationHandler);
+				}
+				while (squadNotificationHandler != squadNotificationHandler2);
+			}
+		}
 
-		public event SquadNotificationHandler SquadDisplayPreferenceChanged;
+		public event SquadNotificationHandler SquadDisplayPreferenceChanged {
+			add {
+				SquadNotificationHandler squadNotificationHandler = this.SquadDisplayPreferenceChanged;
+				SquadNotificationHandler squadNotificationHandler2;
+				do {
+					squadNotificationHandler2 = squadNotificationHandler;
+					squadNotificationHandler = Interlocked.CompareExchange<SquadNotificationHandler> (ref this.SquadDisplayPreferenceChanged, (SquadNotificationHandler)Delegate.Combine (squadNotificationHandler2, value), squadNotificationHandler);
+				}
+				while (squadNotificationHandler != squadNotificationHandler2);
+			}
+			remove {
+				SquadNotificationHandler squadNotificationHandler = this.SquadDisplayPreferenceChanged;
+				SquadNotificationHandler squadNotificationHandler2;
+				do {
+					squadNotificationHandler2 = squadNotificationHandler;
+					squadNotificationHandler = Interlocked.CompareExchange<SquadNotificationHandler> (ref this.SquadDisplayPreferenceChanged, (SquadNotificationHandler)Delegate.Remove (squadNotificationHandler2, value), squadNotificationHandler);
+				}
+				while (squadNotificationHandler != squadNotificationHandler2);
+			}
+		}
 
-		public event SquadOrderChangedHandler SquadOrderChanged;
+		public event SquadOrderChangedHandler SquadOrderChanged {
+			add {
+				SquadOrderChangedHandler squadOrderChangedHandler = this.SquadOrderChanged;
+				SquadOrderChangedHandler squadOrderChangedHandler2;
+				do {
+					squadOrderChangedHandler2 = squadOrderChangedHandler;
+					squadOrderChangedHandler = Interlocked.CompareExchange<SquadOrderChangedHandler> (ref this.SquadOrderChanged, (SquadOrderChangedHandler)Delegate.Combine (squadOrderChangedHandler2, value), squadOrderChangedHandler);
+				}
+				while (squadOrderChangedHandler != squadOrderChangedHandler2);
+			}
+			remove {
+				SquadOrderChangedHandler squadOrderChangedHandler = this.SquadOrderChanged;
+				SquadOrderChangedHandler squadOrderChangedHandler2;
+				do {
+					squadOrderChangedHandler2 = squadOrderChangedHandler;
+					squadOrderChangedHandler = Interlocked.CompareExchange<SquadOrderChangedHandler> (ref this.SquadOrderChanged, (SquadOrderChangedHandler)Delegate.Remove (squadOrderChangedHandler2, value), squadOrderChangedHandler);
+				}
+				while (squadOrderChangedHandler != squadOrderChangedHandler2);
+			}
+		}
 
-		public event SquadRemovedHandler SquadRemoved;
+		public event SquadRemovedHandler SquadRemoved {
+			add {
+				SquadRemovedHandler squadRemovedHandler = this.SquadRemoved;
+				SquadRemovedHandler squadRemovedHandler2;
+				do {
+					squadRemovedHandler2 = squadRemovedHandler;
+					squadRemovedHandler = Interlocked.CompareExchange<SquadRemovedHandler> (ref this.SquadRemoved, (SquadRemovedHandler)Delegate.Combine (squadRemovedHandler2, value), squadRemovedHandler);
+				}
+				while (squadRemovedHandler != squadRemovedHandler2);
+			}
+			remove {
+				SquadRemovedHandler squadRemovedHandler = this.SquadRemoved;
+				SquadRemovedHandler squadRemovedHandler2;
+				do {
+					squadRemovedHandler2 = squadRemovedHandler;
+					squadRemovedHandler = Interlocked.CompareExchange<SquadRemovedHandler> (ref this.SquadRemoved, (SquadRemovedHandler)Delegate.Remove (squadRemovedHandler2, value), squadRemovedHandler);
+				}
+				while (squadRemovedHandler != squadRemovedHandler2);
+			}
+		}
 	}
+}
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class SquadManagerThing : Thing
 	{
+		//
+		// Static Fields
+		//
 		public static readonly string DefName = "EdBInterfaceSquadManager";
 
 		protected static SquadManagerThing instance;
 
+		//
+		// Fields
+		//
 		protected bool inMap;
 
 		private string squadFilterId = string.Empty;
@@ -14767,9 +17478,12 @@ namespace EdB.Interface
 
 		private List<Pawn> missingPawns = new List<Pawn> ();
 
+		//
+		// Static Properties
+		//
 		public static SquadManagerThing Instance {
 			get {
-				List<Thing> list = Find.Map.listerThings.ThingsOfDef (ThingDef.Named (SquadManagerThing.DefName));
+				List<Thing> list = Find.get_Map ().listerThings.ThingsOfDef (ThingDef.Named (SquadManagerThing.DefName));
 				if (list != null && list.Count > 0) {
 					SquadManagerThing.instance = (list [0] as SquadManagerThing);
 					if (SquadManagerThing.instance != null) {
@@ -14779,7 +17493,7 @@ namespace EdB.Interface
 				if (SquadManagerThing.instance == null) {
 					SquadManagerThing.instance = (ThingMaker.MakeThing (ThingDef.Named (SquadManagerThing.DefName), null) as SquadManagerThing);
 					if (SquadManagerThing.instance != null) {
-						SquadManagerThing.instance.Position = new IntVec3 (0, 0, 0);
+						SquadManagerThing.instance.set_Position (new IntVec3 (0, 0, 0));
 					}
 					else {
 						Log.Error ("Could not create Squad Manager Thing.");
@@ -14789,6 +17503,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Properties
+		//
 		public Squad CurrentSquad {
 			get {
 				return this.currentSquad;
@@ -14825,15 +17542,21 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Static Methods
+		//
 		public static void Clear ()
 		{
 			SquadManagerThing.instance = null;
 		}
 
+		//
+		// Methods
+		//
 		public bool AddToMap ()
 		{
 			if (!this.inMap) {
-				Find.Map.listerThings.Add (this);
+				Find.get_Map ().listerThings.Add (this);
 				this.inMap = true;
 				return true;
 			}
@@ -14843,7 +17566,7 @@ namespace EdB.Interface
 		public override void ExposeData ()
 		{
 			base.ExposeData ();
-			if (Scribe.mode == LoadSaveMode.Saving) {
+			if (Scribe.mode == 1) {
 				this.squads.Clear ();
 				this.squads.AddRange (SquadManager.Instance.Squads);
 				this.missingPawns.Clear ();
@@ -14887,10 +17610,10 @@ namespace EdB.Interface
 			}
 			Scribe_Values.LookValue<string> (ref this.currentSquadId, "currentSquad", null, false);
 			Scribe_Values.LookValue<string> (ref this.squadFilterId, "squadFilter", null, false);
-			Scribe_Collections.LookList<string> (ref this.favoriteIds, "favorites", LookMode.Value, null);
-			Scribe_Collections.LookList<Pawn> (ref this.missingPawns, "missingPawns", LookMode.Deep, null);
-			Scribe_Collections.LookList<Squad> (ref this.squads, "squads", LookMode.Deep, null);
-			if (Scribe.mode == LoadSaveMode.PostLoadInit) {
+			Scribe_Collections.LookList<string> (ref this.favoriteIds, "favorites", 1, null);
+			Scribe_Collections.LookList<Pawn> (ref this.missingPawns, "missingPawns", 2, null);
+			Scribe_Collections.LookList<Squad> (ref this.squads, "squads", 2, null);
+			if (Scribe.mode == 4) {
 				if (this.favorites == null) {
 					this.favorites = new List<Squad> ();
 				}
@@ -14926,26 +17649,45 @@ namespace EdB.Interface
 		public bool RemoveFromMap ()
 		{
 			if (this.inMap) {
-				Find.Map.listerThings.Remove (this);
+				Find.get_Map ().listerThings.Remove (this);
 				this.inMap = false;
 				return true;
 			}
 			return false;
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public delegate void SquadNotificationHandler (Squad squad);
+}
+using System;
 
+namespace EdB.Interface
+{
 	public delegate void SquadOrderChangedHandler ();
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class SquadPriorities
 	{
+		//
+		// Fields
+		//
 		protected DefMap<WorkTypeDef, int> priorities = new DefMap<WorkTypeDef, int> ();
 
+		//
+		// Methods
+		//
 		public int GetPriority (WorkTypeDef w)
 		{
-			int num = this.priorities[w];
-			if (num > 0 && !Find.PlaySettings.useWorkPriorities) {
+			int num = this.priorities.get_Item (w);
+			if (num > 0 && !Find.get_PlaySettings ().useWorkPriorities) {
 				return 1;
 			}
 			return num;
@@ -14956,8 +17698,8 @@ namespace EdB.Interface
 			if (this.priorities == null) {
 				this.priorities = new DefMap<WorkTypeDef, int> ();
 			}
-			if (this.priorities.Count == 0) {
-				foreach (WorkTypeDef current in DefDatabase<WorkTypeDef>.AllDefs) {
+			if (this.priorities.get_Count () == 0) {
+				foreach (WorkTypeDef current in DefDatabase<WorkTypeDef>.get_AllDefs ()) {
 					this.SetPriority (current, 0);
 				}
 			}
@@ -14969,14 +17711,28 @@ namespace EdB.Interface
 			if (priority < 0 || priority > 4) {
 				Log.Message ("Trying to set work to invalid priority " + priority);
 			}
-			this.priorities.Item = priority;
+			this.priorities.set_Item (w, priority);
 		}
 	}
+}
+using System;
 
+namespace EdB.Interface
+{
 	public delegate void SquadRemovedHandler (Squad squad, int index);
+}
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class SquadShortcuts
 	{
+		//
+		// Fields
+		//
 		protected List<KeyBindingDef> squadSelectionBindings = new List<KeyBindingDef> ();
 
 		protected int keypressCount;
@@ -14989,11 +17745,17 @@ namespace EdB.Interface
 
 		protected KeyBindingDef nextSquadKeyBinding;
 
+		//
+		// Properties
+		//
 		public ColonistBarSquadSupervisor ColonistBarSquadSupervisor {
 			get;
 			set;
 		}
 
+		//
+		// Constructors
+		//
 		public SquadShortcuts ()
 		{
 			this.squadSelectionBindings.Clear ();
@@ -15011,22 +17773,25 @@ namespace EdB.Interface
 			this.previousSquadKeyBinding = KeyBindingDef.Named ("EdB_Interface_PreviousSquad");
 		}
 
+		//
+		// Methods
+		//
 		public void Update ()
 		{
 			for (int i = 0; i < this.squadSelectionBindings.Count; i++) {
-				if (this.squadSelectionBindings [i] != null && this.squadSelectionBindings [i].JustPressed) {
-					Event current = Event.current;
-					if (current.shift || current.control) {
+				if (this.squadSelectionBindings [i] != null && this.squadSelectionBindings [i].get_JustPressed ()) {
+					Event current = Event.get_current ();
+					if (current.get_shift () || current.get_control ()) {
 						if (this.ColonistBarSquadSupervisor.SaveCurrentSquadAsFavorite (i)) {
 							Messages.Message (Translator.Translate ("EdB.Squads.Shortcuts.Assigned", new object[] {
 								this.ColonistBarSquadSupervisor.SelectedSquad.Name,
-								this.squadSelectionBindings [i].MainKeyLabel
-							}), MessageSound.Standard);
+								this.squadSelectionBindings [i].get_MainKeyLabel ()
+							}), 1);
 						}
 					}
 					else {
 						int? num = this.pressedKey;
-						if (num.HasValue && this.pressedKey.Value == i && Time.time - this.lastKeypressTimestamp < 0.3f) {
+						if (num.HasValue && this.pressedKey.Value == i && Time.get_time () - this.lastKeypressTimestamp < 0.3) {
 							this.keypressCount++;
 							if (this.keypressCount > 2) {
 								this.keypressCount = 1;
@@ -15044,35 +17809,52 @@ namespace EdB.Interface
 							this.pressedKey = null;
 							this.keypressCount = 0;
 						}
-						this.lastKeypressTimestamp = Time.time;
+						this.lastKeypressTimestamp = Time.get_time ();
 					}
 				}
 			}
-			if (this.nextSquadKeyBinding != null && this.nextSquadKeyBinding.JustPressed) {
+			if (this.nextSquadKeyBinding != null && this.nextSquadKeyBinding.get_JustPressed ()) {
 				this.ColonistBarSquadSupervisor.SelectNextSquad (1);
 			}
-			if (this.previousSquadKeyBinding != null && this.previousSquadKeyBinding.JustPressed) {
+			if (this.previousSquadKeyBinding != null && this.previousSquadKeyBinding.get_JustPressed ()) {
 				this.ColonistBarSquadSupervisor.SelectNextSquad (-1);
 			}
 		}
 	}
+}
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public abstract class StringOptionsPreference : IPreference
 	{
 		public delegate void ValueChangedHandler (string value);
 
+		//
+		// Static Fields
+		//
 		public static float LabelMargin = StringOptionsPreference.RadioButtonWidth + StringOptionsPreference.RadioButtonMargin;
 
 		public static float RadioButtonMargin = 18;
 
 		public static float RadioButtonWidth = 24;
 
+		//
+		// Fields
+		//
 		private string stringValue;
 
 		private string setValue;
 
 		public int tooltipId;
 
+		//
+		// Properties
+		//
 		public abstract string DefaultValue {
 			get;
 		}
@@ -15169,15 +17951,21 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public StringOptionsPreference ()
 		{
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI (float positionX, ref float positionY, float width)
 		{
 			bool disabled = this.Disabled;
 			if (disabled) {
-				GUI.color = Dialog_InterfaceOptions.DisabledControlColor;
+				GUI.set_color (Dialog_InterfaceOptions.DisabledControlColor);
 			}
 			float num = (!this.Indent) ? 0 : Dialog_InterfaceOptions.IndentSize;
 			foreach (string current in this.OptionValues) {
@@ -15201,35 +17989,70 @@ namespace EdB.Interface
 				positionY += num2 + Dialog_InterfaceOptions.PreferencePadding.y;
 			}
 			positionY -= Dialog_InterfaceOptions.PreferencePadding.y;
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 		}
 
-		public event StringOptionsPreference.ValueChangedHandler ValueChanged;
+		//
+		// Events
+		//
+		public event StringOptionsPreference.ValueChangedHandler ValueChanged {
+			add {
+				StringOptionsPreference.ValueChangedHandler valueChangedHandler = this.ValueChanged;
+				StringOptionsPreference.ValueChangedHandler valueChangedHandler2;
+				do {
+					valueChangedHandler2 = valueChangedHandler;
+					valueChangedHandler = Interlocked.CompareExchange<StringOptionsPreference.ValueChangedHandler> (ref this.ValueChanged, (StringOptionsPreference.ValueChangedHandler)Delegate.Combine (valueChangedHandler2, value), valueChangedHandler);
+				}
+				while (valueChangedHandler != valueChangedHandler2);
+			}
+			remove {
+				StringOptionsPreference.ValueChangedHandler valueChangedHandler = this.ValueChanged;
+				StringOptionsPreference.ValueChangedHandler valueChangedHandler2;
+				do {
+					valueChangedHandler2 = valueChangedHandler;
+					valueChangedHandler = Interlocked.CompareExchange<StringOptionsPreference.ValueChangedHandler> (ref this.ValueChanged, (StringOptionsPreference.ValueChangedHandler)Delegate.Remove (valueChangedHandler2, value), valueChangedHandler);
+				}
+				while (valueChangedHandler != valueChangedHandler2);
+			}
+		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Verse;
+using Verse.Sound;
 
+namespace EdB.Interface
+{
 	public static class TabDrawer
 	{
+		//
+		// Static Fields
+		//
 		private const float TabHoriztonalOverlap = 10;
 
 		public static Color HeaderColor = new Color (1, 1, 1);
 
-		public static Color SeparatorColor = new Color (0.3f, 0.3f, 0.3f);
+		public static Color SeparatorColor = new Color (0.3, 0.3, 0.3);
 
-		public static Color NoneColor = new Color (0.4f, 0.4f, 0.4f);
+		public static Color NoneColor = new Color (0.4, 0.4, 0.4);
 
-		public static Color BoxColor = new Color (0.1172f, 0.1328f, 0.1484f);
+		public static Color BoxColor = new Color (0.1172, 0.1328, 0.1484);
 
-		public static Color BoxBorderColor = new Color (0.52157f, 0.52157f, 0.52157f);
+		public static Color BoxBorderColor = new Color (0.52157, 0.52157, 0.52157);
 
 		private static List<TabRecord> tabList = new List<TabRecord> ();
 
-		public static Color TextColor = new Color (0.8f, 0.8f, 0.8f);
+		public static Color TextColor = new Color (0.8, 0.8, 0.8);
 
 		private const float MaxTabWidth = 200;
 
 		private const float TabHeight = 32;
 
-		public static readonly Texture2D AlternateRowTexture = SolidColorMaterials.NewSolidColorTexture (new Color (1, 1, 1, 0.05f));
+		public static readonly Texture2D AlternateRowTexture = SolidColorMaterials.NewSolidColorTexture (new Color (1, 1, 1, 0.05));
 
 		public static readonly Texture2D Rename = ContentFinder<Texture2D>.Get ("UI/Buttons/Rename", true);
 
@@ -15237,32 +18060,35 @@ namespace EdB.Interface
 
 		public static Vector2 TabPanelSize = new Vector2 (360, 670);
 
+		//
+		// Static Methods
+		//
 		public static void DrawBox (Rect rect)
 		{
-			GUI.color = TabDrawer.BoxColor;
+			GUI.set_color (TabDrawer.BoxColor);
 			GUI.DrawTexture (rect, TabDrawer.WhiteTexture);
-			GUI.color = TabDrawer.BoxBorderColor;
+			GUI.set_color (TabDrawer.BoxBorderColor);
 			Widgets.DrawBox (rect, 1);
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 		}
 
 		public static float DrawHeader (float left, float top, float contentWidth, string labelText, bool drawSeparator = true, TextAnchor alignment = 0)
 		{
-			TextAnchor alignment2 = GUI.skin.label.alignment;
+			TextAnchor alignment2 = GUI.get_skin ().get_label ().get_alignment ();
 			float num = 2;
-			GUI.skin.label.alignment = alignment;
+			GUI.get_skin ().get_label ().set_alignment (alignment);
 			Rect rect = new Rect (left, top, contentWidth, 22);
-			rect.y = top;
-			Text.Font = GameFont.Small;
-			GUI.color = TabDrawer.HeaderColor;
+			rect.set_y (top);
+			Text.set_Font (1);
+			GUI.set_color (TabDrawer.HeaderColor);
 			Widgets.Label (rect, labelText);
 			if (drawSeparator) {
-				GUI.color = TabDrawer.SeparatorColor;
-				Widgets.DrawLineHorizontal (left, rect.y + rect.height - num, rect.width);
-				GUI.color = TabDrawer.TextColor;
+				GUI.set_color (TabDrawer.SeparatorColor);
+				Widgets.DrawLineHorizontal (left, rect.get_y () + rect.get_height () - num, rect.get_width ());
+				GUI.set_color (TabDrawer.TextColor);
 			}
-			float num2 = top + (rect.height - num);
-			GUI.skin.label.alignment = alignment2;
+			float num2 = top + (rect.get_height () - num);
+			GUI.get_skin ().get_label ().set_alignment (alignment2);
 			return num2 - top;
 		}
 
@@ -15270,51 +18096,51 @@ namespace EdB.Interface
 		{
 			float num = top;
 			float num2 = 5;
-			GUI.skin.label.alignment = TextAnchor.UpperLeft;
+			GUI.get_skin ().get_label ().set_alignment (0);
 			Rect rect = new Rect (left, num, contentWidth, 30);
-			Text.Font = GameFont.Medium;
+			Text.set_Font (2);
 			if (pawn != null) {
-				string text = (pawn.story == null) ? pawn.Label : pawn.Name.ToStringFull;
+				string text = (pawn.story == null) ? pawn.get_Label () : pawn.get_Name ().get_ToStringFull ();
 				Vector2 vector = Text.CalcSize (text);
-				GUI.color = TabDrawer.HeaderColor;
+				GUI.set_color (TabDrawer.HeaderColor);
 				Widgets.Label (rect, text);
-				float num3 = rect.height - num2;
-				if (allowRename && pawn.IsColonist) {
+				float num3 = rect.get_height () - num2;
+				if (allowRename && pawn.get_IsColonist ()) {
 					Rect rect2 = new Rect (left + vector.x + 7, num - 2, 30, 30);
 					TooltipHandler.TipRegion (rect2, new TipSignal (Translator.Translate ("RenameColonist")));
 					if (Widgets.ImageButton (rect2, TabDrawer.Rename)) {
-						Find.WindowStack.Add (new Dialog_ChangeNameTriple (pawn));
+						Find.get_WindowStack ().Add (new Dialog_ChangeNameTriple (pawn));
 					}
 				}
 				num += num3;
 			}
 			Vector2 vector2 = new Vector2 (contentWidth, 24);
-			Text.Font = GameFont.Small;
-			GUI.color = TabDrawer.HeaderColor;
+			Text.set_Font (1);
+			GUI.set_color (TabDrawer.HeaderColor);
 			Rect rect3 = new Rect (left, num, vector2.x, vector2.y);
-			string text2 = (pawn.gender == Gender.Male) ? GenText.CapitalizeFirst (Translator.Translate ("Male")) : GenText.CapitalizeFirst (Translator.Translate ("Female"));
-			if (!pawn.def.label.Equals (pawn.KindLabel)) {
+			string text2 = (pawn.gender == 1) ? GenText.CapitalizeFirst (Translator.Translate ("Male")) : GenText.CapitalizeFirst (Translator.Translate ("Female"));
+			if (!pawn.def.label.Equals (pawn.get_KindLabel ())) {
 				Widgets.Label (rect3, string.Concat (new string[] {
 					text2,
 					" ",
-					pawn.def.LabelCap,
+					pawn.def.get_LabelCap (),
 					" ",
-					pawn.KindLabel,
+					pawn.get_KindLabel (),
 					", ",
 					Translator.Translate ("AgeIndicator", new object[] {
-						pawn.ageTracker.AgeNumberString
+						pawn.ageTracker.get_AgeNumberString ()
 					})
 				}));
-				TooltipHandler.TipRegion (rect3, () => pawn.ageTracker.AgeTooltipString, 6873641);
+				TooltipHandler.TipRegion (rect3, () => pawn.ageTracker.get_AgeTooltipString (), 6873641);
 			}
 			else {
 				Widgets.Label (rect3, string.Concat (new string[] {
 					text2,
 					" ",
-					pawn.def.LabelCap,
+					pawn.def.get_LabelCap (),
 					", ",
 					Translator.Translate ("AgeIndicator", new object[] {
-						pawn.ageTracker.AgeNumberString
+						pawn.ageTracker.get_AgeNumberString ()
 					})
 				}));
 			}
@@ -15325,32 +18151,32 @@ namespace EdB.Interface
 		public static void DrawTab (TabRecord record, Rect rect, Texture2D atlas)
 		{
 			Rect rect2 = new Rect (rect);
-			rect2.width = 30;
+			rect2.set_width (30);
 			Rect rect3 = new Rect (rect);
-			rect3.width = 30;
-			rect3.x = rect.x + rect.width - 30;
-			Rect rect4 = new Rect (0.53125f, 0, 0.46875f, 1);
+			rect3.set_width (30);
+			rect3.set_x (rect.get_x () + rect.get_width () - 30);
+			Rect rect4 = new Rect (0.53125, 0, 0.46875, 1);
 			Rect rect5 = new Rect (rect);
-			rect5.x = rect5.x + rect2.width;
-			rect5.width = rect5.width - 60;
-			Rect rect6 = Widgets.ToUVRect (new Rect (30, 0, 4, (float)atlas.height), new Vector2 ((float)atlas.width, (float)atlas.height));
-			Widgets.DrawTexturePart (rect2, new Rect (0, 0, 0.46875f, 1), atlas);
+			rect5.set_x (rect5.get_x () + rect2.get_width ());
+			rect5.set_width (rect5.get_width () - 60);
+			Rect rect6 = Widgets.ToUVRect (new Rect (30, 0, 4, (float)atlas.get_height ()), new Vector2 ((float)atlas.get_width (), (float)atlas.get_height ()));
+			Widgets.DrawTexturePart (rect2, new Rect (0, 0, 0.46875, 1), atlas);
 			Widgets.DrawTexturePart (rect5, rect6, atlas);
 			Widgets.DrawTexturePart (rect3, rect4, atlas);
 			Rect rect7 = rect;
-			if (rect.Contains (Event.current.mousePosition)) {
-				GUI.color = Color.yellow;
-				rect7.x = rect7.x + 2;
-				rect7.y = rect7.y - 2;
+			if (rect.Contains (Event.get_current ().get_mousePosition ())) {
+				GUI.set_color (Color.get_yellow ());
+				rect7.set_x (rect7.get_x () + 2);
+				rect7.set_y (rect7.get_y () - 2);
 			}
 			Widgets.Label (rect7, record.label);
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 			if (!record.selected) {
 				Rect rect8 = new Rect (rect);
-				rect8.y = rect8.y + rect.height;
-				rect8.y = rect8.y - 1;
-				rect8.height = 1;
-				Rect rect9 = new Rect (0.5f, 0.01f, 0.01f, 0.01f);
+				rect8.set_y (rect8.get_y () + rect.get_height ());
+				rect8.set_y (rect8.get_y () - 1);
+				rect8.set_height (1);
+				Rect rect9 = new Rect (0.5, 0.01, 0.01, 0.01);
 				Widgets.DrawTexturePart (rect8, rect9, atlas);
 			}
 		}
@@ -15369,17 +18195,17 @@ namespace EdB.Interface
 				Debug.LogWarning ("Drew tabs without any being selected.");
 				return TabDrawer.tabList [0];
 			}
-			float num = baseRect.width + (float)(TabDrawer.tabList.Count - 1) * 10;
+			float num = baseRect.get_width () + (float)(TabDrawer.tabList.Count - 1) * 10;
 			float tabWidth = num / (float)TabDrawer.tabList.Count;
 			if (tabWidth > 200) {
 				tabWidth = 200;
 			}
 			Rect rect = new Rect (baseRect);
-			rect.y = rect.y - 32;
-			rect.height = 9999;
+			rect.set_y (rect.get_y () - 32);
+			rect.set_height (9999);
 			GUI.BeginGroup (rect);
-			Text.Anchor = TextAnchor.MiddleCenter;
-			Text.Font = GameFont.Small;
+			Text.set_Anchor (4);
+			Text.set_Font (1);
 			Func<TabRecord, Rect> func = delegate (TabRecord tab) {
 				int num2 = TabDrawer.tabList.IndexOf (tab);
 				float num3 = (float)num2 * (tabWidth - 10);
@@ -15394,7 +18220,7 @@ namespace EdB.Interface
 			for (int i = 0; i < list2.Count; i++) {
 				TabRecord tabRecord4 = list2 [i];
 				Rect rect2 = func.Invoke (tabRecord4);
-				if (tabRecord3 == null && rect2.Contains (Event.current.mousePosition)) {
+				if (tabRecord3 == null && rect2.Contains (Event.get_current ().get_mousePosition ())) {
 					tabRecord3 = tabRecord4;
 				}
 				MouseoverSounds.DoRegion (rect2);
@@ -15406,7 +18232,7 @@ namespace EdB.Interface
 				Rect rect3 = func.Invoke (current2);
 				TabDrawer.DrawTab (current2, rect3, atlas);
 			}
-			Text.Anchor = TextAnchor.UpperLeft;
+			Text.set_Anchor (0);
 			GUI.EndGroup ();
 			if (tabRecord != null) {
 				SoundStarter.PlayOneShotOnCamera (SoundDefOf.SelectDesignator);
@@ -15422,11 +18248,22 @@ namespace EdB.Interface
 			TabDrawer.WhiteTexture = SolidColorMaterials.NewSolidColorTexture (new Color (1, 1, 1));
 		}
 	}
+}
+using RimWorld;
+using System;
 
+namespace EdB.Interface
+{
 	public class TargeterComponent : IRenderedComponent, IUpdatedComponent, INamedComponent
 	{
+		//
+		// Fields
+		//
 		private Targeter targeter;
 
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "Targeter";
@@ -15439,11 +18276,17 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public TargeterComponent (Targeter targeter)
 		{
 			this.targeter = targeter;
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI ()
 		{
 			this.targeter.TargeterOnGUI ();
@@ -15454,9 +18297,18 @@ namespace EdB.Interface
 			this.targeter.TargeterUpdate ();
 		}
 	}
+}
+using System;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	internal class TexButton
 	{
+		//
+		// Static Fields
+		//
 		public static readonly Texture2D CloseXBig = ContentFinder<Texture2D>.Get ("UI/Widgets/CloseX", true);
 
 		public static readonly Texture2D Minus = ContentFinder<Texture2D>.Get ("UI/Buttons/Minus", true);
@@ -15531,22 +18383,43 @@ namespace EdB.Interface
 
 		public static readonly Texture2D CurveResetTex = ContentFinder<Texture2D>.Get ("UI/Buttons/Dev/CurveReset", true);
 	}
+}
+using System;
+using UnityEngine;
 
+namespace EdB.Interface
+{
 	public class TextureColorPair
 	{
+		//
+		// Fields
+		//
 		public Texture texture;
 
 		public Color color;
 
+		//
+		// Constructors
+		//
 		public TextureColorPair (Texture texture, Color color)
 		{
 			this.texture = texture;
 			this.color = color;
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Linq;
+using Verse;
 
+namespace EdB.Interface
+{
 	public static class ThingDefExtensions
 	{
+		//
+		// Static Methods
+		//
 		public static bool BelongsToCategory (this ThingDef def, string category)
 		{
 			return def.thingCategories != null && def.thingCategories.FirstOrDefault ((ThingCategoryDef d) => category.Equals (d.defName)) != null;
@@ -15557,11 +18430,22 @@ namespace EdB.Interface
 			return def.apparel != null || (def.weaponTags != null && def.weaponTags.Count > 0) || def.BelongsToCategory ("FoodMeals") || (def == ThingDefOf.Medicine || def.defName.Equals ("GlitterworldMedicine"));
 		}
 	}
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ThingOverlaysComponent : IRenderedComponent, INamedComponent
 	{
+		//
+		// Fields
+		//
 		private ThingOverlays thingOverlays;
 
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "ThingOverlays";
@@ -15574,19 +18458,33 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public ThingOverlaysComponent (ThingOverlays thingOverlays)
 		{
 			this.thingOverlays = thingOverlays;
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI ()
 		{
 			this.thingOverlays.ThingOverlaysOnGUI ();
 		}
 	}
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class ThingTooltipComponent : IRenderedComponent, INamedComponent
 	{
+		//
+		// Properties
+		//
 		public string Name {
 			get {
 				return "ThingTooltips";
@@ -15599,14 +18497,26 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Methods
+		//
 		public void OnGUI ()
 		{
-			Find.TooltipGiverList.DispenseAllThingTooltips ();
+			Find.get_TooltipGiverList ().DispenseAllThingTooltips ();
 		}
 	}
+}
+using RimWorld;
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class TrackedColonist
 	{
+		//
+		// Fields
+		//
 		private Pawn pawn;
 
 		private Faction capturingFaction;
@@ -15621,6 +18531,9 @@ namespace EdB.Interface
 
 		private bool dead;
 
+		//
+		// Properties
+		//
 		public bool Broken {
 			get {
 				return this.BrokenState != null;
@@ -15630,7 +18543,7 @@ namespace EdB.Interface
 		public BrokenStateDef BrokenState {
 			get {
 				if (this.pawn.mindState != null && this.pawn.mindState.broken != null) {
-					return this.pawn.mindState.broken.CurStateDef;
+					return this.pawn.mindState.broken.get_CurStateDef ();
 				}
 				return null;
 			}
@@ -15698,14 +18611,14 @@ namespace EdB.Interface
 
 		public bool Drafted {
 			get {
-				return !this.dead && this.pawn.Drafted;
+				return !this.dead && this.pawn.get_Drafted ();
 			}
 		}
 
 		public float HealthPercent {
 			get {
 				if (this.pawn.health != null && this.pawn.health.summaryHealth != null) {
-					return this.pawn.health.summaryHealth.SummaryHealthPercent;
+					return this.pawn.health.summaryHealth.get_SummaryHealthPercent ();
 				}
 				return 0;
 			}
@@ -15713,17 +18626,17 @@ namespace EdB.Interface
 
 		public bool Incapacitated {
 			get {
-				return this.pawn.health != null && this.pawn.health.Downed;
+				return this.pawn.health != null && this.pawn.health.get_Downed ();
 			}
 		}
 
 		public int MentalBreakWarningLevel {
 			get {
-				if (this.pawn.mindState != null && this.pawn.mindState.breaker != null && !this.pawn.Downed && !this.pawn.Dead) {
-					if (this.pawn.mindState.breaker.HardBreakImminent) {
+				if (this.pawn.mindState != null && this.pawn.mindState.breaker != null && !this.pawn.get_Downed () && !this.pawn.get_Dead ()) {
+					if (this.pawn.mindState.breaker.get_HardBreakImminent ()) {
 						return 2;
 					}
-					if (this.pawn.mindState.breaker.MentalBreakApproaching) {
+					if (this.pawn.mindState.breaker.get_MentalBreakApproaching ()) {
 						return 1;
 					}
 				}
@@ -15758,6 +18671,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public TrackedColonist ()
 		{
 		}
@@ -15773,57 +18689,76 @@ namespace EdB.Interface
 			this.cryptosleep = false;
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public static class TrainingCardUtility
 	{
+		//
+		// Static Fields
+		//
 		private const float RowHeight = 28;
 
 		private const float InfoHeaderHeight = 50;
 
 		private static FieldInfo stepsField;
 
+		//
+		// Constructors
+		//
 		static TrainingCardUtility ()
 		{
 			TrainingCardUtility.stepsField = typeof(Pawn_TrainingTracker).GetField ("steps", BindingFlags.Instance | BindingFlags.NonPublic);
 		}
 
+		//
+		// Static Methods
+		//
 		public static void DrawTrainingCard (Rect rect, Pawn pawn)
 		{
 			try {
 				GUI.BeginGroup (rect);
-				Rect rect2 = new Rect (0, 0, rect.width, 25);
+				Rect rect2 = new Rect (0, 0, rect.get_width (), 25);
 				string text = Translator.Translate ("Master") + ": ";
 				Vector2 vector = Text.CalcSize (text);
 				Widgets.Label (rect2, text);
-				Rect rect3 = new Rect (rect2.x + vector.x + 6, rect2.y, 200, rect2.height);
+				Rect rect3 = new Rect (rect2.get_x () + vector.x + 6, rect2.get_y (), 200, rect2.get_height ());
 				if (pawn.training.IsCompleted (TrainableDefOf.Obedience)) {
-					rect3.y = rect3.y - 1;
+					rect3.set_y (rect3.get_y () - 1);
 					string text2 = TrainableUtility.MasterString (pawn);
 					if (Widgets.TextButton (rect3, text2, true, false)) {
 						TrainableUtility.OpenMasterSelectMenu (pawn);
 					}
 				}
 				else {
-					GUI.color = new Color (0.7f, 0.7f, 0.7f);
+					GUI.set_color (new Color (0.7, 0.7, 0.7));
 					Widgets.Label (rect3, Translator.Translate ("None"));
-					GUI.color = Color.white;
+					GUI.set_color (Color.get_white ());
 				}
-				List<TrainableDef> trainableDefsInListOrder = TrainableUtility.TrainableDefsInListOrder;
+				List<TrainableDef> trainableDefsInListOrder = TrainableUtility.get_TrainableDefsInListOrder ();
 				int count = trainableDefsInListOrder.Count;
 				float num = (float)(count * 28 + 20);
-				Rect rect4 = new Rect (0, rect2.y + 35, rect.width, num);
+				Rect rect4 = new Rect (0, rect2.get_y () + 35, rect.get_width (), num);
 				TabDrawer.DrawBox (rect4);
 				Rect rect5 = GenUI.ContractedBy (rect4, 10);
-				rect5.height = 28;
+				rect5.set_height (28);
 				for (int i = 0; i < trainableDefsInListOrder.Count; i++) {
 					if (TrainingCardUtility.TryDrawTrainableRow (rect5, pawn, trainableDefsInListOrder [i])) {
-						rect5.y = rect5.y + 28;
+						rect5.set_y (rect5.get_y () + 28);
 					}
 				}
-				Text.Anchor = TextAnchor.UpperRight;
-				string text3 = Translator.Translate ("TrainableIntelligence") + ": " + TrainableIntelligenceExtension.GetLabel (pawn.RaceProps.trainableIntelligence);
-				Widgets.Label (new Rect (0, rect4.y + rect4.height + 5, rect4.width - 2, 25), text3);
-				Text.Anchor = TextAnchor.UpperLeft;
+				Text.set_Anchor (2);
+				string text3 = Translator.Translate ("TrainableIntelligence") + ": " + TrainableIntelligenceExtension.GetLabel (pawn.get_RaceProps ().trainableIntelligence);
+				Widgets.Label (new Rect (0, rect4.get_y () + rect4.get_height () + 5, rect4.get_width () - 2, 25), text3);
+				Text.set_Anchor (0);
 			}
 			finally {
 				GUI.EndGroup ();
@@ -15833,7 +18768,7 @@ namespace EdB.Interface
 		public static int GetSteps (Pawn_TrainingTracker training, TrainableDef td)
 		{
 			DefMap<TrainableDef, int> defMap = (DefMap<TrainableDef, int>)TrainingCardUtility.stepsField.GetValue (training);
-			return defMap[td];
+			return defMap.get_Item (td);
 		}
 
 		private static void SetWantedRecursive (TrainableDef td, Pawn pawn, bool checkOn)
@@ -15847,7 +18782,7 @@ namespace EdB.Interface
 				}
 			}
 			else {
-				IEnumerable<TrainableDef> enumerable = from t in DefDatabase<TrainableDef>.AllDefsListForReading
+				IEnumerable<TrainableDef> enumerable = from t in DefDatabase<TrainableDef>.get_AllDefsListForReading ()
 				where t.prerequisites != null && t.prerequisites.Contains (td)
 				select t;
 				foreach (TrainableDef current in enumerable) {
@@ -15860,80 +18795,106 @@ namespace EdB.Interface
 		{
 			bool flag = pawn.training.IsCompleted (td);
 			bool flag2;
-			AcceptanceReport canTrain = pawn.training.CanAssignToTrain (td, out flag2);
+			AcceptanceReport canTrain = pawn.training.CanAssignToTrain (td, ref flag2);
 			if (!flag2) {
 				return false;
 			}
 			Widgets.DrawHighlightIfMouseover (rect);
 			Rect rect2 = rect;
-			rect2.width = rect2.width - 50;
-			rect2.xMin = rect2.xMin + (float)td.indent * 15;
+			rect2.set_width (rect2.get_width () - 50);
+			rect2.set_xMin (rect2.get_xMin () + (float)td.indent * 15);
 			Rect rect3 = rect;
-			rect3.xMin = rect3.xMax - 50 + 17;
+			rect3.set_xMin (rect3.get_xMax () - 50 + 17);
 			if (!flag) {
 				bool wanted = pawn.training.GetWanted (td);
 				bool flag3 = wanted;
-				Widgets.LabelCheckbox (rect2, td.LabelCap, ref wanted, !canTrain.Accepted);
+				Widgets.LabelCheckbox (rect2, td.get_LabelCap (), ref wanted, !canTrain.get_Accepted ());
 				if (wanted != flag3) {
-					ConceptDatabase.KnowledgeDemonstrated (ConceptDefOf.AnimalTraining, KnowledgeAmount.Total);
+					ConceptDatabase.KnowledgeDemonstrated (ConceptDefOf.AnimalTraining, 6);
 					TrainingCardUtility.SetWantedRecursive (td, pawn, wanted);
 				}
 			}
 			else {
-				Text.Anchor = TextAnchor.MiddleLeft;
-				Widgets.Label (rect2, td.LabelCap);
-				Text.Anchor = TextAnchor.UpperLeft;
+				Text.set_Anchor (3);
+				Widgets.Label (rect2, td.get_LabelCap ());
+				Text.set_Anchor (0);
 			}
 			if (flag) {
-				GUI.color = Color.green;
+				GUI.set_color (Color.get_green ());
 			}
-			Text.Anchor = TextAnchor.MiddleLeft;
+			Text.set_Anchor (3);
 			Widgets.Label (rect3, TrainingCardUtility.GetSteps (pawn.training, td) + " / " + td.steps);
-			Text.Anchor = TextAnchor.UpperLeft;
-			if (Game.GodMode && !pawn.training.IsCompleted (td)) {
+			Text.set_Anchor (0);
+			if (Game.get_GodMode () && !pawn.training.IsCompleted (td)) {
 				Rect rect4 = rect3;
-				rect4.yMin = rect4.yMax - 10;
-				rect4.xMin = rect4.xMax - 10;
+				rect4.set_yMin (rect4.get_yMax () - 10);
+				rect4.set_xMin (rect4.get_xMax () - 10);
 				if (Widgets.TextButton (rect4, "+", true, false)) {
-					pawn.training.Train (td, GenCollection.RandomElement<Pawn> (Find.ListerPawns.FreeColonistsSpawned));
+					pawn.training.Train (td, GenCollection.RandomElement<Pawn> (Find.get_ListerPawns ().get_FreeColonistsSpawned ()));
 				}
 			}
 			TooltipHandler.TipRegion (rect, delegate {
-				string text = td.LabelCap + "\n\n" + td.description;
-				if (!canTrain.Accepted) {
-					text = text + "\n\n" + canTrain.Reason;
+				string text = td.get_LabelCap () + "
+
+" + td.description;
+				if (!canTrain.get_Accepted ()) {
+					text = text + "
+
+" + canTrain.get_Reason ();
 				}
 				else if (!GenList.NullOrEmpty<TrainableDef> (td.prerequisites)) {
-					text += "\n";
+					text += "
+";
 					for (int i = 0; i < td.prerequisites.Count; i++) {
 						if (!pawn.training.IsCompleted (td.prerequisites [i])) {
-							text = text + "\n" + Translator.Translate ("TrainingNeedsPrerequisite", new object[] {
-								td.prerequisites [i].LabelCap
+							text = text + "
+" + Translator.Translate ("TrainingNeedsPrerequisite", new object[] {
+								td.prerequisites [i].get_LabelCap ()
 							});
 						}
 					}
 				}
 				return text;
-			}, (int)(rect.y * 612));
-			GUI.color = Color.white;
+			}, (int)(rect.get_y () * 612));
+			GUI.set_color (Color.get_white ());
 			return true;
 		}
 	}
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class UIRoot_MapIntermediary : UIRoot
 	{
+		//
+		// Methods
+		//
 		public override void UIRootOnGUI ()
 		{
 			base.UIRootOnGUI ();
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using UnityEngine;
+using Verse;
 
+namespace EdB.Interface
+{
 	public class UserInterface : UIRoot_Map
 	{
 		public delegate void UIRootOnGUIDelegate ();
 
 		public delegate void UIRootUpdateDelegate ();
 
+		//
+		// Fields
+		//
 		private List<IUpdatedComponent> updatedComponents = new List<IUpdatedComponent> ();
 
 		private List<IInitializedComponent> initializedComponents = new List<IInitializedComponent> ();
@@ -15958,6 +18919,9 @@ namespace EdB.Interface
 
 		private UserInterface.UIRootUpdateDelegate uiRootUpdateDelegate;
 
+		//
+		// Properties
+		//
 		public MainTabsRoot MainTabsRoot {
 			get {
 				return this.mainTabsRoot;
@@ -15970,6 +18934,9 @@ namespace EdB.Interface
 			}
 		}
 
+		//
+		// Constructors
+		//
 		public UserInterface ()
 		{
 			Preferences.Instance.Reset ();
@@ -16024,6 +18991,9 @@ namespace EdB.Interface
 			this.ResetTextures ();
 		}
 
+		//
+		// Methods
+		//
 		protected void AddComponentPreferences (IComponentWithPreferences component)
 		{
 			if (!this.componentsWithPreferences.Contains (component)) {
@@ -16112,7 +19082,7 @@ namespace EdB.Interface
 		public T FindMainTabOfType<T> () where T : MainTabWindow
 		{
 			foreach (MainTabDef current in this.mainTabsRoot.AllTabs) {
-				MainTabWindow window = current.Window;
+				MainTabWindow window = current.get_Window ();
 				if (window != null && window is T) {
 					return (T)((object)window);
 				}
@@ -16154,8 +19124,8 @@ namespace EdB.Interface
 
 		private void OpenMainMenuShortcut ()
 		{
-			if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Escape) {
-				Event.current.Use ();
+			if (Event.get_current ().get_type () == 4 && Event.get_current ().get_keyCode () == 27) {
+				Event.get_current ().Use ();
 				this.mainTabsRoot.SetCurrentTab (MainTabDefOf.Menu, true);
 			}
 		}
@@ -16201,10 +19171,10 @@ namespace EdB.Interface
 			this.CallAncestorUIRootOnGUI ();
 			this.screenSizeMonitor.Update ();
 			this.thingOverlays.ThingOverlaysOnGUI ();
-			for (int i = 0; i < Find.Map.components.Count; i++) {
-				Find.Map.components [i].MapComponentOnGUI ();
+			for (int i = 0; i < Find.get_Map ().components.Count; i++) {
+				Find.get_Map ().components [i].MapComponentOnGUI ();
 			}
-			bool filtersCurrentEvent = this.screenshotMode.FiltersCurrentEvent;
+			bool filtersCurrentEvent = this.screenshotMode.get_FiltersCurrentEvent ();
 			foreach (IRenderedComponent current in this.renderedComponents) {
 				if (!filtersCurrentEvent || current.RenderWithScreenshots) {
 					current.OnGUI ();
@@ -16214,10 +19184,10 @@ namespace EdB.Interface
 			this.selector.dragBox.DragBoxOnGUI ();
 			DesignatorManager.DesignationManagerOnGUI ();
 			this.targeter.TargeterOnGUI ();
-			Find.TooltipGiverList.DispenseAllThingTooltips ();
-			Find.ColonyInfo.ColonyInfoOnGUI ();
+			Find.get_TooltipGiverList ().DispenseAllThingTooltips ();
+			Find.get_ColonyInfo ().ColonyInfoOnGUI ();
 			DebugTools.DebugToolsOnGUI ();
-			if (!this.screenshotMode.FiltersCurrentEvent) {
+			if (!this.screenshotMode.get_FiltersCurrentEvent ()) {
 				this.globalControls.GlobalControlsOnGUI ();
 				this.resourceReadout.ResourceReadoutOnGUI ();
 				this.mainTabsRoot.MainTabsOnGUI ();
@@ -16226,7 +19196,7 @@ namespace EdB.Interface
 				ActiveTutorNoteManager.ActiveLessonManagerOnGUI ();
 			}
 			RoomStatsDrawer.RoomStatsOnGUI ();
-			Find.DebugDrawer.DebugDrawerOnGUI ();
+			Find.get_DebugDrawer ().DebugDrawerOnGUI ();
 			this.windows.WindowStackOnGUI ();
 			DesignatorManager.ProcessInputEvents ();
 			this.targeter.ProcessInputEvents ();
@@ -16255,9 +19225,20 @@ namespace EdB.Interface
 			}
 		}
 	}
+}
+using RimWorld;
+using System;
+using UnityEngine;
+using Verse;
+using Verse.Sound;
 
+namespace EdB.Interface
+{
 	public static class WidgetDrawer
 	{
+		//
+		// Static Fields
+		//
 		public static readonly Texture2D RadioButOnTex;
 
 		public static float LabelMargin;
@@ -16270,6 +19251,9 @@ namespace EdB.Interface
 
 		public static readonly Texture2D RadioButOffTex;
 
+		//
+		// Constructors
+		//
 		static WidgetDrawer ()
 		{
 			WidgetDrawer.CheckboxWidth = 24;
@@ -16280,6 +19264,9 @@ namespace EdB.Interface
 			WidgetDrawer.RadioButOffTex = ContentFinder<Texture2D>.Get ("UI/Widgets/RadioButOff", true);
 		}
 
+		//
+		// Static Methods
+		//
 		public static float DrawLabeledCheckbox (Rect rect, string labelText, ref bool value)
 		{
 			return WidgetDrawer.DrawLabeledCheckbox (rect, labelText, ref value, false);
@@ -16287,32 +19274,32 @@ namespace EdB.Interface
 
 		public static float DrawLabeledCheckbox (Rect rect, string labelText, ref bool value, bool disabled)
 		{
-			Text.Anchor = TextAnchor.UpperLeft;
-			float num = rect.width - WidgetDrawer.LabelMargin;
+			Text.set_Anchor (0);
+			float num = rect.get_width () - WidgetDrawer.LabelMargin;
 			float num2 = Text.CalcHeight (labelText, num);
-			Rect rect2 = new Rect (rect.x, rect.y, num, num2);
-			Color color = GUI.color;
+			Rect rect2 = new Rect (rect.get_x (), rect.get_y (), num, num2);
+			Color color = GUI.get_color ();
 			if (disabled) {
-				GUI.color = Dialog_InterfaceOptions.DisabledControlColor;
+				GUI.set_color (Dialog_InterfaceOptions.DisabledControlColor);
 			}
 			Widgets.Label (rect2, labelText);
-			GUI.color = color;
-			Widgets.Checkbox (new Vector2 (rect.x + num + WidgetDrawer.CheckboxMargin, rect.y - 1), ref value, 24, disabled);
+			GUI.set_color (color);
+			Widgets.Checkbox (new Vector2 (rect.get_x () + num + WidgetDrawer.CheckboxMargin, rect.get_y () - 1), ref value, 24, disabled);
 			return (num2 >= WidgetDrawer.CheckboxHeight) ? num2 : WidgetDrawer.CheckboxHeight;
 		}
 
 		public static bool DrawLabeledRadioButton (Rect rect, string labelText, bool chosen, bool playSound)
 		{
-			TextAnchor anchor = Text.Anchor;
-			Text.Anchor = TextAnchor.MiddleLeft;
-			Rect rect2 = new Rect (rect.x, rect.y - 2, rect.width, rect.height);
+			TextAnchor anchor = Text.get_Anchor ();
+			Text.set_Anchor (3);
+			Rect rect2 = new Rect (rect.get_x (), rect.get_y () - 2, rect.get_width (), rect.get_height ());
 			Widgets.Label (rect2, labelText);
-			Text.Anchor = anchor;
+			Text.set_Anchor (anchor);
 			bool flag = Widgets.InvisibleButton (rect);
 			if (playSound && flag && !chosen) {
 				SoundStarter.PlayOneShotOnCamera (SoundDefOf.RadioButtonClicked);
 			}
-			Vector2 topLeft = new Vector2 (rect.x + rect.width - 32, rect.y + rect.height / 2 - 16);
+			Vector2 topLeft = new Vector2 (rect.get_x () + rect.get_width () - 32, rect.get_y () + rect.get_height () / 2 - 16);
 			WidgetDrawer.DrawRadioButton (topLeft, chosen);
 			return flag;
 		}
@@ -16330,9 +19317,22 @@ namespace EdB.Interface
 			GUI.DrawTexture (rect, texture2D);
 		}
 	}
+}
+using RimWorld;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using UnityEngine;
+using Verse;
+using Verse.Sound;
 
+namespace EdB.Interface
+{
 	public static class WidgetsWork
 	{
+		//
+		// Static Fields
+		//
 		public const float WorkBoxSize = 25;
 
 		private static Texture2D PassionWorkboxMajorIcon = ContentFinder<Texture2D>.Get ("UI/Icons/PassionMajorGray", true);
@@ -16347,10 +19347,13 @@ namespace EdB.Interface
 
 		private static readonly Texture2D WorkBoxBGTex_Bad = ContentFinder<Texture2D>.Get ("UI/Widgets/WorkBoxBG_Bad", true);
 
-		private const float PassionOpacity = 0.4f;
+		private const float PassionOpacity = 0.4;
 
 		private const int MidAptCutoff = 14;
 
+		//
+		// Static Properties
+		//
 		public static bool ColorCodedWorkPassions {
 			get {
 				return WidgetsWork.PreferenceColorCodedWorkPassions != null && WidgetsWork.PreferenceColorCodedWorkPassions.Value;
@@ -16362,28 +19365,31 @@ namespace EdB.Interface
 			set;
 		}
 
+		//
+		// Static Methods
+		//
 		private static Color ColorOfPriority (int prio, Passion passion)
 		{
 			if (!WidgetsWork.ColorCodedWorkPassions) {
 				switch (prio) {
 				case 1:
-					return Color.green;
+					return Color.get_green ();
 				case 2:
-					return new Color (1, 0.9f, 0.6f);
+					return new Color (1, 0.9, 0.6);
 				case 3:
-					return new Color (0.8f, 0.7f, 0.5f);
+					return new Color (0.8, 0.7, 0.5);
 				case 4:
-					return new Color (0.6f, 0.6f, 0.6f);
+					return new Color (0.6, 0.6, 0.6);
 				default:
-					return Color.grey;
+					return Color.get_grey ();
 				}
 			}
 			else {
-				if (passion == Passion.Minor) {
+				if (passion == 1) {
 					return new Color (1, 1, 0);
 				}
-				if (passion != Passion.Major) {
-					return new Color (0.8f, 0.8f, 0.8f);
+				if (passion != 2) {
+					return new Color (0.8, 0.8, 0.8);
 				}
 				return new Color (0, 1, 0);
 			}
@@ -16406,22 +19412,22 @@ namespace EdB.Interface
 				num2 = (num - 14) / 6;
 			}
 			GUI.DrawTexture (rect, texture2D);
-			GUI.color = new Color (1, 1, 1, num2);
+			GUI.set_color (new Color (1, 1, 1, num2));
 			GUI.DrawTexture (rect, texture2D2);
 			Passion passion = p.skills.MaxPassionOfRelevantSkillsFor (workDef);
 			if (passion > 0) {
-				GUI.color = new Color (1, 1, 1, 0.4f);
+				GUI.set_color (new Color (1, 1, 1, 0.4));
 				Rect rect2 = rect;
-				rect2.xMin = rect.center.x;
-				rect2.yMin = rect.center.y;
-				if (passion == Passion.Minor) {
+				rect2.set_xMin (rect.get_center ().x);
+				rect2.set_yMin (rect.get_center ().y);
+				if (passion == 1) {
 					GUI.DrawTexture (rect2, WidgetsWork.PassionWorkboxMinorIcon);
 				}
-				else if (passion == Passion.Major) {
+				else if (passion == 2) {
 					GUI.DrawTexture (rect2, WidgetsWork.PassionWorkboxMajorIcon);
 				}
 			}
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 		}
 
 		private static void DrawWorkBoxBackgroundForSquad (Rect rect, WorkTypeDef workDef)
@@ -16441,9 +19447,9 @@ namespace EdB.Interface
 				num2 = (num - 14) / 6;
 			}
 			GUI.DrawTexture (rect, texture2D);
-			GUI.color = new Color (1, 1, 1, num2);
+			GUI.set_color (new Color (1, 1, 1, num2));
 			GUI.DrawTexture (rect, texture2D2);
-			GUI.color = Color.white;
+			GUI.set_color (Color.get_white ());
 		}
 
 		public static void DrawWorkBoxFor (Vector2 topLeft, Pawn p, WorkTypeDef wType)
@@ -16453,7 +19459,7 @@ namespace EdB.Interface
 			}
 			Rect rect = new Rect (topLeft.x, topLeft.y, 25, 25);
 			WidgetsWork.DrawWorkBoxBackground (rect, p, wType);
-			if (Find.PlaySettings.useWorkPriorities) {
+			if (Find.get_PlaySettings ().useWorkPriorities) {
 				int priority = p.workSettings.GetPriority (wType);
 				string text;
 				if (priority > 0) {
@@ -16462,14 +19468,14 @@ namespace EdB.Interface
 				else {
 					text = string.Empty;
 				}
-				Text.Anchor = TextAnchor.MiddleCenter;
-				GUI.color = WidgetsWork.ColorOfPriority (priority, p.skills.MaxPassionOfRelevantSkillsFor (wType));
+				Text.set_Anchor (4);
+				GUI.set_color (WidgetsWork.ColorOfPriority (priority, p.skills.MaxPassionOfRelevantSkillsFor (wType)));
 				Rect rect2 = GenUI.ContractedBy (rect, -3);
 				Widgets.Label (rect2, text);
-				GUI.color = Color.white;
-				Text.Anchor = TextAnchor.UpperLeft;
-				if (Event.current.type == null && Mouse.IsOver (rect)) {
-					if (Event.current.button == 0) {
+				GUI.set_color (Color.get_white ());
+				Text.set_Anchor (0);
+				if (Event.get_current ().get_type () == null && Mouse.IsOver (rect)) {
+					if (Event.get_current ().get_button () == 0) {
 						int num = p.workSettings.GetPriority (wType) - 1;
 						if (num < 0) {
 							num = 4;
@@ -16477,7 +19483,7 @@ namespace EdB.Interface
 						p.workSettings.SetPriority (wType, num);
 						SoundStarter.PlayOneShotOnCamera (SoundDefOf.AmountIncrement);
 					}
-					if (Event.current.button == 1) {
+					if (Event.get_current ().get_button () == 1) {
 						int num2 = p.workSettings.GetPriority (wType) + 1;
 						if (num2 > 4) {
 							num2 = 0;
@@ -16485,7 +19491,7 @@ namespace EdB.Interface
 						p.workSettings.SetPriority (wType, num2);
 						SoundStarter.PlayOneShotOnCamera (SoundDefOf.AmountDecrement);
 					}
-					Event.current.Use ();
+					Event.get_current ().Use ();
 				}
 			}
 			else {
@@ -16510,7 +19516,7 @@ namespace EdB.Interface
 		{
 			Rect rect = new Rect (topLeft.x, topLeft.y, 25, 25);
 			WidgetsWork.DrawWorkBoxBackgroundForSquad (rect, wType);
-			if (Find.PlaySettings.useWorkPriorities) {
+			if (Find.get_PlaySettings ().useWorkPriorities) {
 				int priority = priorities.GetPriority (wType);
 				string text;
 				if (priority > 0) {
@@ -16519,14 +19525,14 @@ namespace EdB.Interface
 				else {
 					text = string.Empty;
 				}
-				Text.Anchor = TextAnchor.MiddleCenter;
-				GUI.color = Color.white;
+				Text.set_Anchor (4);
+				GUI.set_color (Color.get_white ());
 				Rect rect2 = GenUI.ContractedBy (rect, -3);
 				Widgets.Label (rect2, text);
-				GUI.color = Color.white;
-				Text.Anchor = TextAnchor.UpperLeft;
-				if (Event.current.type == null && Mouse.IsOver (rect)) {
-					if (Event.current.button == 0) {
+				GUI.set_color (Color.get_white ());
+				Text.set_Anchor (0);
+				if (Event.get_current ().get_type () == null && Mouse.IsOver (rect)) {
+					if (Event.get_current ().get_button () == 0) {
 						int num = priorities.GetPriority (wType) - 1;
 						if (num < 0) {
 							num = 4;
@@ -16535,7 +19541,7 @@ namespace EdB.Interface
 						WidgetsWork.SetPriorityForPawns (pawns, wType, num);
 						SoundStarter.PlayOneShotOnCamera (SoundDefOf.AmountIncrement);
 					}
-					if (Event.current.button == 1) {
+					if (Event.get_current ().get_button () == 1) {
 						int num2 = priorities.GetPriority (wType) + 1;
 						if (num2 > 4) {
 							num2 = 0;
@@ -16544,7 +19550,7 @@ namespace EdB.Interface
 						WidgetsWork.SetPriorityForPawns (pawns, wType, num2);
 						SoundStarter.PlayOneShotOnCamera (SoundDefOf.AmountDecrement);
 					}
-					Event.current.Use ();
+					Event.get_current ().Use ();
 				}
 			}
 			else {
@@ -16582,7 +19588,7 @@ namespace EdB.Interface
 			stringBuilder.AppendLine (wDef.gerundLabel);
 			if (p.story.WorkTypeIsDisabled (wDef)) {
 				stringBuilder.Append (Translator.Translate ("CannotDoThisWork", new object[] {
-					p.NameStringShort
+					p.get_NameStringShort ()
 				}));
 			}
 			else {
@@ -16607,13 +19613,21 @@ namespace EdB.Interface
 			return stringBuilder.ToString ();
 		}
 	}
+}
+using System;
+using Verse;
 
+namespace EdB.Interface
+{
 	public static class WindowStackExtensions
 	{
+		//
+		// Static Methods
+		//
 		public static Window Top (this WindowStack stack)
 		{
-			if (stack.Count > 0) {
-				return stack.Windows [0];
+			if (stack.get_Count () > 0) {
+				return stack.get_Windows () [0];
 			}
 			return null;
 		}
