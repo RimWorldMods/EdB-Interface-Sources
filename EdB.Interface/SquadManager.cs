@@ -24,135 +24,15 @@ namespace EdB.Interface
 
 		protected AllColonistsSquad allColonistsSquad;
 
-		public event SquadNotificationHandler SquadChanged
-		{
-			add
-			{
-				SquadNotificationHandler squadNotificationHandler = this.SquadChanged;
-				SquadNotificationHandler squadNotificationHandler2;
-				do
-				{
-					squadNotificationHandler2 = squadNotificationHandler;
-					squadNotificationHandler = Interlocked.CompareExchange<SquadNotificationHandler>(ref this.SquadChanged, (SquadNotificationHandler)Delegate.Combine(squadNotificationHandler2, value), squadNotificationHandler);
-				}
-				while (squadNotificationHandler != squadNotificationHandler2);
-			}
-			remove
-			{
-				SquadNotificationHandler squadNotificationHandler = this.SquadChanged;
-				SquadNotificationHandler squadNotificationHandler2;
-				do
-				{
-					squadNotificationHandler2 = squadNotificationHandler;
-					squadNotificationHandler = Interlocked.CompareExchange<SquadNotificationHandler>(ref this.SquadChanged, (SquadNotificationHandler)Delegate.Remove(squadNotificationHandler2, value), squadNotificationHandler);
-				}
-				while (squadNotificationHandler != squadNotificationHandler2);
-			}
-		}
+		public event SquadNotificationHandler SquadChanged;
 
-		public event SquadNotificationHandler SquadAdded
-		{
-			add
-			{
-				SquadNotificationHandler squadNotificationHandler = this.SquadAdded;
-				SquadNotificationHandler squadNotificationHandler2;
-				do
-				{
-					squadNotificationHandler2 = squadNotificationHandler;
-					squadNotificationHandler = Interlocked.CompareExchange<SquadNotificationHandler>(ref this.SquadAdded, (SquadNotificationHandler)Delegate.Combine(squadNotificationHandler2, value), squadNotificationHandler);
-				}
-				while (squadNotificationHandler != squadNotificationHandler2);
-			}
-			remove
-			{
-				SquadNotificationHandler squadNotificationHandler = this.SquadAdded;
-				SquadNotificationHandler squadNotificationHandler2;
-				do
-				{
-					squadNotificationHandler2 = squadNotificationHandler;
-					squadNotificationHandler = Interlocked.CompareExchange<SquadNotificationHandler>(ref this.SquadAdded, (SquadNotificationHandler)Delegate.Remove(squadNotificationHandler2, value), squadNotificationHandler);
-				}
-				while (squadNotificationHandler != squadNotificationHandler2);
-			}
-		}
+		public event SquadNotificationHandler SquadAdded;
 
-		public event SquadRemovedHandler SquadRemoved
-		{
-			add
-			{
-				SquadRemovedHandler squadRemovedHandler = this.SquadRemoved;
-				SquadRemovedHandler squadRemovedHandler2;
-				do
-				{
-					squadRemovedHandler2 = squadRemovedHandler;
-					squadRemovedHandler = Interlocked.CompareExchange<SquadRemovedHandler>(ref this.SquadRemoved, (SquadRemovedHandler)Delegate.Combine(squadRemovedHandler2, value), squadRemovedHandler);
-				}
-				while (squadRemovedHandler != squadRemovedHandler2);
-			}
-			remove
-			{
-				SquadRemovedHandler squadRemovedHandler = this.SquadRemoved;
-				SquadRemovedHandler squadRemovedHandler2;
-				do
-				{
-					squadRemovedHandler2 = squadRemovedHandler;
-					squadRemovedHandler = Interlocked.CompareExchange<SquadRemovedHandler>(ref this.SquadRemoved, (SquadRemovedHandler)Delegate.Remove(squadRemovedHandler2, value), squadRemovedHandler);
-				}
-				while (squadRemovedHandler != squadRemovedHandler2);
-			}
-		}
+		public event SquadRemovedHandler SquadRemoved;
 
-		public event SquadNotificationHandler SquadDisplayPreferenceChanged
-		{
-			add
-			{
-				SquadNotificationHandler squadNotificationHandler = this.SquadDisplayPreferenceChanged;
-				SquadNotificationHandler squadNotificationHandler2;
-				do
-				{
-					squadNotificationHandler2 = squadNotificationHandler;
-					squadNotificationHandler = Interlocked.CompareExchange<SquadNotificationHandler>(ref this.SquadDisplayPreferenceChanged, (SquadNotificationHandler)Delegate.Combine(squadNotificationHandler2, value), squadNotificationHandler);
-				}
-				while (squadNotificationHandler != squadNotificationHandler2);
-			}
-			remove
-			{
-				SquadNotificationHandler squadNotificationHandler = this.SquadDisplayPreferenceChanged;
-				SquadNotificationHandler squadNotificationHandler2;
-				do
-				{
-					squadNotificationHandler2 = squadNotificationHandler;
-					squadNotificationHandler = Interlocked.CompareExchange<SquadNotificationHandler>(ref this.SquadDisplayPreferenceChanged, (SquadNotificationHandler)Delegate.Remove(squadNotificationHandler2, value), squadNotificationHandler);
-				}
-				while (squadNotificationHandler != squadNotificationHandler2);
-			}
-		}
+		public event SquadNotificationHandler SquadDisplayPreferenceChanged;
 
-		public event SquadOrderChangedHandler SquadOrderChanged
-		{
-			add
-			{
-				SquadOrderChangedHandler squadOrderChangedHandler = this.SquadOrderChanged;
-				SquadOrderChangedHandler squadOrderChangedHandler2;
-				do
-				{
-					squadOrderChangedHandler2 = squadOrderChangedHandler;
-					squadOrderChangedHandler = Interlocked.CompareExchange<SquadOrderChangedHandler>(ref this.SquadOrderChanged, (SquadOrderChangedHandler)Delegate.Combine(squadOrderChangedHandler2, value), squadOrderChangedHandler);
-				}
-				while (squadOrderChangedHandler != squadOrderChangedHandler2);
-			}
-			remove
-			{
-				SquadOrderChangedHandler squadOrderChangedHandler = this.SquadOrderChanged;
-				SquadOrderChangedHandler squadOrderChangedHandler2;
-				do
-				{
-					squadOrderChangedHandler2 = squadOrderChangedHandler;
-					squadOrderChangedHandler = Interlocked.CompareExchange<SquadOrderChangedHandler>(ref this.SquadOrderChanged, (SquadOrderChangedHandler)Delegate.Remove(squadOrderChangedHandler2, value), squadOrderChangedHandler);
-				}
-				while (squadOrderChangedHandler != squadOrderChangedHandler2);
-			}
-		}
+		public event SquadOrderChangedHandler SquadOrderChanged;
 
 		public PreferenceEnableSquads PreferenceEnableSquads
 		{

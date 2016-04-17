@@ -66,31 +66,7 @@ namespace EdB.Interface
 
 		protected KeyCode lastKey;
 
-		public event ColonistBar.SelectedGroupChangedHandler SelectedGroupChanged
-		{
-			add
-			{
-				ColonistBar.SelectedGroupChangedHandler selectedGroupChangedHandler = this.SelectedGroupChanged;
-				ColonistBar.SelectedGroupChangedHandler selectedGroupChangedHandler2;
-				do
-				{
-					selectedGroupChangedHandler2 = selectedGroupChangedHandler;
-					selectedGroupChangedHandler = Interlocked.CompareExchange<ColonistBar.SelectedGroupChangedHandler>(ref this.SelectedGroupChanged, (ColonistBar.SelectedGroupChangedHandler)Delegate.Combine(selectedGroupChangedHandler2, value), selectedGroupChangedHandler);
-				}
-				while (selectedGroupChangedHandler != selectedGroupChangedHandler2);
-			}
-			remove
-			{
-				ColonistBar.SelectedGroupChangedHandler selectedGroupChangedHandler = this.SelectedGroupChanged;
-				ColonistBar.SelectedGroupChangedHandler selectedGroupChangedHandler2;
-				do
-				{
-					selectedGroupChangedHandler2 = selectedGroupChangedHandler;
-					selectedGroupChangedHandler = Interlocked.CompareExchange<ColonistBar.SelectedGroupChangedHandler>(ref this.SelectedGroupChanged, (ColonistBar.SelectedGroupChangedHandler)Delegate.Remove(selectedGroupChangedHandler2, value), selectedGroupChangedHandler);
-				}
-				while (selectedGroupChangedHandler != selectedGroupChangedHandler2);
-			}
-		}
+		public event ColonistBar.SelectedGroupChangedHandler SelectedGroupChanged;
 
 		public ColonistBarDrawer Drawer
 		{

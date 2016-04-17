@@ -25,31 +25,7 @@ namespace EdB.Interface
 
 		public static float LabelMargin = MultipleSelectionStringOptionsPreference.RadioButtonWidth + MultipleSelectionStringOptionsPreference.RadioButtonMargin;
 
-		public event MultipleSelectionStringOptionsPreference.ValueChangedHandler ValueChanged
-		{
-			add
-			{
-				MultipleSelectionStringOptionsPreference.ValueChangedHandler valueChangedHandler = this.ValueChanged;
-				MultipleSelectionStringOptionsPreference.ValueChangedHandler valueChangedHandler2;
-				do
-				{
-					valueChangedHandler2 = valueChangedHandler;
-					valueChangedHandler = Interlocked.CompareExchange<MultipleSelectionStringOptionsPreference.ValueChangedHandler>(ref this.ValueChanged, (MultipleSelectionStringOptionsPreference.ValueChangedHandler)Delegate.Combine(valueChangedHandler2, value), valueChangedHandler);
-				}
-				while (valueChangedHandler != valueChangedHandler2);
-			}
-			remove
-			{
-				MultipleSelectionStringOptionsPreference.ValueChangedHandler valueChangedHandler = this.ValueChanged;
-				MultipleSelectionStringOptionsPreference.ValueChangedHandler valueChangedHandler2;
-				do
-				{
-					valueChangedHandler2 = valueChangedHandler;
-					valueChangedHandler = Interlocked.CompareExchange<MultipleSelectionStringOptionsPreference.ValueChangedHandler>(ref this.ValueChanged, (MultipleSelectionStringOptionsPreference.ValueChangedHandler)Delegate.Remove(valueChangedHandler2, value), valueChangedHandler);
-				}
-				while (valueChangedHandler != valueChangedHandler2);
-			}
-		}
+		public event MultipleSelectionStringOptionsPreference.ValueChangedHandler ValueChanged;
 
 		public IEnumerable<string> SelectedOptions
 		{

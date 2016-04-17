@@ -21,31 +21,7 @@ namespace EdB.Interface
 
 		public static float LabelMargin = BooleanPreference.CheckboxWidth + BooleanPreference.CheckboxMargin;
 
-		public event BooleanPreference.ValueChangedHandler ValueChanged
-		{
-			add
-			{
-				BooleanPreference.ValueChangedHandler valueChangedHandler = this.ValueChanged;
-				BooleanPreference.ValueChangedHandler valueChangedHandler2;
-				do
-				{
-					valueChangedHandler2 = valueChangedHandler;
-					valueChangedHandler = Interlocked.CompareExchange<BooleanPreference.ValueChangedHandler>(ref this.ValueChanged, (BooleanPreference.ValueChangedHandler)Delegate.Combine(valueChangedHandler2, value), valueChangedHandler);
-				}
-				while (valueChangedHandler != valueChangedHandler2);
-			}
-			remove
-			{
-				BooleanPreference.ValueChangedHandler valueChangedHandler = this.ValueChanged;
-				BooleanPreference.ValueChangedHandler valueChangedHandler2;
-				do
-				{
-					valueChangedHandler2 = valueChangedHandler;
-					valueChangedHandler = Interlocked.CompareExchange<BooleanPreference.ValueChangedHandler>(ref this.ValueChanged, (BooleanPreference.ValueChangedHandler)Delegate.Remove(valueChangedHandler2, value), valueChangedHandler);
-				}
-				while (valueChangedHandler != valueChangedHandler2);
-			}
-		}
+		public event BooleanPreference.ValueChangedHandler ValueChanged;
 
 		public abstract string Name
 		{

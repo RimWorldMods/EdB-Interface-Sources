@@ -374,7 +374,7 @@ namespace EdB.Interface
 			}
 			Graphics.DrawMesh(this.backgroundMesh, Matrix4x4.TRS(new Vector3(position.x + ColonistBarDrawer.BackgroundOffset.x, position.y + ColonistBarDrawer.BackgroundOffset.y, num), identity, one), ColonistBarDrawer.SlotBordersMat, 1, this.camera);
 			num += 1f;
-			if (Find.Selector.IsSelected((slot.Corpse != null) ? slot.Corpse : pawn))
+			if ((slot.Corpse != null) ? Find.Selector.IsSelected(slot.Corpse) : Find.Selector.IsSelected(pawn))
 			{
 				Graphics.DrawMesh(this.backgroundMesh, Matrix4x4.TRS(new Vector3(position.x + ColonistBarDrawer.BackgroundOffset.x, position.y + ColonistBarDrawer.BackgroundOffset.y, num), identity, one), ColonistBarDrawer.SlotSelectedMat, 1, this.camera);
 				num += 1f;

@@ -29,31 +29,7 @@ namespace EdB.Interface
 
 		protected List<ColonistBarGroup> scratchGroups = new List<ColonistBarGroup>();
 
-		public event ColonistBarSquadSupervisor.SelectedSquadChangedHandler SelectedSquadChanged
-		{
-			add
-			{
-				ColonistBarSquadSupervisor.SelectedSquadChangedHandler selectedSquadChangedHandler = this.SelectedSquadChanged;
-				ColonistBarSquadSupervisor.SelectedSquadChangedHandler selectedSquadChangedHandler2;
-				do
-				{
-					selectedSquadChangedHandler2 = selectedSquadChangedHandler;
-					selectedSquadChangedHandler = Interlocked.CompareExchange<ColonistBarSquadSupervisor.SelectedSquadChangedHandler>(ref this.SelectedSquadChanged, (ColonistBarSquadSupervisor.SelectedSquadChangedHandler)Delegate.Combine(selectedSquadChangedHandler2, value), selectedSquadChangedHandler);
-				}
-				while (selectedSquadChangedHandler != selectedSquadChangedHandler2);
-			}
-			remove
-			{
-				ColonistBarSquadSupervisor.SelectedSquadChangedHandler selectedSquadChangedHandler = this.SelectedSquadChanged;
-				ColonistBarSquadSupervisor.SelectedSquadChangedHandler selectedSquadChangedHandler2;
-				do
-				{
-					selectedSquadChangedHandler2 = selectedSquadChangedHandler;
-					selectedSquadChangedHandler = Interlocked.CompareExchange<ColonistBarSquadSupervisor.SelectedSquadChangedHandler>(ref this.SelectedSquadChanged, (ColonistBarSquadSupervisor.SelectedSquadChangedHandler)Delegate.Remove(selectedSquadChangedHandler2, value), selectedSquadChangedHandler);
-				}
-				while (selectedSquadChangedHandler != selectedSquadChangedHandler2);
-			}
-		}
+		public event ColonistBarSquadSupervisor.SelectedSquadChangedHandler SelectedSquadChanged;
 
 		public Squad SelectedSquad
 		{

@@ -31,57 +31,9 @@ namespace EdB.Interface
 
 		protected float scrollableContentHeight;
 
-		public event ListWidgetMultiSelectionChangedHandler<T> MultiSelectionChangedEvent
-		{
-			add
-			{
-				ListWidgetMultiSelectionChangedHandler<T> listWidgetMultiSelectionChangedHandler = this.MultiSelectionChangedEvent;
-				ListWidgetMultiSelectionChangedHandler<T> listWidgetMultiSelectionChangedHandler2;
-				do
-				{
-					listWidgetMultiSelectionChangedHandler2 = listWidgetMultiSelectionChangedHandler;
-					listWidgetMultiSelectionChangedHandler = Interlocked.CompareExchange<ListWidgetMultiSelectionChangedHandler<T>>(ref this.MultiSelectionChangedEvent, (ListWidgetMultiSelectionChangedHandler<T>)Delegate.Combine(listWidgetMultiSelectionChangedHandler2, value), listWidgetMultiSelectionChangedHandler);
-				}
-				while (listWidgetMultiSelectionChangedHandler != listWidgetMultiSelectionChangedHandler2);
-			}
-			remove
-			{
-				ListWidgetMultiSelectionChangedHandler<T> listWidgetMultiSelectionChangedHandler = this.MultiSelectionChangedEvent;
-				ListWidgetMultiSelectionChangedHandler<T> listWidgetMultiSelectionChangedHandler2;
-				do
-				{
-					listWidgetMultiSelectionChangedHandler2 = listWidgetMultiSelectionChangedHandler;
-					listWidgetMultiSelectionChangedHandler = Interlocked.CompareExchange<ListWidgetMultiSelectionChangedHandler<T>>(ref this.MultiSelectionChangedEvent, (ListWidgetMultiSelectionChangedHandler<T>)Delegate.Remove(listWidgetMultiSelectionChangedHandler2, value), listWidgetMultiSelectionChangedHandler);
-				}
-				while (listWidgetMultiSelectionChangedHandler != listWidgetMultiSelectionChangedHandler2);
-			}
-		}
+		public event ListWidgetMultiSelectionChangedHandler<T> MultiSelectionChangedEvent;
 
-		public event ListWidgetSingleSelectionChangedHandler<T> SingleSelectionChangedEvent
-		{
-			add
-			{
-				ListWidgetSingleSelectionChangedHandler<T> listWidgetSingleSelectionChangedHandler = this.SingleSelectionChangedEvent;
-				ListWidgetSingleSelectionChangedHandler<T> listWidgetSingleSelectionChangedHandler2;
-				do
-				{
-					listWidgetSingleSelectionChangedHandler2 = listWidgetSingleSelectionChangedHandler;
-					listWidgetSingleSelectionChangedHandler = Interlocked.CompareExchange<ListWidgetSingleSelectionChangedHandler<T>>(ref this.SingleSelectionChangedEvent, (ListWidgetSingleSelectionChangedHandler<T>)Delegate.Combine(listWidgetSingleSelectionChangedHandler2, value), listWidgetSingleSelectionChangedHandler);
-				}
-				while (listWidgetSingleSelectionChangedHandler != listWidgetSingleSelectionChangedHandler2);
-			}
-			remove
-			{
-				ListWidgetSingleSelectionChangedHandler<T> listWidgetSingleSelectionChangedHandler = this.SingleSelectionChangedEvent;
-				ListWidgetSingleSelectionChangedHandler<T> listWidgetSingleSelectionChangedHandler2;
-				do
-				{
-					listWidgetSingleSelectionChangedHandler2 = listWidgetSingleSelectionChangedHandler;
-					listWidgetSingleSelectionChangedHandler = Interlocked.CompareExchange<ListWidgetSingleSelectionChangedHandler<T>>(ref this.SingleSelectionChangedEvent, (ListWidgetSingleSelectionChangedHandler<T>)Delegate.Remove(listWidgetSingleSelectionChangedHandler2, value), listWidgetSingleSelectionChangedHandler);
-				}
-				while (listWidgetSingleSelectionChangedHandler != listWidgetSingleSelectionChangedHandler2);
-			}
-		}
+		public event ListWidgetSingleSelectionChangedHandler<T> SingleSelectionChangedEvent;
 
 		public List<int> SelectedIndices
 		{

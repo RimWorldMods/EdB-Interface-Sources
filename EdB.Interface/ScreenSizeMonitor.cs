@@ -12,31 +12,7 @@ namespace EdB.Interface
 
 		protected int height;
 
-		public event ScreenSizeMonitor.ScreenSizeChangeHandler Changed
-		{
-			add
-			{
-				ScreenSizeMonitor.ScreenSizeChangeHandler screenSizeChangeHandler = this.Changed;
-				ScreenSizeMonitor.ScreenSizeChangeHandler screenSizeChangeHandler2;
-				do
-				{
-					screenSizeChangeHandler2 = screenSizeChangeHandler;
-					screenSizeChangeHandler = Interlocked.CompareExchange<ScreenSizeMonitor.ScreenSizeChangeHandler>(ref this.Changed, (ScreenSizeMonitor.ScreenSizeChangeHandler)Delegate.Combine(screenSizeChangeHandler2, value), screenSizeChangeHandler);
-				}
-				while (screenSizeChangeHandler != screenSizeChangeHandler2);
-			}
-			remove
-			{
-				ScreenSizeMonitor.ScreenSizeChangeHandler screenSizeChangeHandler = this.Changed;
-				ScreenSizeMonitor.ScreenSizeChangeHandler screenSizeChangeHandler2;
-				do
-				{
-					screenSizeChangeHandler2 = screenSizeChangeHandler;
-					screenSizeChangeHandler = Interlocked.CompareExchange<ScreenSizeMonitor.ScreenSizeChangeHandler>(ref this.Changed, (ScreenSizeMonitor.ScreenSizeChangeHandler)Delegate.Remove(screenSizeChangeHandler2, value), screenSizeChangeHandler);
-				}
-				while (screenSizeChangeHandler != screenSizeChangeHandler2);
-			}
-		}
+		public event ScreenSizeMonitor.ScreenSizeChangeHandler Changed;
 
 		public int Width
 		{

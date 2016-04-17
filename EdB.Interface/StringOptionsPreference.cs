@@ -22,31 +22,7 @@ namespace EdB.Interface
 
 		public static float LabelMargin = StringOptionsPreference.RadioButtonWidth + StringOptionsPreference.RadioButtonMargin;
 
-		public event StringOptionsPreference.ValueChangedHandler ValueChanged
-		{
-			add
-			{
-				StringOptionsPreference.ValueChangedHandler valueChangedHandler = this.ValueChanged;
-				StringOptionsPreference.ValueChangedHandler valueChangedHandler2;
-				do
-				{
-					valueChangedHandler2 = valueChangedHandler;
-					valueChangedHandler = Interlocked.CompareExchange<StringOptionsPreference.ValueChangedHandler>(ref this.ValueChanged, (StringOptionsPreference.ValueChangedHandler)Delegate.Combine(valueChangedHandler2, value), valueChangedHandler);
-				}
-				while (valueChangedHandler != valueChangedHandler2);
-			}
-			remove
-			{
-				StringOptionsPreference.ValueChangedHandler valueChangedHandler = this.ValueChanged;
-				StringOptionsPreference.ValueChangedHandler valueChangedHandler2;
-				do
-				{
-					valueChangedHandler2 = valueChangedHandler;
-					valueChangedHandler = Interlocked.CompareExchange<StringOptionsPreference.ValueChangedHandler>(ref this.ValueChanged, (StringOptionsPreference.ValueChangedHandler)Delegate.Remove(valueChangedHandler2, value), valueChangedHandler);
-				}
-				while (valueChangedHandler != valueChangedHandler2);
-			}
-		}
+		public event StringOptionsPreference.ValueChangedHandler ValueChanged;
 
 		public abstract string Name
 		{

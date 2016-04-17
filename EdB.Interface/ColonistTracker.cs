@@ -25,57 +25,9 @@ namespace EdB.Interface
 
 		protected ThingRequest corpseThingRequest;
 
-		public event ColonistNotificationHandler ColonistChanged
-		{
-			add
-			{
-				ColonistNotificationHandler colonistNotificationHandler = this.ColonistChanged;
-				ColonistNotificationHandler colonistNotificationHandler2;
-				do
-				{
-					colonistNotificationHandler2 = colonistNotificationHandler;
-					colonistNotificationHandler = Interlocked.CompareExchange<ColonistNotificationHandler>(ref this.ColonistChanged, (ColonistNotificationHandler)Delegate.Combine(colonistNotificationHandler2, value), colonistNotificationHandler);
-				}
-				while (colonistNotificationHandler != colonistNotificationHandler2);
-			}
-			remove
-			{
-				ColonistNotificationHandler colonistNotificationHandler = this.ColonistChanged;
-				ColonistNotificationHandler colonistNotificationHandler2;
-				do
-				{
-					colonistNotificationHandler2 = colonistNotificationHandler;
-					colonistNotificationHandler = Interlocked.CompareExchange<ColonistNotificationHandler>(ref this.ColonistChanged, (ColonistNotificationHandler)Delegate.Remove(colonistNotificationHandler2, value), colonistNotificationHandler);
-				}
-				while (colonistNotificationHandler != colonistNotificationHandler2);
-			}
-		}
+		public event ColonistNotificationHandler ColonistChanged;
 
-		public event ColonistListSyncNeededHandler ColonistListSyncNeeded
-		{
-			add
-			{
-				ColonistListSyncNeededHandler colonistListSyncNeededHandler = this.ColonistListSyncNeeded;
-				ColonistListSyncNeededHandler colonistListSyncNeededHandler2;
-				do
-				{
-					colonistListSyncNeededHandler2 = colonistListSyncNeededHandler;
-					colonistListSyncNeededHandler = Interlocked.CompareExchange<ColonistListSyncNeededHandler>(ref this.ColonistListSyncNeeded, (ColonistListSyncNeededHandler)Delegate.Combine(colonistListSyncNeededHandler2, value), colonistListSyncNeededHandler);
-				}
-				while (colonistListSyncNeededHandler != colonistListSyncNeededHandler2);
-			}
-			remove
-			{
-				ColonistListSyncNeededHandler colonistListSyncNeededHandler = this.ColonistListSyncNeeded;
-				ColonistListSyncNeededHandler colonistListSyncNeededHandler2;
-				do
-				{
-					colonistListSyncNeededHandler2 = colonistListSyncNeededHandler;
-					colonistListSyncNeededHandler = Interlocked.CompareExchange<ColonistListSyncNeededHandler>(ref this.ColonistListSyncNeeded, (ColonistListSyncNeededHandler)Delegate.Remove(colonistListSyncNeededHandler2, value), colonistListSyncNeededHandler);
-				}
-				while (colonistListSyncNeededHandler != colonistListSyncNeededHandler2);
-			}
-		}
+		public event ColonistListSyncNeededHandler ColonistListSyncNeeded;
 
 		public static ColonistTracker Instance
 		{

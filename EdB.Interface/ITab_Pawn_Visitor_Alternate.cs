@@ -50,17 +50,15 @@ namespace EdB.Interface
 					TabDrawer.DrawBox(rect3);
 					Rect rect4 = rect3.ContractedBy(10f);
 					rect4.height = 28f;
-					using (IEnumerator enumerator = Enum.GetValues(typeof(PrisonerInteractionMode)).GetEnumerator())
+					IEnumerator enumerator = Enum.GetValues(typeof(PrisonerInteractionMode)).GetEnumerator();
+					while (enumerator.MoveNext())
 					{
-						while (enumerator.MoveNext())
+						PrisonerInteractionMode prisonerInteractionMode = (PrisonerInteractionMode)((byte)enumerator.Current);
+						if (WidgetDrawer.DrawLabeledRadioButton(rect4, prisonerInteractionMode.GetLabel(), base.SelPawn.guest.interactionMode == prisonerInteractionMode, true))
 						{
-							PrisonerInteractionMode prisonerInteractionMode = (PrisonerInteractionMode)((byte)enumerator.Current);
-							if (WidgetDrawer.DrawLabeledRadioButton(rect4, prisonerInteractionMode.GetLabel(), base.SelPawn.guest.interactionMode == prisonerInteractionMode, true))
-							{
-								base.SelPawn.guest.interactionMode = prisonerInteractionMode;
-							}
-							rect4.y += 28f;
+							base.SelPawn.guest.interactionMode = prisonerInteractionMode;
 						}
+						rect4.y += 28f;
 					}
 					Rect rect5 = new Rect(rect3.x, rect3.y + rect3.height + 5f, rect3.width - 4f, 28f);
 					Text.Anchor = TextAnchor.UpperRight;

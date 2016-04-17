@@ -268,13 +268,10 @@ namespace EdB.Interface
 						}
 						if (this.equipmentAssignmentFloatMenu == null)
 						{
-							InventoryTab.<DrawResources>c__AnonStoreyF <DrawResources>c__AnonStoreyF = new InventoryTab.<DrawResources>c__AnonStoreyF();
-							<DrawResources>c__AnonStoreyF.tooltipText = GenLabel.ThingLabel(current.thingDef, current.stuffDef, 1).CapitalizeFirst() + (string.IsNullOrEmpty(current.thingDef.description) ? string.Empty : ("\n\n" + current.thingDef.description));
+							string tooltipText = GenLabel.ThingLabel(current.thingDef, current.stuffDef, 1).CapitalizeFirst() + (string.IsNullOrEmpty(current.thingDef.description) ? string.Empty : ("\n\n" + current.thingDef.description));
 							if (current.availableCount > -1)
 							{
-								InventoryTab.<DrawResources>c__AnonStoreyF arg_432_0 = <DrawResources>c__AnonStoreyF;
-								string tooltipText = <DrawResources>c__AnonStoreyF.tooltipText;
-								arg_432_0.tooltipText = string.Concat(new string[]
+								tooltipText = string.Concat(new string[]
 								{
 									tooltipText,
 									"\n\n",
@@ -294,7 +291,7 @@ namespace EdB.Interface
 									})
 								});
 							}
-							TipSignal tip = new TipSignal(() => <DrawResources>c__AnonStoreyF.tooltipText, <DrawResources>c__AnonStoreyF.tooltipText.GetHashCode());
+							TipSignal tip = new TipSignal(tooltipText, tooltipText.GetHashCode());
 							TooltipHandler.TipRegion(rect, tip);
 						}
 						Text.Anchor = TextAnchor.UpperCenter;
