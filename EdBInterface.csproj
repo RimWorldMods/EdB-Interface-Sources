@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{4DBEFBF9-AD07-48E7-9302-A3B4DBEE54FC}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <OutputType>Library</OutputType>
+    <AssemblyName>EdBInterface</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp" />
+    <Reference Include="UnityEngine" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="EdB.Interface\AlertsReadoutComponent.cs" />
+    <Compile Include="EdB.Interface\AllColonistsSquad.cs" />
+    <Compile Include="EdB.Interface\ArchitectCategoryTab.cs" />
+    <Compile Include="EdB.Interface\AreaAllowedGUI.cs" />
+    <Compile Include="EdB.Interface\BeautyDrawer.cs" />
+    <Compile Include="EdB.Interface\BeautyDrawerComponent.cs" />
+    <Compile Include="EdB.Interface\BillDrawer.cs" />
+    <Compile Include="EdB.Interface\BillExtensions.cs" />
+    <Compile Include="EdB.Interface\BooleanPreference.cs" />
+    <Compile Include="EdB.Interface\Bootstrap.cs" />
+    <Compile Include="EdB.Interface\BrowseButtonDrawer.cs" />
+    <Compile Include="EdB.Interface\Button.cs" />
+    <Compile Include="EdB.Interface\ColonistBar.cs" />
+    <Compile Include="EdB.Interface\ColonistBarDrawer.cs" />
+    <Compile Include="EdB.Interface\ColonistBarGroup.cs" />
+    <Compile Include="EdB.Interface\ColonistBarSlot.cs" />
+    <Compile Include="EdB.Interface\ColonistBarSquadSupervisor.cs" />
+    <Compile Include="EdB.Interface\ColonistListSyncNeededHandler.cs" />
+    <Compile Include="EdB.Interface\ColonistNotification.cs" />
+    <Compile Include="EdB.Interface\ColonistNotificationHandler.cs" />
+    <Compile Include="EdB.Interface\ColonistNotificationType.cs" />
+    <Compile Include="EdB.Interface\ColonistRowDrawer.cs" />
+    <Compile Include="EdB.Interface\ColonistTracker.cs" />
+    <Compile Include="EdB.Interface\ColonyInfoComponent.cs" />
+    <Compile Include="EdB.Interface\ComponentAlternateMaterialSelection.cs" />
+    <Compile Include="EdB.Interface\ComponentAlternateTimeDisplay.cs" />
+    <Compile Include="EdB.Interface\ComponentColonistBar.cs" />
+    <Compile Include="EdB.Interface\ComponentColonistTracker.cs" />
+    <Compile Include="EdB.Interface\ComponentColorCodedWorkPassions.cs" />
+    <Compile Include="EdB.Interface\ComponentEmptyStockpile.cs" />
+    <Compile Include="EdB.Interface\ComponentHideMainTabs.cs" />
+    <Compile Include="EdB.Interface\ComponentInventory.cs" />
+    <Compile Include="EdB.Interface\ComponentMainTabCloseButton.cs" />
+    <Compile Include="EdB.Interface\ComponentPauseOnStart.cs" />
+    <Compile Include="EdB.Interface\ComponentSquadManager.cs" />
+    <Compile Include="EdB.Interface\ComponentTabReplacement.cs" />
+    <Compile Include="EdB.Interface\ConceptDeciderComponent.cs" />
+    <Compile Include="EdB.Interface\Controller.cs" />
+    <Compile Include="EdB.Interface\DateReadout.cs" />
+    <Compile Include="EdB.Interface\DebugToolsComponent.cs" />
+    <Compile Include="EdB.Interface\DebugWindowsOpenerComponent.cs" />
+    <Compile Include="EdB.Interface\DesignatorManagerComponent.cs" />
+    <Compile Include="EdB.Interface\Designator_ZoneAddStockpile_Resources.cs" />
+    <Compile Include="EdB.Interface\Dialog_InterfaceOptions.cs" />
+    <Compile Include="EdB.Interface\Dialog_NameSquad.cs" />
+    <Compile Include="EdB.Interface\DragBoxComponent.cs" />
+    <Compile Include="EdB.Interface\EquippableThing.cs" />
+    <Compile Include="EdB.Interface\EquippableThings.cs" />
+    <Compile Include="EdB.Interface\GizmoGridDrawer.cs" />
+    <Compile Include="EdB.Interface\GlobalControls.cs" />
+    <Compile Include="EdB.Interface\GlobalControlsComponent.cs" />
+    <Compile Include="EdB.Interface\HealthCardUtility.cs" />
+    <Compile Include="EdB.Interface\IComponentWithPreferences.cs" />
+    <Compile Include="EdB.Interface\ICustomTextureComponent.cs" />
+    <Compile Include="EdB.Interface\IInitializedComponent.cs" />
+    <Compile Include="EdB.Interface\INamedComponent.cs" />
+    <Compile Include="EdB.Interface\InspectGizmoGrid.cs" />
+    <Compile Include="EdB.Interface\InspectPaneFiller.cs" />
+    <Compile Include="EdB.Interface\IntegerOptionsPreference.cs" />
+    <Compile Include="EdB.Interface\InventoryCount.cs" />
+    <Compile Include="EdB.Interface\InventoryCounter.cs" />
+    <Compile Include="EdB.Interface\InventoryCounterDefault.cs" />
+    <Compile Include="EdB.Interface\InventoryManager.cs" />
+    <Compile Include="EdB.Interface\InventoryPreferences.cs" />
+    <Compile Include="EdB.Interface\InventoryRecord.cs" />
+    <Compile Include="EdB.Interface\InventoryRecordKey.cs" />
+    <Compile Include="EdB.Interface\InventoryResolver.cs" />
+    <Compile Include="EdB.Interface\InventoryState.cs" />
+    <Compile Include="EdB.Interface\InventoryTab.cs" />
+    <Compile Include="EdB.Interface\InventoryTab_Buildings.cs" />
+    <Compile Include="EdB.Interface\InventoryTab_Items.cs" />
+    <Compile Include="EdB.Interface\InventoryType.cs" />
+    <Compile Include="EdB.Interface\IPreference.cs" />
+    <Compile Include="EdB.Interface\IRenderedComponent.cs" />
+    <Compile Include="EdB.Interface\ITab_Art_Alternate.cs" />
+    <Compile Include="EdB.Interface\ITab_Bills_Alternate.cs" />
+    <Compile Include="EdB.Interface\ITab_Growing_Alternate.cs" />
+    <Compile Include="EdB.Interface\ITab_Pawn_Character_Alternate.cs" />
+    <Compile Include="EdB.Interface\ITab_Pawn_Character_Vanilla.cs" />
+    <Compile Include="EdB.Interface\ITab_Pawn_Gear_Alternate.cs" />
+    <Compile Include="EdB.Interface\ITab_Pawn_Gear_Vanilla.cs" />
+    <Compile Include="EdB.Interface\ITab_Pawn_Guest_Alternate.cs" />
+    <Compile Include="EdB.Interface\ITab_Pawn_Guest_Vanilla.cs" />
+    <Compile Include="EdB.Interface\ITab_Pawn_Health_Alternate.cs" />
+    <Compile Include="EdB.Interface\ITab_Pawn_Health_Vanilla.cs" />
+    <Compile Include="EdB.Interface\ITab_Pawn_Needs_Alternate.cs" />
+    <Compile Include="EdB.Interface\ITab_Pawn_Needs_Vanilla.cs" />
+    <Compile Include="EdB.Interface\ITab_Pawn_Prisoner_Alternate.cs" />
+    <Compile Include="EdB.Interface\ITab_Pawn_Prisoner_Vanilla.cs" />
+    <Compile Include="EdB.Interface\ITab_Pawn_Training_Alternate.cs" />
+    <Compile Include="EdB.Interface\ITab_Pawn_Training_Vanilla.cs" />
+    <Compile Include="EdB.Interface\ITab_Pawn_Visitor_Alternate.cs" />
+    <Compile Include="EdB.Interface\IUpdatedComponent.cs" />
+    <Compile Include="EdB.Interface\LessonsComponent.cs" />
+    <Compile Include="EdB.Interface\ListWidget.cs" />
+    <Compile Include="EdB.Interface\ListWidgetItemDrawer.cs" />
+    <Compile Include="EdB.Interface\ListWidgetLabelDrawer.cs" />
+    <Compile Include="EdB.Interface\ListWidgetMultiSelectionChangedHandler.cs" />
+    <Compile Include="EdB.Interface\ListWidgetSingleSelectionChangedHandler.cs" />
+    <Compile Include="EdB.Interface\MainMenuDrawer.cs" />
+    <Compile Include="EdB.Interface\MainTabsComponent.cs" />
+    <Compile Include="EdB.Interface\MainTabsRoot.cs" />
+    <Compile Include="EdB.Interface\MainTabWindow_Architect.cs" />
+    <Compile Include="EdB.Interface\MainTabWindow_Inspect.cs" />
+    <Compile Include="EdB.Interface\MainTabWindow_Inventory.cs" />
+    <Compile Include="EdB.Interface\MainTabWindow_Menu.cs" />
+    <Compile Include="EdB.Interface\MainTabWindow_Outfits.cs" />
+    <Compile Include="EdB.Interface\MainTabWindow_PawnListWithSquads.cs" />
+    <Compile Include="EdB.Interface\MainTabWindow_Restrictions.cs" />
+    <Compile Include="EdB.Interface\MainTabWindow_Squads.cs" />
+    <Compile Include="EdB.Interface\MainTabWindow_Work.cs" />
+    <Compile Include="EdB.Interface\MapComponentsComponent.cs" />
+    <Compile Include="EdB.Interface\MaterialResolver.cs" />
+    <Compile Include="EdB.Interface\MedicalCareUtility.cs" />
+    <Compile Include="EdB.Interface\MessagesComponent.cs" />
+    <Compile Include="EdB.Interface\MouseoverReadout.cs" />
+    <Compile Include="EdB.Interface\MouseoverReadoutComponent.cs" />
+    <Compile Include="EdB.Interface\MultipleSelectionStringOptionsPreference.cs" />
+    <Compile Include="EdB.Interface\PreferenceAlwaysShowSquadName.cs" />
+    <Compile Include="EdB.Interface\PreferenceAmPm.cs" />
+    <Compile Include="EdB.Interface\PreferenceColorCodedWorkPassions.cs" />
+    <Compile Include="EdB.Interface\PreferenceCompressedStorage.cs" />
+    <Compile Include="EdB.Interface\PreferenceEmptyStockpile.cs" />
+    <Compile Include="EdB.Interface\PreferenceEnableAlternateTimeDisplay.cs" />
+    <Compile Include="EdB.Interface\PreferenceEnabled.cs" />
+    <Compile Include="EdB.Interface\PreferenceEnableInventory.cs" />
+    <Compile Include="EdB.Interface\PreferenceEnableSquadFiltering.cs" />
+    <Compile Include="EdB.Interface\PreferenceEnableSquadRow.cs" />
+    <Compile Include="EdB.Interface\PreferenceEnableSquads.cs" />
+    <Compile Include="EdB.Interface\PreferenceEnableTabReplacement.cs" />
+    <Compile Include="EdB.Interface\PreferenceGroup.cs" />
+    <Compile Include="EdB.Interface\PreferenceHideMainTabs.cs" />
+    <Compile Include="EdB.Interface\PreferenceIncludeUnfinished.cs" />
+    <Compile Include="EdB.Interface\PreferenceMinuteInterval.cs" />
+    <Compile Include="EdB.Interface\PreferencePauseOnStart.cs" />
+    <Compile Include="EdB.Interface\PreferenceRightClickOnly.cs" />
+    <Compile Include="EdB.Interface\Preferences.cs" />
+    <Compile Include="EdB.Interface\PreferenceShowCloseButton.cs" />
+    <Compile Include="EdB.Interface\PreferenceSmallIcons.cs" />
+    <Compile Include="EdB.Interface\PreferenceTabArt.cs" />
+    <Compile Include="EdB.Interface\PreferenceTabBills.cs" />
+    <Compile Include="EdB.Interface\PreferenceTabBrowseButtons.cs" />
+    <Compile Include="EdB.Interface\PreferenceTabCharacter.cs" />
+    <Compile Include="EdB.Interface\PreferenceTabGear.cs" />
+    <Compile Include="EdB.Interface\PreferenceTabGrowing.cs" />
+    <Compile Include="EdB.Interface\PreferenceTabGuestAndPrisoner.cs" />
+    <Compile Include="EdB.Interface\PreferenceTabHealth.cs" />
+    <Compile Include="EdB.Interface\PreferenceTabNeeds.cs" />
+    <Compile Include="EdB.Interface\PreferenceTabTraining.cs" />
+    <Compile Include="EdB.Interface\ReplacementTabs.cs" />
+    <Compile Include="EdB.Interface\ResourceReadoutComponent.cs" />
+    <Compile Include="EdB.Interface\RoomOverlaysComponent.cs" />
+    <Compile Include="EdB.Interface\RoomStatsComponent.cs" />
+    <Compile Include="EdB.Interface\RoomStatsDrawer.cs" />
+    <Compile Include="EdB.Interface\ScreenSizeMonitor.cs" />
+    <Compile Include="EdB.Interface\ScrollView.cs" />
+    <Compile Include="EdB.Interface\SelectionOverlaysComponent.cs" />
+    <Compile Include="EdB.Interface\SelectorUtility.cs" />
+    <Compile Include="EdB.Interface\SkillDrawer.cs" />
+    <Compile Include="EdB.Interface\Squad.cs" />
+    <Compile Include="EdB.Interface\SquadAddedHandler.cs" />
+    <Compile Include="EdB.Interface\SquadChangedHandler.cs" />
+    <Compile Include="EdB.Interface\SquadManager.cs" />
+    <Compile Include="EdB.Interface\SquadManagerThing.cs" />
+    <Compile Include="EdB.Interface\SquadNotificationHandler.cs" />
+    <Compile Include="EdB.Interface\SquadOrderChangedHandler.cs" />
+    <Compile Include="EdB.Interface\SquadPriorities.cs" />
+    <Compile Include="EdB.Interface\SquadRemovedHandler.cs" />
+    <Compile Include="EdB.Interface\SquadShortcuts.cs" />
+    <Compile Include="EdB.Interface\StringOptionsPreference.cs" />
+    <Compile Include="EdB.Interface\TabDrawer.cs" />
+    <Compile Include="EdB.Interface\TargeterComponent.cs" />
+    <Compile Include="EdB.Interface\TexButton.cs" />
+    <Compile Include="EdB.Interface\TextureColorPair.cs" />
+    <Compile Include="EdB.Interface\ThingDefExtensions.cs" />
+    <Compile Include="EdB.Interface\ThingOverlaysComponent.cs" />
+    <Compile Include="EdB.Interface\ThingTooltipComponent.cs" />
+    <Compile Include="EdB.Interface\TrackedColonist.cs" />
+    <Compile Include="EdB.Interface\TrainingCardUtility.cs" />
+    <Compile Include="EdB.Interface\UIRoot_MapIntermediary.cs" />
+    <Compile Include="EdB.Interface\UserInterface.cs" />
+    <Compile Include="EdB.Interface\WidgetDrawer.cs" />
+    <Compile Include="EdB.Interface\WidgetsWork.cs" />
+    <Compile Include="EdB.Interface\WindowStackExtensions.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
